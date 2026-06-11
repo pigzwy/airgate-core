@@ -6,7 +6,7 @@ import { IdCard, Hash, Gauge } from 'lucide-react';
 import type {
   PluginBatchAccountInput,
   PluginBatchImportResult,
-} from '@doudou-start/airgate-theme/plugin';
+} from '../../../app/plugin-types';
 import { accountsApi } from '../../../shared/api/accounts';
 import { groupsApi } from '../../../shared/api/groups';
 import { proxiesApi } from '../../../shared/api/proxies';
@@ -189,7 +189,7 @@ export function CreateAccountModal({
 
   return (
     <CommonModal
-      className="ag-create-account-modal"
+
       footer={(
         <div className="flex w-full justify-end gap-2">
           <Button variant="secondary" onPress={handleClose}>
@@ -215,7 +215,7 @@ export function CreateAccountModal({
     >
       <Form
         id={CREATE_ACCOUNT_FORM_ID}
-        className="ag-form-scroll-safe ag-create-account-form"
+
         onSubmit={(event) => {
           event.preventDefault();
           handleSubmit();
@@ -248,7 +248,7 @@ export function CreateAccountModal({
                     <HeroTextField fullWidth isRequired={!batchMode}>
                       <Label>{t('common.name')}</Label>
                       <div className="relative">
-                        <IdCard className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                        <IdCard className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                         <Input
                           className="pl-9"
                           name="name"
@@ -264,7 +264,7 @@ export function CreateAccountModal({
 
                 {PluginAccountForm ? (
                   <section
-                    className="ag-plugin-scope border-t border-border pt-4"
+                    className="border-t border-border pt-4"
                   >
                     <PluginAccountForm
                       credentials={credentials}
@@ -290,12 +290,12 @@ export function CreateAccountModal({
                   />
                 ) : null}
 
-                <section className="ag-create-account-advanced space-y-4">
+                <section className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <HeroTextField fullWidth>
                       <Label>{t('accounts.priority_hint')}</Label>
                       <div className="relative">
-                        <Hash className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                        <Hash className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                         <Input
                           className="pl-9"
                           type="number"
@@ -314,7 +314,7 @@ export function CreateAccountModal({
                     <HeroTextField fullWidth>
                       <Label>{t('accounts.concurrency')}</Label>
                       <div className="relative">
-                        <Gauge className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                        <Gauge className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                         <Input
                           className="pl-9"
                           type="number"
@@ -366,9 +366,9 @@ export function CreateAccountModal({
                   </div>
 
                   <NativeSwitch
-                    className="ag-create-account-pool-switch"
+
                     isSelected={form.upstream_is_pool ?? false}
-                    label={<span className="text-sm text-text">{t('accounts.upstream_is_pool', '池模式')}</span>}
+                    label={<span className="text-sm text-foreground">{t('accounts.upstream_is_pool', '池模式')}</span>}
                     onChange={(checked) => setForm({ ...form, upstream_is_pool: checked })}
                   />
 
@@ -379,13 +379,13 @@ export function CreateAccountModal({
                   />
 
                   {availableGroups.length > 0 && (
-                    <div className="ag-create-account-groups">
+                    <div>
                       <Label>{t('accounts.groups')}</Label>
-                      <div className="ag-create-account-group-list">
+                      <div>
                         {availableGroups.map((group) => (
                           <Checkbox
                             key={group.id}
-                            className="ag-create-account-group-item"
+
                             isSelected={groupIds.includes(group.id)}
                             onChange={() => toggleGroup(group.id)}
                           >
@@ -395,7 +395,7 @@ export function CreateAccountModal({
                             <Checkbox.Content>
                               <span className="min-w-0">
                                 <span className="block truncate">{group.name}</span>
-                                <span className="block truncate text-[10px] text-text-tertiary">
+                                <span className="block truncate text-[10px] text-muted">
                                   {pName(group.platform)}
                                 </span>
                               </span>

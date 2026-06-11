@@ -2,6 +2,14 @@ import { Chip } from '@heroui/react';
 
 type MetricChipColor = 'default' | 'warning' | 'success' | 'accent' | 'danger';
 
+const DOLLAR_TEXT_CLASS: Record<MetricChipColor, string> = {
+  accent: 'text-accent',
+  danger: 'text-danger',
+  default: 'text-foreground',
+  success: 'text-success',
+  warning: 'text-warning',
+};
+
 export type MetricChipItem = {
   amount?: number;
   color: MetricChipColor;
@@ -25,25 +33,17 @@ function formatMetricTitleValue(item: MetricChipItem) {
 function MetricChip({ amount, color, decimals, dollarTone, highlightDollar, label, mutedWhenZero, value }: MetricChipItem) {
   const amountText = amount == null ? null : formatMoneyAmount(amount, decimals);
   const isMutedZero = mutedWhenZero && amount === 0;
-  const chipClassName = [
-    'ag-metric-chip',
-    isMutedZero ? 'ag-metric-chip--zero' : '',
-  ].filter(Boolean).join(' ');
-  const effectiveDollarTone = dollarTone ?? (highlightDollar ? 'warning' : undefined);
-  const dollarClassName = [
-    'ag-metric-dollar',
-    effectiveDollarTone ? `ag-metric-dollar--${effectiveDollarTone}` : '',
-  ].filter(Boolean).join(' ');
+  const dollarColor = dollarTone ?? (highlightDollar ? 'warning' : undefined);
 
   return (
-    <Chip className={chipClassName} color={isMutedZero ? 'default' : color} size="sm" variant="soft">
-      <span className="ag-metric-chip-label">{label}</span>
-      <span className="ag-metric-chip-value">
+    <Chip color={isMutedZero ? 'default' : color} size="sm" variant="soft">
+      <span>{label}</span>
+      <span>
         {amountText == null ? (
-          value === '∞' ? <span className="ag-metric-infinity">{value}</span> : value
+          value === '∞' ? <span>{value}</span> : value
         ) : (
           <>
-            <span className={dollarClassName}>$</span>
+            <span className={dollarColor ? DOLLAR_TEXT_CLASS[dollarColor] : undefined}>$</span>
             <span>{amountText}</span>
           </>
         )}
@@ -64,7 +64,7 @@ export function MetricChips({
     .join(' / ');
 
   return (
-    <div className={`ag-metric-chips ${className ?? ''}`} title={title}>
+    <div className={className} title={title}>
       {items.map((item, idx) => (
         <MetricChip key={`${idx}-${item.label}`} {...item} />
       ))}

@@ -38,7 +38,7 @@ function PieNameTooltip({
   if (!active || name == null || name === '') return null;
 
   return (
-    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-text shadow-lg">
+    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-foreground shadow-lg">
       {String(name)}
     </div>
   );
@@ -61,7 +61,7 @@ export function UsagePieChart({ data }: { data: UsagePieChartItem[] }) {
         dataKey="value"
         isAnimationActive={false}
         minAngle={3}
-        stroke="var(--ag-surface)"
+        stroke="var(--surface)"
         strokeWidth={2}
       >
         {data.map((_, i) => (
@@ -127,16 +127,16 @@ export function UsageTokenTrendChart({
   return (
     <ResponsiveContainer width="100%" height="100%" debounce={80} initialDimension={{ width: 800, height: 300 }}>
       <LineChart data={chartData} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
-        <CartesianGrid stroke="var(--ag-border-subtle)" vertical={false} />
+        <CartesianGrid stroke="var(--separator)" vertical={false} />
         <XAxis
           dataKey="time"
-          tick={{ fontSize: 11, fill: 'var(--ag-text-tertiary)' }}
+          tick={{ fontSize: 11, fill: 'var(--muted)' }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
           yAxisId="tokens"
-          tick={{ fontSize: 11, fill: 'var(--ag-text-tertiary)' }}
+          tick={{ fontSize: 11, fill: 'var(--muted)' }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v: number) => fmtNum(v)}
@@ -145,7 +145,7 @@ export function UsageTokenTrendChart({
           yAxisId="ratio"
           orientation="right"
           domain={[0, 100]}
-          tick={{ fontSize: 11, fill: 'var(--ag-text-tertiary)' }}
+          tick={{ fontSize: 11, fill: 'var(--muted)' }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v: number) => `${Math.round(v)}%`}
@@ -153,13 +153,13 @@ export function UsageTokenTrendChart({
         />
         <RechartsTooltip
           contentStyle={{
-            background: 'var(--ag-bg-elevated)',
-            border: '1px solid var(--ag-border)',
+            background: 'var(--overlay)',
+            border: '1px solid var(--border)',
             borderRadius: 8,
             fontSize: 12,
             padding: '8px 12px',
           }}
-          labelStyle={{ color: 'var(--ag-text)', fontWeight: 600, marginBottom: 4 }}
+          labelStyle={{ color: 'var(--foreground)', fontWeight: 600, marginBottom: 4 }}
           labelFormatter={(_label, payload) => {
             if (payload?.[0]?.payload?.rawTime) {
               return payload[0].payload.rawTime;
@@ -179,18 +179,18 @@ export function UsageTokenTrendChart({
               return (aIndex < 0 ? TOKEN_TREND_LINE_ORDER.length : aIndex) - (bIndex < 0 ? TOKEN_TREND_LINE_ORDER.length : bIndex);
             });
             return (
-              <div className="rounded-lg border border-border bg-bg-elevated p-3 text-xs shadow-lg">
-                <div className="font-semibold text-text mb-2">{d?.rawTime ?? label}</div>
+              <div className="rounded-lg border border-border bg-overlay p-3 text-xs shadow-lg">
+                <div className="font-semibold text-foreground mb-2">{d?.rawTime ?? label}</div>
                 {orderedPayload.map((entry, i) => (
                   <div key={i} className="flex items-center gap-2 py-0.5">
                     <div className="w-2.5 h-2.5 rounded-sm" style={{ background: entry.color }} />
-                    <span className="text-text-secondary">{lineLabels[String(entry.dataKey)] || String(entry.dataKey)}:</span>
-                    <span className="font-mono text-text ml-auto">
+                    <span className="text-muted">{lineLabels[String(entry.dataKey)] || String(entry.dataKey)}:</span>
+                    <span className="font-mono text-foreground ml-auto">
                       {TOKEN_TREND_RATIO_KEYS.has(String(entry.dataKey) as keyof typeof USAGE_TOKEN_COLORS) ? `${Number(entry.value).toFixed(1)}%` : fmtNum(Number(entry.value))}
                     </span>
                   </div>
                 ))}
-                <div className="border-t border-border-subtle mt-2 pt-2 text-text-secondary">
+                <div className="border-t border-separator mt-2 pt-2 text-muted">
                   Actual: <CostValue className="font-mono" value={d?.actualCost ?? 0} tone="actual" />
                   {' | '}
                   Standard: <CostValue className="font-mono" value={d?.standardCost ?? 0} tone="standard" />
@@ -202,7 +202,7 @@ export function UsageTokenTrendChart({
         <Legend
           height={24}
           content={() => (
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-1 text-[11px] text-text-tertiary">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-1 text-[11px] text-muted">
               {TOKEN_TREND_LINE_ORDER.map((key) => (
                 <span key={key} className="inline-flex items-center gap-1.5">
                   {TOKEN_TREND_RATIO_KEYS.has(key) ? (

@@ -201,28 +201,28 @@ export function BulkRefreshProgressModal({
               <div className="space-y-4">
         {/* 进度条 */}
         <div>
-          <div className="flex items-center justify-between text-xs mb-1.5" style={{ color: 'var(--ag-text-secondary)' }}>
+          <div className="flex items-center justify-between text-xs mb-1.5" style={{ color: 'var(--muted)' }}>
             <span>
               {t('accounts.bulk_refresh_progress', { done, total })}
             </span>
             <span className="font-mono">{pct}%</span>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--ag-glass-border)' }}>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
             <div
               className="h-full"
-              style={{ width: `${pct}%`, background: 'var(--ag-primary)' }}
+              style={{ width: `${pct}%`, background: 'var(--accent)' }}
             />
           </div>
         </div>
 
         {/* 汇总 */}
-        <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--ag-text-secondary)' }}>
+        <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--muted)' }}>
           <span className="inline-flex items-center gap-1">
-            <Check className="w-3.5 h-3.5" style={{ color: 'var(--ag-success)' }} />
+            <Check className="w-3.5 h-3.5" style={{ color: 'var(--success)' }} />
             {t('accounts.bulk_refresh_success_count', { count: success })}
           </span>
           <span className="inline-flex items-center gap-1">
-            <X className="w-3.5 h-3.5" style={{ color: 'var(--ag-danger)' }} />
+            <X className="w-3.5 h-3.5" style={{ color: 'var(--danger)' }} />
             {t('accounts.bulk_refresh_failed_count', { count: failed })}
           </span>
         </div>
@@ -233,24 +233,24 @@ export function BulkRefreshProgressModal({
           className="rounded-lg overflow-y-auto"
           style={{
             maxHeight: 260,
-            border: '1px solid var(--ag-glass-border)',
-            background: 'var(--ag-bg-surface)',
+            border: '1px solid var(--border)',
+            background: 'var(--surface)',
           }}
         >
           {items.map((item) => (
             <div
               key={item.id}
               className="flex items-center gap-2 px-3 py-2 text-xs"
-              style={{ borderBottom: '1px solid var(--ag-border-subtle)' }}
+              style={{ borderBottom: '1px solid var(--separator)' }}
             >
               <StatusIcon status={item.status} />
-              <span className="flex-1 truncate" style={{ color: 'var(--ag-text)' }}>
+              <span className="flex-1 truncate" style={{ color: 'var(--foreground)' }}>
                 {item.name}
               </span>
               {item.error && (
                 <span
                   className="truncate max-w-[180px]"
-                  style={{ color: 'var(--ag-danger)' }}
+                  style={{ color: 'var(--danger)' }}
                   title={item.error}
                 >
                   {item.error}
@@ -259,7 +259,7 @@ export function BulkRefreshProgressModal({
               {!item.error && item.warning && (
                 <span
                   className="truncate max-w-[180px]"
-                  style={{ color: 'var(--ag-warning)' }}
+                  style={{ color: 'var(--warning)' }}
                   title={item.warning}
                 >
                   {t('accounts.refresh_quota_reauth_warning_short', '需重新授权')}
@@ -270,7 +270,7 @@ export function BulkRefreshProgressModal({
         </div>
 
         {fatalError && (
-          <div className="text-xs" style={{ color: 'var(--ag-danger)' }}>
+          <div className="text-xs" style={{ color: 'var(--danger)' }}>
             {fatalError}
           </div>
         )}
@@ -281,16 +281,16 @@ export function BulkRefreshProgressModal({
 
 function StatusIcon({ status }: { status: ItemStatus }) {
   if (status === 'running') {
-    return <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: 'var(--ag-primary)' }} />;
+    return <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: 'var(--accent)' }} />;
   }
   if (status === 'success') {
-    return <Check className="w-3.5 h-3.5" style={{ color: 'var(--ag-success)' }} />;
+    return <Check className="w-3.5 h-3.5" style={{ color: 'var(--success)' }} />;
   }
   if (status === 'warning') {
-    return <AlertTriangle className="w-3.5 h-3.5" style={{ color: 'var(--ag-warning)' }} />;
+    return <AlertTriangle className="w-3.5 h-3.5" style={{ color: 'var(--warning)' }} />;
   }
   if (status === 'error') {
-    return <X className="w-3.5 h-3.5" style={{ color: 'var(--ag-danger)' }} />;
+    return <X className="w-3.5 h-3.5" style={{ color: 'var(--danger)' }} />;
   }
-  return <div className="w-3.5 h-3.5 rounded-full" style={{ background: 'var(--ag-glass-border)' }} />;
+  return <div className="w-3.5 h-3.5 rounded-full" style={{ background: 'var(--border)' }} />;
 }

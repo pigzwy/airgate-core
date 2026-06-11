@@ -60,11 +60,11 @@ export function CreateKeyModal({ open, groups, onClose, onSubmit, loading }: Cre
       label: (
         <div className="flex min-w-0 items-center justify-between gap-2">
           <span className="truncate">{group.name} ({group.platform})</span>
-          <span className="shrink-0 text-xs text-text-tertiary">
+          <span className="shrink-0 text-xs text-muted">
             {hasOverride ? (
               <>
                 <span className="line-through opacity-60">{group.rate_multiplier}x</span>{' '}
-                <span className="font-medium text-primary">{override}x</span>
+                <span className="font-medium text-accent">{override}x</span>
               </>
             ) : (
               <>{group.rate_multiplier}x 倍率</>
@@ -86,7 +86,7 @@ export function CreateKeyModal({ open, groups, onClose, onSubmit, loading }: Cre
 
   return (
     <CommonModal
-      className="ag-create-key-modal"
+
       footer={(
         <div className="flex w-full justify-end gap-2">
           <Button variant="secondary" onPress={handleClose}>
@@ -102,13 +102,13 @@ export function CreateKeyModal({ open, groups, onClose, onSubmit, loading }: Cre
       state={modalState}
       title={t('api_keys.create')}
     >
-      <div className="ag-form-scroll-safe">
+      <div>
         <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
           <div className="space-y-5">
             <HeroTextField fullWidth isRequired>
               <Label>{t('common.name')}</Label>
               <div className="relative">
-                <Key className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                <Key className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                 <Input
                   className="pl-9"
                   value={form.name}

@@ -26,23 +26,23 @@ export function TablePaginationFooter({
   const pageSizeItems = pageSizeOptions.map((size) => ({ id: String(size), label: String(size) }));
 
   return (
-    <Pagination className="ag-table-pagination" size="sm">
-      <Pagination.Summary className="ag-table-pagination-summary">
+    <Pagination className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted" size="sm">
+      <Pagination.Summary className="flex flex-wrap items-center gap-1">
         <span>共</span>
-        <span className="ag-table-pagination-number">{total.toLocaleString()}</span>
+        <span className="font-mono text-foreground">{total.toLocaleString()}</span>
         <span>条</span>
-        <span className="ag-table-pagination-separator" aria-hidden="true" />
+        <span className="mx-1 h-4 w-px bg-separator" aria-hidden="true" />
         <span>第</span>
-        <span className="ag-table-pagination-number">{page}</span>
+        <span className="font-mono text-foreground">{page}</span>
         <span>/</span>
-        <span className="ag-table-pagination-number">{safeTotalPages}</span>
+        <span className="font-mono text-foreground">{safeTotalPages}</span>
         <span>页</span>
         {showPageSize ? (
-          <div className="ag-table-page-size">
+          <div className="ml-2 flex items-center gap-1">
             <span>每页</span>
             <Select
               aria-label="每页数量"
-              className="ag-table-page-size-select"
+              className="min-w-16"
               selectedKey={selectedPageSize}
               onSelectionChange={(key) => {
                 if (!setPageSize || key == null) return;

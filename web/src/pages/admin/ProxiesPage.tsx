@@ -233,10 +233,10 @@ export default function ProxiesPage() {
                 rows.map((row) => (
                   <CommonTable.Row id={String(row.id)} key={row.id}>
                     <CommonTable.Cell>
-                      <span className="font-mono text-text-tertiary">{row.id}</span>
+                      <span className="font-mono text-muted">{row.id}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="text-text">{row.name}</span>
+                      <span className="text-foreground">{row.name}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <Chip color={row.protocol === 'http' ? 'accent' : 'warning'} size="sm" variant="soft">
@@ -249,13 +249,13 @@ export default function ProxiesPage() {
                       </span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="text-text-secondary">{row.username || '-'}</span>
+                      <span className="text-muted">{row.username || '-'}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <StatusChip status={row.status} />
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <div className="ag-table-row-actions flex justify-center gap-1">
+                      <div className="flex justify-center gap-1">
                         <Button
                           size="sm"
                           variant="secondary"
@@ -295,7 +295,7 @@ export default function ProxiesPage() {
         <DialogTriggerShim />
         <Modal.Backdrop>
           <Modal.Container placement="center" scroll="inside" size="md">
-            <Modal.Dialog className="ag-elevation-modal">
+            <Modal.Dialog>
               <Modal.Header>
                 <Modal.Heading>{editingProxy ? t('proxies.edit') : t('proxies.create')}</Modal.Heading>
                 <Modal.CloseTrigger />
@@ -404,7 +404,7 @@ export default function ProxiesPage() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('proxies.delete_proxy')}</AlertDialog.Heading>

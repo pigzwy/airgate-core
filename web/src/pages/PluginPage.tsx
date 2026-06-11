@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useParams } from '@tanstack/react-router';
-import type { PluginFrontendModule } from '@doudou-start/airgate-theme/plugin';
+import type { PluginFrontendModule } from '../app/plugin-types';
 import { loadPluginFrontend } from '../app/plugin-loader';
 import { ChatPageLoading, PageLoading } from '../shared/components/PageLoading';
 
@@ -61,7 +61,7 @@ export default function PluginPage({ pluginNameOverride, subPathOverride }: Plug
   if (!activeMod?.routes?.length) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-text-secondary">插件未提供页面</div>
+        <div className="text-muted">插件未提供页面</div>
       </div>
     );
   }
@@ -69,14 +69,14 @@ export default function PluginPage({ pluginNameOverride, subPathOverride }: Plug
   if (!matched) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-text-secondary">页面未找到</div>
+        <div className="text-muted">页面未找到</div>
       </div>
     );
   }
 
   const PageComponent = matched.component;
   return (
-    <div className="ag-plugin-scope h-full min-h-0">
+    <div className="h-full min-h-0">
       <PageComponent />
     </div>
   );

@@ -222,7 +222,7 @@ export function UseKeyModal({
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '560px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -233,7 +233,7 @@ export function UseKeyModal({
       {useKeyValue ? (
         useKeyPlatform ? (
           <div className="space-y-4">
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-muted">
               {t('user_keys.use_key_desc')}
             </p>
 
@@ -310,9 +310,9 @@ export function UseKeyModal({
                       {file.hint}
                     </p>
                   )}
-                  <div className="rounded-md overflow-hidden border border-glass-border">
-                    <div className="flex items-center justify-between px-3 py-1.5 bg-bg-hover border-b border-glass-border">
-                      <span className="text-xs text-text-tertiary font-mono">{file.path}</span>
+                  <div className="rounded-md overflow-hidden border border-border">
+                    <div className="flex items-center justify-between px-3 py-1.5 bg-default-hover border-b border-border">
+                      <span className="text-xs text-muted font-mono">{file.path}</span>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -322,7 +322,7 @@ export function UseKeyModal({
                         {t('user_keys.copy')}
                       </Button>
                     </div>
-                    <pre className="p-3 text-sm font-mono text-text bg-surface overflow-x-auto whitespace-pre-wrap">
+                    <pre className="p-3 text-sm font-mono text-foreground bg-surface overflow-x-auto whitespace-pre-wrap">
                       {file.content}
                     </pre>
                   </div>
@@ -331,12 +331,12 @@ export function UseKeyModal({
             )}
           </div>
         ) : (
-          <div className="rounded-md border border-glass-border bg-surface p-4 text-sm text-text-secondary">
+          <div className="rounded-md border border-border bg-surface p-4 text-sm text-muted">
             {t('user_keys.group_unbound_hint')}
           </div>
         )
       ) : (
-        <div className="flex items-center justify-center py-8 text-text-tertiary text-sm">
+        <div className="flex items-center justify-center py-8 text-muted text-sm">
           {t('common.loading')}
         </div>
       )}

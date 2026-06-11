@@ -272,8 +272,8 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-5 h-5 animate-spin text-primary" />
-        <span className="ml-2 text-sm text-text-tertiary">{t('common.loading')}</span>
+        <Loader2 className="w-5 h-5 animate-spin text-accent" />
+        <span className="ml-2 text-sm text-muted">{t('common.loading')}</span>
       </div>
     );
   }
@@ -281,8 +281,8 @@ export default function SettingsPage() {
   function renderSaveAction(left?: React.ReactNode) {
     if (activeTab === 'system') return null;
     return (
-      <div className="ag-settings-card-footer">
-        {left ? <div className="ag-settings-card-footer-left">{left}</div> : null}
+      <div>
+        {left ? <div>{left}</div> : null}
         <Button
           onPress={handleSave}
           isDisabled={!hasChanges || saveMutation.isPending}
@@ -329,7 +329,7 @@ export default function SettingsPage() {
     <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex flex-col gap-6 min-h-screen">
       <div className="mx-auto w-full max-w-full overflow-x-auto hide-scrollbar pb-1">
         <Tabs
-          className="ag-page-tabs ag-settings-tabs whitespace-nowrap"
+          className="whitespace-nowrap"
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as TabKey)}
         >
@@ -388,7 +388,7 @@ export default function SettingsPage() {
               <Card.Title>{t('settings.tab_security')}</Card.Title>
             </Card.Header>
             <Card.Content>
-              <div className="ag-settings-section-stack">
+              <div>
                 <SecurityPanel />
 
                 <SettingsSection title={t('settings.registration_auth')}>
@@ -398,8 +398,8 @@ export default function SettingsPage() {
                         isSelected={boolVal('registration_enabled')}
                         label={(
                           <>
-                            <span className="text-sm font-medium text-text">{t('settings.registration_enabled')}</span>
-                            <span className="block text-xs text-text-tertiary">{t('settings.registration_enabled_desc')}</span>
+                            <span className="text-sm font-medium text-foreground">{t('settings.registration_enabled')}</span>
+                            <span className="block text-xs text-muted">{t('settings.registration_enabled_desc')}</span>
                           </>
                         )}
                         onChange={(v) => set('registration_enabled', String(v))}
@@ -409,8 +409,8 @@ export default function SettingsPage() {
                         isSelected={boolVal('email_verify_enabled')}
                         label={(
                           <>
-                            <span className="text-sm font-medium text-text">{t('settings.email_verify_enabled')}</span>
-                            <span className="block text-xs text-text-tertiary">
+                            <span className="text-sm font-medium text-foreground">{t('settings.email_verify_enabled')}</span>
+                            <span className="block text-xs text-muted">
                               {val('smtp_host') ? t('settings.email_verify_enabled_desc') : t('settings.email_verify_no_smtp')}
                             </span>
                           </>
@@ -474,7 +474,7 @@ export default function SettingsPage() {
               </Button>
             </Card.Header>
             <Card.Content>
-              <div className="ag-settings-section-stack">
+              <div>
                 <SettingsSection title={t('settings.smtp_config')}>
                   <Form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -505,8 +505,8 @@ export default function SettingsPage() {
                       isSelected={boolVal('smtp_use_tls')}
                       label={(
                         <>
-                          <span className="text-sm font-medium text-text">{t('settings.smtp_use_tls')}</span>
-                          <span className="block text-xs text-text-tertiary">{t('settings.smtp_use_tls_desc')}</span>
+                          <span className="text-sm font-medium text-foreground">{t('settings.smtp_use_tls')}</span>
+                          <span className="block text-xs text-muted">{t('settings.smtp_use_tls_desc')}</span>
                         </>
                       )}
                       onChange={(v) => set('smtp_use_tls', String(v))}
@@ -517,7 +517,6 @@ export default function SettingsPage() {
                 <SettingsSection
                   action={(
                     <Tabs
-                      className="ag-page-tabs ag-page-tabs-compact"
                       selectedKey={emailTplType}
                       onSelectionChange={(key) => setEmailTplType(key as 'verify' | 'balance_alert')}
                     >
@@ -752,22 +751,22 @@ function SecurityPanel() {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center py-4 text-text-tertiary text-sm">
+          <div className="flex items-center py-4 text-muted text-sm">
             <Loader2 className="w-4 h-4 animate-spin mr-2" />
             {t('common.loading')}
           </div>
         ) : (
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <div className="text-[12px] text-text-tertiary mb-1.5">
+              <div className="text-[12px] text-muted mb-1.5">
                 {t('settings.security_admin_key_current')}
               </div>
               {hasKey ? (
-                <code className="inline-block px-2.5 py-1.5 rounded-md bg-surface border border-glass-border text-[13px] font-mono text-text break-all">
+                <code className="inline-block px-2.5 py-1.5 rounded-md bg-surface border border-border text-[13px] font-mono text-foreground break-all">
                   {data!.hint}
                 </code>
               ) : (
-                <span className="text-[13px] text-text-tertiary">
+                <span className="text-[13px] text-muted">
                   {t('settings.security_admin_key_none')}
                 </span>
               )}
@@ -818,7 +817,7 @@ function SecurityPanel() {
         <Modal.Backdrop>
           <Modal.Container placement="center" scroll="inside" size="md">
             <Modal.Dialog
-              className="ag-elevation-modal"
+
               style={{ maxWidth: '520px', width: 'min(100%, calc(100vw - 2rem))' }}
             >
               <Modal.Header>
@@ -833,7 +832,7 @@ function SecurityPanel() {
                     </Alert.Content>
                   </Alert>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-surface border border-glass-border text-[13px] font-mono text-text break-all">
+                    <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-surface border border-border text-[13px] font-mono text-foreground break-all">
                       {plainKey}
                     </code>
                     <Button
@@ -866,7 +865,7 @@ function SecurityPanel() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('settings.security_admin_key_regenerate_confirm_title')}</AlertDialog.Heading>
@@ -895,7 +894,7 @@ function SecurityPanel() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('settings.security_admin_key_delete_confirm_title')}</AlertDialog.Heading>
@@ -964,10 +963,10 @@ function EmailTemplateEditor({
   return (
     <>
       <div className="space-y-4">
-        <div className="text-[11px] text-text-tertiary space-x-3">
+        <div className="text-[11px] text-muted space-x-3">
           <span>{t('settings.template_vars')}:</span>
           {variables.map((v) => (
-            <code key={v.name} className="px-1.5 py-0.5 rounded bg-surface border border-glass-border text-primary">{`{{${v.name}}}`}</code>
+            <code key={v.name} className="px-1.5 py-0.5 rounded bg-surface border border-border text-accent">{`{{${v.name}}}`}</code>
           ))}
         </div>
         <Field label={t('settings.template_subject')}>
@@ -988,7 +987,7 @@ function EmailTemplateEditor({
           <Modal.Backdrop>
             <Modal.Container placement="center" scroll="inside" size="lg">
               <Modal.Dialog
-                className="ag-elevation-modal"
+
                 style={{ maxWidth: '820px', width: 'min(100%, calc(100vw - 2rem))' }}
               >
                 <Modal.Header>
@@ -996,19 +995,19 @@ function EmailTemplateEditor({
                   <Modal.CloseTrigger />
                 </Modal.Header>
                 <Modal.Body>
-                  <div className="overflow-hidden rounded-xl border border-glass-border bg-overlay shadow-sm">
-                    <div className="space-y-0.5 border-b border-glass-border bg-bg-hover/50 px-4 py-2.5 text-[11px]">
+                  <div className="overflow-hidden rounded-xl border border-border bg-overlay shadow-sm">
+                    <div className="space-y-0.5 border-b border-border bg-default-hover/50 px-4 py-2.5 text-[11px]">
                       <div className="flex gap-2">
-                        <span className="w-8 shrink-0 text-text-tertiary">From</span>
-                        <span className="text-text-secondary">{siteName}</span>
+                        <span className="w-8 shrink-0 text-muted">From</span>
+                        <span className="text-muted">{siteName}</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-8 shrink-0 text-text-tertiary">To</span>
-                        <span className="text-text-secondary">user@example.com</span>
+                        <span className="w-8 shrink-0 text-muted">To</span>
+                        <span className="text-muted">user@example.com</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="w-8 shrink-0 text-text-tertiary">Sub</span>
-                        <span className="font-medium text-text">{replaceVars(subject)}</span>
+                        <span className="w-8 shrink-0 text-muted">Sub</span>
+                        <span className="font-medium text-foreground">{replaceVars(subject)}</span>
                       </div>
                     </div>
                     <div className="max-h-[60vh] overflow-y-auto bg-[#f8f9fa] p-5">
@@ -1121,15 +1120,15 @@ function StoragePanel({
             isSelected={boolVal('s3_use_ssl')}
             label={(
               <>
-                <span className="text-sm font-medium text-text">{t('settings.s3_use_ssl')}</span>
-                <span className="block text-xs text-text-tertiary">{t('settings.s3_use_ssl_desc')}</span>
+                <span className="text-sm font-medium text-foreground">{t('settings.s3_use_ssl')}</span>
+                <span className="block text-xs text-muted">{t('settings.s3_use_ssl_desc')}</span>
               </>
             )}
             onChange={(v) => set('s3_use_ssl', String(v))}
           />
           <div className="col-span-1 md:col-span-2 pt-2 border-t border-border">
-            <div className="text-sm font-medium text-text">{t('settings.asset_retention_section')}</div>
-            <div className="mt-1 text-xs text-text-tertiary">{t('settings.asset_retention_section_hint')}</div>
+            <div className="text-sm font-medium text-foreground">{t('settings.asset_retention_section')}</div>
+            <div className="mt-1 text-xs text-muted">{t('settings.asset_retention_section_hint')}</div>
           </div>
           <Field label={t('settings.asset_retention_generated_days')} hint={t('settings.asset_retention_generated_days_hint')}>
             <Input
@@ -1200,18 +1199,18 @@ function OpenClawPanel({
         <Card.Title>{t('settings.tab_openclaw')}</Card.Title>
       </Card.Header>
       <Card.Content>
-        <div className="ag-settings-section-stack">
+        <div>
           <SettingsSection
             description={t('settings.openclaw_quickstart_desc')}
             title={t('settings.openclaw_quickstart')}
           >
             <div className="space-y-4">
               <div className="space-y-2">
-                <div className="text-sm font-medium text-text">
+                <div className="text-sm font-medium text-foreground">
                   {t('settings.openclaw_install_tab_unix')}
                 </div>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-surface border border-glass-border text-[12px] font-mono text-text break-all">
+                  <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-surface border border-border text-[12px] font-mono text-foreground break-all">
                     {installCommandBash}
                   </code>
                   <Button
@@ -1227,11 +1226,11 @@ function OpenClawPanel({
               </div>
 
               <div className="space-y-2">
-                <div className="text-sm font-medium text-text">
+                <div className="text-sm font-medium text-foreground">
                   {t('settings.openclaw_install_tab_windows')}
                 </div>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-surface border border-glass-border text-[12px] font-mono text-text break-all">
+                  <code className="flex-1 min-w-0 px-3 py-2 rounded-md bg-surface border border-border text-[12px] font-mono text-foreground break-all">
                     {installCommandPowerShell}
                   </code>
                   <Button
@@ -1247,7 +1246,7 @@ function OpenClawPanel({
               </div>
             </div>
             {usingFallbackOrigin && (
-              <p className="text-[11px] text-text-tertiary mt-2">
+              <p className="text-[11px] text-muted mt-2">
                 {t('settings.openclaw_base_url_missing_hint')}
               </p>
             )}
@@ -1260,8 +1259,8 @@ function OpenClawPanel({
                 isSelected={enabled}
                 label={(
                   <>
-                    <span className="text-sm font-medium text-text">{t('settings.openclaw_enabled')}</span>
-                    <span className="block text-xs text-text-tertiary">{t('settings.openclaw_enabled_desc')}</span>
+                    <span className="text-sm font-medium text-foreground">{t('settings.openclaw_enabled')}</span>
+                    <span className="block text-xs text-muted">{t('settings.openclaw_enabled_desc')}</span>
                   </>
                 )}
                 onChange={(v) => set('openclaw.enabled', String(v))}
@@ -1290,8 +1289,8 @@ function OpenClawPanel({
                 isSelected={boolVal('openclaw.memory_search_enabled')}
                 label={(
                   <>
-                    <span className="text-sm font-medium text-text">{t('settings.openclaw_memory_search_enabled')}</span>
-                    <span className="block text-xs text-text-tertiary">{t('settings.openclaw_memory_search_enabled_desc')}</span>
+                    <span className="text-sm font-medium text-foreground">{t('settings.openclaw_memory_search_enabled')}</span>
+                    <span className="block text-xs text-muted">{t('settings.openclaw_memory_search_enabled_desc')}</span>
                   </>
                 )}
                 onChange={(v) => set('openclaw.memory_search_enabled', String(v))}
@@ -1422,17 +1421,17 @@ function SettingsSection({
   title: React.ReactNode;
 }) {
   return (
-    <section className="ag-settings-section">
-      <div className="ag-settings-section-heading">
+    <section>
+      <div>
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-text">{title}</h3>
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
           {description ? (
-            <p className="mt-1 text-[12px] leading-5 text-text-tertiary">{description}</p>
+            <p className="mt-1 text-[12px] leading-5 text-muted">{description}</p>
           ) : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
-      <div className="ag-settings-section-body">{children}</div>
+      <div>{children}</div>
     </section>
   );
 }
@@ -1450,11 +1449,11 @@ function Field({
 }) {
   return (
     <div className={`flex flex-col ${className}`}>
-      <Label className="block text-[13px] font-medium text-text-secondary mb-1.5">
+      <Label className="block text-[13px] font-medium text-muted mb-1.5">
         {label}
       </Label>
       {children}
-      {hint && <p className="text-[11px] text-text-tertiary mt-1">{hint}</p>}
+      {hint && <p className="text-[11px] text-muted mt-1">{hint}</p>}
     </div>
   );
 }

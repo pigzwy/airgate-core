@@ -33,7 +33,7 @@ export interface UsageColumnConfig<T extends UsageRow = UsageRow> {
   render: (row: T) => ReactNode;
 }
 
-const RICH_TOOLTIP_TRIGGER_CLASS = 'flex h-full w-full cursor-default items-center justify-center rounded-[var(--radius)] px-1.5 py-0 text-center transition-colors hover:bg-bg-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+const RICH_TOOLTIP_TRIGGER_CLASS = 'flex h-full w-full cursor-default items-center justify-center rounded-[var(--radius)] px-1.5 py-0 text-center transition-colors hover:bg-default-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 const RICH_TOOLTIP_OPEN_DELAY_MS = 140;
 
 function RichTooltip({
@@ -74,8 +74,8 @@ function TooltipPanel({
   return (
     <div className="overflow-hidden rounded-[var(--radius)]">
       <div className="border-b border-border bg-default px-2.5 py-1.5">
-        <div className="text-sm font-semibold leading-none text-text">{title}</div>
-        {subtitle ? <div className="mt-1 truncate text-xs text-text-tertiary">{subtitle}</div> : null}
+        <div className="text-sm font-semibold leading-none text-foreground">{title}</div>
+        {subtitle ? <div className="mt-1 truncate text-xs text-muted">{subtitle}</div> : null}
       </div>
       <div className="space-y-0.5 p-2">{children}</div>
     </div>
@@ -98,16 +98,16 @@ function TooltipRow({
     : tone === 'warning'
       ? 'text-warning'
       : tone === 'info'
-        ? 'text-info'
+        ? 'text-accent'
         : tone === 'accent'
-          ? 'text-primary'
+          ? 'text-accent'
           : tone === 'strong'
-            ? 'text-text'
-            : 'text-text-secondary';
+            ? 'text-foreground'
+            : 'text-muted';
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(7rem,max-content)] items-center gap-3 rounded-[var(--radius)] bg-surface px-2 py-1 text-xs">
-      <span className="min-w-0 truncate text-text-tertiary">{label}</span>
+      <span className="min-w-0 truncate text-muted">{label}</span>
       <span
         className={`min-w-0 max-w-[12rem] justify-self-end truncate text-right font-mono font-medium ${toneClass}`}
         style={color ? { color } : undefined}
@@ -149,7 +149,7 @@ function MetaChip({
 }) {
   return (
     <span
-      className={`${MODEL_META_SLOT_WIDTH_CLASS} ${dotColor ? 'ag-usage-image-size-chip' : ''} inline-flex h-4 shrink-0 items-center justify-center truncate rounded px-1.5 text-[12px] font-semibold leading-none whitespace-nowrap`}
+      className={`${MODEL_META_SLOT_WIDTH_CLASS} inline-flex h-4 shrink-0 items-center justify-center gap-1 truncate rounded px-1.5 text-[12px] font-semibold leading-none whitespace-nowrap`}
       style={{
         background: `color-mix(in srgb, ${color} 18%, transparent)`,
         boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color} 34%, transparent)`,
@@ -159,7 +159,7 @@ function MetaChip({
     >
       {dotColor ? (
         <span
-          className="ag-usage-image-size-dot"
+          className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
           aria-hidden="true"
           style={{ backgroundColor: dotColor }}
         />
@@ -308,7 +308,7 @@ function metricColor(metric: UsageMetric, index: number): string | undefined {
   if (key.includes('output')) return USAGE_TOKEN_COLORS.output;
   if (key.includes('cache_read') || key.includes('cached_input')) return USAGE_TOKEN_COLORS.cacheRead;
   if (key.includes('cache_creation')) return USAGE_TOKEN_COLORS.cacheCreation;
-  if (metric.kind === 'image') return 'var(--ag-success)';
+  if (metric.kind === 'image') return 'var(--success)';
   return [USAGE_TOKEN_COLORS.input, USAGE_TOKEN_COLORS.output, USAGE_TOKEN_COLORS.cacheRead, USAGE_TOKEN_COLORS.cacheCreation][index % 4];
 }
 
@@ -481,11 +481,11 @@ function buildResellerCostColumn(t: TFunction, adminView: boolean): UsageColumnC
         >
           <div className="flex w-full flex-col items-center font-mono text-center text-xs">
             {row.sell_rate > 0 && row.billed_cost !== row.actual_cost ? (
-              <div className="text-[15px] font-semibold leading-none text-text">
+              <div className="text-[15px] font-semibold leading-none text-foreground">
                 <CostValue value={row.billed_cost} decimals={6} tone="warning" />
               </div>
             ) : (
-              <div className="text-[15px] font-semibold leading-none text-text">
+              <div className="text-[15px] font-semibold leading-none text-foreground">
                 <CostValue value={row.actual_cost} decimals={6} tone="warning" />
               </div>
             )}
@@ -514,7 +514,7 @@ function buildCustomerCostColumn(t: TFunction): UsageColumnConfig<UsageRow> {
           )}
         >
           <div className="flex w-full flex-col items-center font-mono text-center text-xs">
-            <div className="text-[15px] font-semibold leading-none text-text">
+            <div className="text-[15px] font-semibold leading-none text-foreground">
               <CostValue value={cost} decimals={6} tone="warning" />
             </div>
           </div>
@@ -554,10 +554,10 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
 
         return (
           <div className="flex min-w-0 items-center gap-1.5 font-mono text-xs" title={fullLabel}>
-            <span className="shrink-0 font-mono text-[13px] font-medium text-text">
+            <span className="shrink-0 font-mono text-[13px] font-medium text-foreground">
               {timeLabel}
             </span>
-            <span className="hidden shrink-0 text-text-tertiary xl:inline">
+            <span className="hidden shrink-0 text-muted xl:inline">
               {dateLabel}
             </span>
           </div>
@@ -606,7 +606,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
 
         return (
           <div className="grid w-full min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-2 text-left">
-            <div className={`ag-usage-model-meta-slot ${MODEL_META_SLOT_WIDTH_CLASS} flex h-4 shrink-0 items-center justify-center overflow-hidden`}>
+            <div className={`${MODEL_META_SLOT_WIDTH_CLASS} flex h-4 shrink-0 items-center justify-center overflow-hidden`}>
               {PluginUsageModelMeta ? (
                 <PluginUsageModelMeta
                   recordId={row.id}
@@ -614,7 +614,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
                 />
               ) : fallbackMeta}
             </div>
-            <span className="min-w-0 truncate text-sm font-medium leading-none text-text" title={row.model}>
+            <span className="min-w-0 truncate text-sm font-medium leading-none text-foreground" title={row.model}>
               {row.model}
             </span>
           </div>
@@ -654,7 +654,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
             )}
           >
             {tokenSummaryVisible ? (
-              <div className="mx-auto grid h-full max-h-[var(--ag-usage-table-row-height)] grid-cols-[minmax(0,8.75rem)_4.75rem] items-center justify-center gap-2 overflow-visible px-1">
+              <div className="mx-auto grid h-full max-h-10 grid-cols-[minmax(0,8.75rem)_4.75rem] items-center justify-center gap-2 overflow-visible px-1">
                 <div className="grid min-w-0 grid-cols-2 gap-x-2 gap-y-px">
                   <TokenRow
                     color={USAGE_TOKEN_COLORS.input}
@@ -685,16 +685,16 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
                     </>
                   ) : null}
                 </div>
-                <div className="w-[4.75rem] text-center font-mono text-base font-semibold tabular-nums leading-none text-text">
+                <div className="w-[4.75rem] text-center font-mono text-base font-semibold tabular-nums leading-none text-foreground">
                   {fmtNum(total)}
                 </div>
               </div>
             ) : (
               <div className="flex h-full min-w-0 flex-col items-center justify-center px-2 text-center">
-                <span className="max-w-full truncate text-[11px] leading-none text-text-tertiary" title={primaryMetric?.label || primaryMetric?.key}>
+                <span className="max-w-full truncate text-[11px] leading-none text-muted" title={primaryMetric?.label || primaryMetric?.key}>
                   {primaryMetric?.label || primaryMetric?.key || '-'}
                 </span>
-                <span className="mt-1 max-w-full truncate font-mono text-sm font-semibold leading-none text-text">
+                <span className="mt-1 max-w-full truncate font-mono text-sm font-semibold leading-none text-foreground">
                   {primaryMetric ? formatMetricValue(primaryMetric) : '-'}
                 </span>
               </div>
@@ -711,7 +711,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
       hideOnMobile: true,
       render: (row) => (
         <span
-          className="inline-flex h-6 min-w-0 items-center justify-center rounded-[var(--radius)] px-1.5 text-[13px] font-medium leading-none text-text-secondary"
+          className="inline-flex h-6 min-w-0 items-center justify-center rounded-[var(--radius)] px-1.5 text-[13px] font-medium leading-none text-muted"
           style={row.stream ? STREAM_CHIP_STYLE : undefined}
         >
           {row.stream ? t('usage.type_stream') : t('usage.type_sync')}
@@ -724,7 +724,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
       width: '78px',
       hideOnMobile: true,
       render: (row) => (
-        <span className="block text-center font-mono text-[13px] text-text-secondary">
+        <span className="block text-center font-mono text-[13px] text-muted">
           {row.first_token_ms > 0 ? (row.first_token_ms >= 1000 ? `${(row.first_token_ms / 1000).toFixed(2)}s` : `${row.first_token_ms}ms`) : '-'}
         </span>
       ),
@@ -735,7 +735,7 @@ export function useUsageColumns(opts?: { customerScope?: boolean; adminView?: bo
       width: '76px',
       hideOnMobile: true,
       render: (row) => (
-        <span className="block text-center font-mono text-[13px] text-text-secondary">
+        <span className="block text-center font-mono text-[13px] text-muted">
           {row.duration_ms >= 1000 ? `${(row.duration_ms / 1000).toFixed(2)}s` : `${row.duration_ms}ms`}
         </span>
       ),

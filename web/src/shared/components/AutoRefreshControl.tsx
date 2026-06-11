@@ -166,7 +166,7 @@ export const AutoRefreshControl = memo(function AutoRefreshControl({
       </Button>
       <Dropdown>
         <Dropdown.Trigger
-          className={`ag-account-auto-refresh-trigger button button--sm ${enabled ? 'button--secondary' : 'button--ghost'} h-8 min-w-[7.5rem] whitespace-nowrap px-3`}
+          className={`button button--sm ${enabled ? 'button--secondary' : 'button--ghost'} h-8 min-w-[7.5rem] whitespace-nowrap px-3`}
         >
           <span>{currentLabel}</span>
           <ChevronDown className="h-3 w-3 shrink-0" />
@@ -186,7 +186,7 @@ export const AutoRefreshControl = memo(function AutoRefreshControl({
                 <Dropdown.Item key={`auto_${seconds}`} id={`auto_${seconds}`} textValue={itemLabel}>
                   <span className="flex items-center justify-between gap-6">
                     <span>{itemLabel}</span>
-                    {value === seconds ? <Check className="h-3.5 w-3.5 text-primary" /> : null}
+                    {value === seconds ? <Check className="h-3.5 w-3.5 text-accent" /> : null}
                   </span>
                 </Dropdown.Item>
               );

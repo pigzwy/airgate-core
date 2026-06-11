@@ -12,7 +12,7 @@ export const USAGE_TOKEN_COLORS = {
   input: '#10b981',
   output: '#0ea5e9',
   cacheCreation: '#f59e0b',
-  cacheRead: 'var(--ag-muted)',
+  cacheRead: 'var(--muted)',
   cacheRatio: '#c084fc',
   cacheCumulativeRatio: 'var(--success)',
 } as const;
@@ -31,5 +31,18 @@ export const PIE_CHART_COLORS = [
   'oklch(66% 0.085 48)',
 ] as const;
 
-/** 头像颜色池（引用 SDK 装饰色） */
-export { decorativePalette as AVATAR_COLORS } from '@doudou-start/airgate-theme';
+/** 头像颜色池 */
+export const AVATAR_COLORS = [
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#06b6d4',
+  '#ec4899',
+  '#84cc16',
+  '#f97316',
+  '#6366f1',
+  '#0d9488',
+  '#a855f7',
+] as const;

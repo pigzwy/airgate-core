@@ -18,7 +18,7 @@ export interface PluginBreadcrumbsProps {
 
 function Separator() {
   return (
-    <span aria-hidden="true" className="shrink-0 px-0.5 text-text-tertiary opacity-45">
+    <span aria-hidden="true" className="shrink-0 px-0.5 text-muted opacity-45">
       /
     </span>
   );
@@ -42,7 +42,7 @@ export function PluginBreadcrumbs({
   const { t } = useTranslation();
   const navRef = useRef<HTMLElement | null>(null);
   const [isCompact, setIsCompact] = useState(false);
-  const rootClassName = `ag-plugin-breadcrumbs flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden whitespace-nowrap text-sm ${className ?? ''}`;
+  const rootClassName = `flex min-w-0 max-w-full flex-1 items-center gap-1.5 overflow-hidden whitespace-nowrap text-sm ${className ?? ''}`;
   const shortPluginName = pluginName ? pluginShortName(pluginName) : undefined;
   const displayPluginName = shortPluginName
     ? t('plugin_shell.plugin_workbench', {
@@ -79,7 +79,7 @@ export function PluginBreadcrumbs({
       className={rootClassName}
     >
       {items.length === 0 && showWorkbench && (
-        <span className="ag-plugin-breadcrumb-workbench max-w-48 shrink-0 truncate px-1 py-1 font-mono text-[11px] leading-5 text-text-tertiary">
+        <span className="max-w-48 shrink-0 truncate px-1 py-1 font-mono text-[11px] leading-5 text-muted">
           {displayPluginName}
         </span>
       )}
@@ -99,24 +99,24 @@ export function PluginBreadcrumbs({
               <Link
                 to={item.to}
                 preload={false}
-                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-muted transition-colors hover:bg-default-hover hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 {label}
               </Link>
             ) : item.href && !isLast ? (
               <a
                 href={item.href}
-                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-text-tertiary no-underline transition-colors hover:bg-bg-hover hover:text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="shrink-0 rounded-[var(--radius)] px-1.5 py-1 text-muted no-underline transition-colors hover:bg-default-hover hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 {label}
               </a>
             ) : (
-              <span aria-current="page" className="min-w-0 truncate px-1 py-1 font-medium text-text">
+              <span aria-current="page" className="min-w-0 truncate px-1 py-1 font-medium text-foreground">
                 {label}
               </span>
             )}
             {isLast && showWorkbench && (
-              <span className="ag-plugin-breadcrumb-workbench max-w-48 shrink-0 truncate px-0.5 py-1 font-mono text-[11px] leading-5 text-text-tertiary">
+              <span className="max-w-48 shrink-0 truncate px-0.5 py-1 font-mono text-[11px] leading-5 text-muted">
                 {displayPluginName}
               </span>
             )}

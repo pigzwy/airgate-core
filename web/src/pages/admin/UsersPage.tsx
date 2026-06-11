@@ -125,7 +125,7 @@ export default function UsersPage() {
         <div className="w-full sm:w-48">
           <HeroTextField fullWidth aria-label={t('users.search_placeholder')}>
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
               <Input
                 className="pl-9"
                 placeholder={t('users.search_placeholder')}
@@ -162,7 +162,7 @@ export default function UsersPage() {
         </div>
         <div className="flex items-center gap-2 sm:ml-auto">
           {isFetching ? (
-            <RefreshCw className="w-4 h-4 text-text-tertiary animate-spin" />
+            <RefreshCw className="w-4 h-4 text-muted animate-spin" />
           ) : (
             <Button
               isIconOnly
@@ -222,7 +222,7 @@ export default function UsersPage() {
                 rows.map((row) => (
                   <CommonTable.Row id={String(row.id)} key={row.id}>
                     <CommonTable.Cell>
-                      <span className="text-text-tertiary font-mono">{row.id}</span>
+                      <span className="text-muted font-mono">{row.id}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <div className="flex items-center gap-2.5">
@@ -232,11 +232,11 @@ export default function UsersPage() {
                         >
                           {(row.email[0] ?? '?').toUpperCase()}
                         </div>
-                        <span className="text-text truncate">{row.email}</span>
+                        <span className="text-foreground truncate">{row.email}</span>
                       </div>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="text-text-secondary">{row.username || '-'}</span>
+                      <span className="text-muted">{row.username || '-'}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <Chip color={row.role === 'admin' ? 'accent' : 'default'} size="sm" variant="soft">
@@ -252,7 +252,7 @@ export default function UsersPage() {
                         isDisabled={row.role === 'admin'}
                         isSelected={row.status === 'active'}
                         contentClassName="text-xs"
-                        contentStyle={{ color: row.status === 'active' ? 'var(--ag-success)' : 'var(--ag-text-tertiary)' }}
+                        contentStyle={{ color: row.status === 'active' ? 'var(--success)' : 'var(--muted)' }}
                         label={row.status === 'active' ? t('status.enabled') : t('status.disabled')}
                         onChange={(isSelected) => {
                           if (isSelected) {
@@ -264,10 +264,10 @@ export default function UsersPage() {
                       />
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="text-xs text-text-secondary">{formatDateTime(row.created_at)}</span>
+                      <span className="text-xs text-muted">{formatDateTime(row.created_at)}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <div className="ag-table-row-actions flex items-center justify-center gap-0.5">
+                      <div className="flex items-center justify-center gap-0.5">
                         <Button
                           isIconOnly
                           size="sm"
@@ -280,7 +280,7 @@ export default function UsersPage() {
                         <Dropdown>
                           <Dropdown.Trigger
                             aria-label={t('common.more')}
-                            className="ag-table-row-more-trigger button button--icon-only button--sm button--secondary"
+                            className="button button--icon-only button--sm button--secondary"
                           >
                             <MoreHorizontal className="w-3.5 h-3.5" />
                           </Dropdown.Trigger>
@@ -312,31 +312,31 @@ export default function UsersPage() {
                             >
                               <Dropdown.Item id="api_keys" textValue={t('users.api_keys')}>
                                 <span className="flex items-center gap-2">
-                                  <Key className="w-3.5 h-3.5" style={{ color: 'var(--ag-primary)' }} />
+                                  <Key className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                                   {t('users.api_keys')}
                                 </span>
                               </Dropdown.Item>
                               <Dropdown.Item id="groups" textValue={t('users.groups')}>
                                 <span className="flex items-center gap-2">
-                                  <Users className="w-3.5 h-3.5" style={{ color: 'var(--ag-info)' }} />
+                                  <Users className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                                   {t('users.groups')}
                                 </span>
                               </Dropdown.Item>
                               <Dropdown.Item id="topup" textValue={t('users.topup')}>
                                 <span className="flex items-center gap-2">
-                                  <PlusCircle className="w-3.5 h-3.5" style={{ color: 'var(--ag-success)' }} />
+                                  <PlusCircle className="w-3.5 h-3.5" style={{ color: 'var(--success)' }} />
                                   {t('users.topup')}
                                 </span>
                               </Dropdown.Item>
                               <Dropdown.Item id="refund" textValue={t('users.refund')}>
                                 <span className="flex items-center gap-2">
-                                  <MinusCircle className="w-3.5 h-3.5" style={{ color: 'var(--ag-warning)' }} />
+                                  <MinusCircle className="w-3.5 h-3.5" style={{ color: 'var(--warning)' }} />
                                   {t('users.refund')}
                                 </span>
                               </Dropdown.Item>
                               <Dropdown.Item id="balance_history" textValue={t('users.balance_history')}>
                                 <span className="flex items-center gap-2">
-                                  <Clock className="w-3.5 h-3.5" style={{ color: 'var(--ag-text-tertiary)' }} />
+                                  <Clock className="w-3.5 h-3.5" style={{ color: 'var(--muted)' }} />
                                   {t('users.balance_history')}
                                 </span>
                               </Dropdown.Item>
@@ -397,7 +397,7 @@ export default function UsersPage() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('users.disable_title')}</AlertDialog.Heading>
@@ -431,7 +431,7 @@ export default function UsersPage() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('users.delete_title')}</AlertDialog.Heading>

@@ -169,7 +169,7 @@ export function EditAccountModal({
 
   return (
     <CommonModal
-      className="ag-create-account-modal"
+
       footer={(
         <div className="flex w-full justify-end gap-2">
           <Button variant="secondary" onPress={onClose}>
@@ -191,7 +191,7 @@ export function EditAccountModal({
       title={t('accounts.edit')}
     >
               <Form
-                className="ag-form-scroll-safe ag-create-account-form"
+
                 onSubmit={(event) => event.preventDefault()}
               >
                 <section className="space-y-4">
@@ -204,7 +204,7 @@ export function EditAccountModal({
                     <HeroTextField fullWidth isRequired>
                       <Label>{t('common.name')}</Label>
                       <div className="relative">
-                        <Layers className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                        <Layers className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                         <Input
                           className="pl-9"
                           name="name"
@@ -219,7 +219,7 @@ export function EditAccountModal({
                 </section>
 
                 {PluginAccountForm ? (
-                  <section className="ag-plugin-scope border-t border-border pt-4">
+                  <section className="border-t border-border pt-4">
                     <PluginAccountForm
                       credentials={credentials}
                       onChange={setCredentials}
@@ -240,10 +240,10 @@ export function EditAccountModal({
                   />
                 ) : null}
 
-                <section className="ag-create-account-advanced space-y-4">
+                <section className="space-y-4">
                   <NativeSwitch
                     isSelected={form.state !== 'disabled'}
-                    label={<span className="text-sm text-text">{t('accounts.enable_dispatch')}</span>}
+                    label={<span className="text-sm text-foreground">{t('accounts.enable_dispatch')}</span>}
                     onChange={(enabled) =>
                       setForm({ ...form, state: enabled ? 'active' : 'disabled' })
                     }
@@ -253,7 +253,7 @@ export function EditAccountModal({
                     <HeroTextField fullWidth>
                       <Label>{t('accounts.priority_hint')}</Label>
                       <div className="relative">
-                        <Hash className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                        <Hash className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                         <Input
                           className="pl-9"
                           type="number"
@@ -275,7 +275,7 @@ export function EditAccountModal({
                     <HeroTextField fullWidth>
                       <Label>{t('accounts.concurrency')}</Label>
                       <div className="relative">
-                        <Gauge className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                        <Gauge className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                         <Input
                           className="pl-9"
                           type="number"
@@ -327,9 +327,9 @@ export function EditAccountModal({
                   </div>
 
                   <NativeSwitch
-                    className="ag-create-account-pool-switch"
+
                     isSelected={form.upstream_is_pool ?? false}
-                    label={<span className="text-sm text-text">{t('accounts.upstream_is_pool', '池模式')}</span>}
+                    label={<span className="text-sm text-foreground">{t('accounts.upstream_is_pool', '池模式')}</span>}
                     onChange={(checked) => setForm({ ...form, upstream_is_pool: checked })}
                   />
 
@@ -340,13 +340,13 @@ export function EditAccountModal({
                   />
 
                   {availableGroups.length > 0 && (
-                    <div className="ag-create-account-groups">
+                    <div>
                       <Label>{t('accounts.groups')}</Label>
-                      <div className="ag-create-account-group-list">
+                      <div>
                         {availableGroups.map((group) => (
                           <Checkbox
                             key={group.id}
-                            className="ag-create-account-group-item"
+
                             isSelected={groupIds.includes(group.id)}
                             onChange={() => toggleGroup(group.id)}
                           >
@@ -356,7 +356,7 @@ export function EditAccountModal({
                             <Checkbox.Content>
                               <span className="min-w-0">
                                 <span className="block truncate">{group.name}</span>
-                                <span className="block truncate text-[10px] text-text-tertiary">
+                                <span className="block truncate text-[10px] text-muted">
                                   {pName(group.platform)}
                                 </span>
                               </span>

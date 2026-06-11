@@ -159,9 +159,9 @@ export default function DocsPage() {
   }, [toc.length]);
 
   return (
-    <div className="min-h-screen bg-bg-deep text-text">
+    <div className="min-h-screen bg-background text-foreground">
       {/* 顶栏：拉到 7xl，和正文同宽，避免顶栏窄、正文宽的撕裂感 */}
-      <nav className="sticky top-0 z-20 bg-bg-deep/80 backdrop-blur border-b border-border/50">
+      <nav className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border/50">
         <div className="flex items-center justify-between px-6 md:px-12 py-4 max-w-7xl mx-auto">
           <Link to="/home" className="flex items-center gap-2.5">
             <img src={site.site_logo || defaultLogoUrl} alt="" className="w-8 h-8 rounded-sm object-cover" />
@@ -171,7 +171,7 @@ export default function DocsPage() {
             {showStatusEntry && (
               <HeroLink
                 href="/status"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground transition-colors"
               >
                 <Activity className="w-3.5 h-3.5" />
                 {t('nav.status')}
@@ -203,7 +203,7 @@ export default function DocsPage() {
         {/* 左侧目录（lg 以上才显示） */}
         <aside className="hidden lg:block">
           <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
-            <div className="flex items-center gap-2 mb-3 text-text-secondary">
+            <div className="flex items-center gap-2 mb-3 text-muted">
               <BookOpen className="w-4 h-4" />
               <span className="text-xs font-semibold uppercaser">{t('docs.toc')}</span>
             </div>
@@ -255,18 +255,18 @@ export default function DocsPage() {
                 );
               },
               h3: ({ children }) => (
-                <h3 className="text-base font-semibold mt-6 mb-2 text-text scroll-mt-24">{children}</h3>
+                <h3 className="text-base font-semibold mt-6 mb-2 text-foreground scroll-mt-24">{children}</h3>
               ),
               p: ({ children }) => (
-                <p className="text-[14px] leading-relaxed text-text-secondary my-3">{children}</p>
+                <p className="text-[14px] leading-relaxed text-muted my-3">{children}</p>
               ),
               ul: ({ children }) => (
-                <ul className="list-disc pl-6 my-3 space-y-1.5 text-[14px] text-text-secondary">
+                <ul className="list-disc pl-6 my-3 space-y-1.5 text-[14px] text-muted">
                   {children}
                 </ul>
               ),
               ol: ({ children }) => (
-                <ol className="list-decimal pl-6 my-3 space-y-1.5 text-[14px] text-text-secondary">
+                <ol className="list-decimal pl-6 my-3 space-y-1.5 text-[14px] text-muted">
                   {children}
                 </ol>
               ),
@@ -277,20 +277,20 @@ export default function DocsPage() {
                   <HeroLink
                     href={href}
                     {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                    className="text-[var(--ag-primary)] hover:underline"
+                    className="text-[var(--accent)] hover:underline"
                   >
                     {children}
                   </HeroLink>
                 );
               },
               blockquote: ({ children }) => (
-                <blockquote className="border-l-4 border-[var(--ag-primary)] bg-bg-elevated rounded-r-lg pl-4 pr-4 py-3 my-4 text-[13px] text-text-tertiary">
+                <blockquote className="border-l-4 border-[var(--accent)] bg-overlay rounded-r-lg pl-4 pr-4 py-3 my-4 text-[13px] text-muted">
                   {children}
                 </blockquote>
               ),
               hr: () => <hr className="my-8 border-border" />,
               table: ({ children }) => (
-                <div className="ag-markdown-table table-root table-root--secondary my-4">
+                <div className="table-root table-root--secondary my-4">
                   <div className="table__scroll-container">
                     <table className="table__content w-full text-[13px]">{children}</table>
                   </div>
@@ -298,12 +298,12 @@ export default function DocsPage() {
               ),
               thead: ({ children }) => <thead className="table__header">{children}</thead>,
               th: ({ children }) => (
-                <th className="table__column px-3 py-2 text-left font-semibold text-text">
+                <th className="table__column px-3 py-2 text-left font-semibold text-foreground">
                   {children}
                 </th>
               ),
               td: ({ children }) => (
-                <td className="table__cell px-3 py-2 text-text-secondary">
+                <td className="table__cell px-3 py-2 text-muted">
                   {children}
                 </td>
               ),
@@ -315,7 +315,7 @@ export default function DocsPage() {
                 if (!match) {
                   return (
                     <code
-                      className="px-1.5 py-0.5 rounded bg-surface border border-glass-border text-[12px] font-mono text-text"
+                      className="px-1.5 py-0.5 rounded bg-surface border border-border text-[12px] font-mono text-foreground"
                       {...props}
                     >
                       {children}
@@ -334,7 +334,7 @@ export default function DocsPage() {
 
           {/* 底部 CTA */}
           <div className="border-t border-border mt-12 pt-8 flex items-center justify-between">
-            <span className="text-sm text-text-tertiary">{t('docs.cta_hint')}</span>
+            <span className="text-sm text-muted">{t('docs.cta_hint')}</span>
             <Button
               variant="primary"
               onPress={() => navigate({ to: isLoggedIn ? '/' : '/login' })}
@@ -414,9 +414,9 @@ function CodeBlock({ code, language }: { code: string; language: string }): Reac
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <div className="my-4 rounded-xl border border-glass-border bg-bg-elevated overflow-hidden">
+    <div className="my-4 rounded-xl border border-border bg-overlay overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-surface">
-        <span className="text-[11px] uppercaser text-text-tertiary">{language}</span>
+        <span className="text-[11px] uppercaser text-muted">{language}</span>
         <Button
           size="sm"
           variant="ghost"
@@ -426,7 +426,7 @@ function CodeBlock({ code, language }: { code: string; language: string }): Reac
           {copied ? 'Copied' : 'Copy'}
         </Button>
       </div>
-      <pre className="px-4 py-3 overflow-x-auto text-[12px] font-mono text-text leading-relaxed">
+      <pre className="px-4 py-3 overflow-x-auto text-[12px] font-mono text-foreground leading-relaxed">
         <code>{code}</code>
       </pre>
     </div>

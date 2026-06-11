@@ -49,7 +49,7 @@ function LoginForm() {
       <HeroTextField fullWidth isRequired>
         <Label>{t('auth.email')}</Label>
         <div className="relative">
-          <Mail className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+          <Mail className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
           <Input
             className="pl-9"
             name="email"
@@ -66,7 +66,7 @@ function LoginForm() {
       <HeroTextField fullWidth isRequired>
         <Label>{t('auth.password')}</Label>
         <div className="relative">
-          <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+          <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
           <Input
             className="pl-9"
             name="password"
@@ -237,7 +237,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         <HeroTextField fullWidth isRequired>
           <Label>{t('auth.email')}</Label>
           <div className="relative">
-            <Mail className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+            <Mail className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
             <Input
               className="pl-9"
               name="email"
@@ -262,7 +262,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
             <HeroTextField fullWidth isRequired>
               <Label>{t('auth.verify_code')}</Label>
               <div className="relative">
-                <ShieldCheck className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                <ShieldCheck className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                 <Input
                   className="pl-9"
                   name="verify_code"
@@ -309,8 +309,8 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   return (
     <Form onSubmit={handleStep2} className="space-y-4">
       {/* 已验证的邮箱（只读展示） */}
-      <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] border border-glass-border bg-surface text-sm text-text-secondary">
-        <Mail className="w-4 h-4 text-text-tertiary shrink-0" />
+      <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] border border-border bg-surface text-sm text-muted">
+        <Mail className="w-4 h-4 text-muted shrink-0" />
         <span className="truncate">{needVerify ? verifiedEmail : email}</span>
         <Button
           className="ml-auto shrink-0"
@@ -324,7 +324,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       <HeroTextField fullWidth>
         <Label>{t('auth.username')}</Label>
         <div className="relative">
-          <User className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+          <User className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
           <Input
             className="pl-9"
             name="username"
@@ -339,7 +339,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       <HeroTextField fullWidth isRequired>
         <Label>{t('auth.password')}</Label>
         <div className="relative">
-          <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+          <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
           <Input
             className="pl-9"
             name="new-password"
@@ -355,7 +355,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       <HeroTextField fullWidth isInvalid={passwordMismatch} isRequired>
         <Label>{t('auth.confirm_password')}</Label>
         <div className="relative">
-          <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+          <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
           <Input
             className="pl-9"
             name="confirm-new-password"
@@ -422,7 +422,7 @@ function APIKeyLoginForm() {
       <HeroTextField fullWidth isRequired>
         <Label>API Key</Label>
         <div className="relative">
-          <Key className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+          <Key className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
           <Input
             className="pl-9"
             name="api_key"
@@ -436,7 +436,7 @@ function APIKeyLoginForm() {
           />
         </div>
       </HeroTextField>
-      <p className="text-[11px] text-text-tertiary">{t('auth.apikey_login_hint')}</p>
+      <p className="text-[11px] text-muted">{t('auth.apikey_login_hint')}</p>
       {error && (
         <Alert status="danger">
           <Alert.Content>
@@ -468,7 +468,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden bg-bg-deep text-text">
+    <div className="min-h-screen flex relative overflow-hidden bg-background text-foreground">
       {/* ===== 左侧装饰面板（桌面端） ===== */}
       <div
         className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative items-center justify-center overflow-hidden"
@@ -517,7 +517,7 @@ export default function LoginPage() {
       </div>
 
       {/* ===== 右侧表单区 ===== */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-bg-deep relative">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-background relative">
         {/* 主题切换按钮 */}
         <Button
           aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
@@ -533,7 +533,7 @@ export default function LoginPage() {
           {/* 移动端 Logo */}
           <div className="text-center mb-8 lg:hidden">
             <img src={site.site_logo || defaultLogoUrl} alt="" className="w-11 h-11 rounded-sm mb-3 mx-auto object-cover" />
-            <h1 className="text-lg font-bold text-text">
+            <h1 className="text-lg font-bold text-foreground">
               {site.site_name || t('app_name')}
             </h1>
           </div>
@@ -583,13 +583,13 @@ export default function LoginPage() {
             {showStatusEntry && (
               <HeroLink
                 href="/status"
-                className="inline-flex items-center gap-1.5 text-[11px] text-text-tertiary hover:text-primary transition-colors"
+                className="inline-flex items-center gap-1.5 text-[11px] text-muted hover:text-accent transition-colors"
               >
                 <Activity className="w-3 h-3" />
                 {t('nav.status')}
               </HeroLink>
             )}
-            <p className="text-center text-[10px] text-text-tertiary font-mono uppercase">
+            <p className="text-center text-[10px] text-muted font-mono uppercase">
               Powered by {site.site_name || 'AirGate'}
             </p>
           </div>

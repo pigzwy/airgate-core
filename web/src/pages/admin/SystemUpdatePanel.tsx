@@ -112,11 +112,11 @@ export function SystemUpdatePanel() {
     if (info.mode === 'docker') {
       return (
         <div className="space-y-2">
-          <div className="text-xs text-text-tertiary">
+          <div className="text-xs text-muted">
             {t('settings.system_docker_hint')}
           </div>
           <div className="flex items-center gap-2">
-            <code className="flex-1 px-3 py-2 rounded-md bg-bg-subtle border border-border text-xs font-mono text-text overflow-x-auto whitespace-nowrap">
+            <code className="flex-1 px-3 py-2 rounded-md bg-background-subtle border border-border text-xs font-mono text-foreground overflow-x-auto whitespace-nowrap">
               {info.instructions}
             </code>
             <Button
@@ -143,14 +143,14 @@ export function SystemUpdatePanel() {
 
     // noop
     return (
-      <div className="text-xs text-text-tertiary">
+      <div className="text-xs text-muted">
         {t('settings.system_noop_hint')}
         {info.release_url && (
           <HeroLink
             href={info.release_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1 inline-flex items-center gap-1 text-primary hover:underline"
+            className="ml-1 inline-flex items-center gap-1 text-accent hover:underline"
           >
             {t('settings.system_view_release')}
             <ExternalLink className="w-3 h-3" />
@@ -169,30 +169,30 @@ export function SystemUpdatePanel() {
         <div className="space-y-5">
           {/* 版本对照 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-xl border border-border bg-bg-subtle px-4 py-3">
-              <div className="text-[10px] uppercaser text-text-tertiary mb-1">
+            <div className="rounded-xl border border-border bg-background-subtle px-4 py-3">
+              <div className="text-[10px] uppercaser text-muted mb-1">
                 {t('settings.system_current_version')}
               </div>
-              <div className="text-lg font-mono font-semibold text-text">
+              <div className="text-lg font-mono font-semibold text-foreground">
                 {info?.current ?? '—'}
               </div>
               {info?.binary_path && (
-                <div className="text-[11px] text-text-tertiary mt-1 truncate" title={info.binary_path}>
+                <div className="text-[11px] text-muted mt-1 truncate" title={info.binary_path}>
                   {info.binary_path}
                 </div>
               )}
             </div>
-            <div className="rounded-xl border border-border bg-bg-subtle px-4 py-3">
+            <div className="rounded-xl border border-border bg-background-subtle px-4 py-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] uppercaser text-text-tertiary">
+                <span className="text-[10px] uppercaser text-muted">
                   {t('settings.system_latest_version')}
                 </span>
                 {renderStateBadge()}
               </div>
-              <div className="text-lg font-mono font-semibold text-text">
+              <div className="text-lg font-mono font-semibold text-foreground">
                 {info?.latest ?? '—'}
               </div>
-              <div className="text-[11px] text-text-tertiary mt-1">
+              <div className="text-[11px] text-muted mt-1">
                 {t('settings.system_mode')}：<span className="font-mono">{info?.mode ?? '—'}</span>
               </div>
             </div>
@@ -216,15 +216,15 @@ export function SystemUpdatePanel() {
 
         {/* Release notes */}
         {info?.release_notes && (
-          <details className="rounded-xl border border-border bg-bg-subtle">
-            <summary className="px-4 py-3 cursor-pointer text-xs font-medium text-text-secondary select-none">
+          <details className="rounded-xl border border-border bg-background-subtle">
+            <summary className="px-4 py-3 cursor-pointer text-xs font-medium text-muted select-none">
               {t('settings.system_release_notes')}
               {info.release_url && (
                 <HeroLink
                   href={info.release_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-2 text-primary hover:underline inline-flex items-center gap-1"
+                  className="ml-2 text-accent hover:underline inline-flex items-center gap-1"
                   onClick={(e) => e.stopPropagation()}
                 >
                   GitHub
@@ -232,7 +232,7 @@ export function SystemUpdatePanel() {
                 </HeroLink>
               )}
             </summary>
-            <pre className="px-4 pb-4 text-[11px] text-text-tertiary whitespace-pre-wrap font-mono max-h-80 overflow-y-auto">
+            <pre className="px-4 pb-4 text-[11px] text-muted whitespace-pre-wrap font-mono max-h-80 overflow-y-auto">
               {info.release_notes}
             </pre>
           </details>
@@ -304,7 +304,7 @@ function UpgradeRunModal({
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '560px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -333,7 +333,7 @@ function UpgradeRunModal({
               isSelected={confirmBackup}
               onChange={setConfirmBackup}
             >
-              <span className="text-xs text-text-secondary">
+              <span className="text-xs text-muted">
                 {t('settings.system_confirm_backup')}
               </span>
             </Checkbox>
@@ -348,29 +348,29 @@ function UpgradeRunModal({
               ) : status.state === 'restarting' || status.state === 'success' ? (
                 <CheckCircle2 className="w-5 h-5 text-success" />
               ) : (
-                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                <Loader2 className="w-5 h-5 animate-spin text-accent" />
               )}
-              <div className="text-sm font-medium text-text">
+              <div className="text-sm font-medium text-foreground">
                 {t(`settings.system_state_${status.state}`)}
               </div>
             </div>
 
             {status.state === 'downloading' && (
               <div>
-                <div className="h-2 rounded-full bg-bg-subtle overflow-hidden">
+                <div className="h-2 rounded-full bg-background-subtle overflow-hidden">
                   <div
-                    className="h-full bg-primary"
+                    className="h-full bg-accent"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
-                <div className="text-[11px] text-text-tertiary mt-1 text-right font-mono">
+                <div className="text-[11px] text-muted mt-1 text-right font-mono">
                   {progressPct}%
                 </div>
               </div>
             )}
 
             {status.message && (
-              <div className="text-xs text-text-tertiary font-mono break-all">
+              <div className="text-xs text-muted font-mono break-all">
                 {status.message}
               </div>
             )}

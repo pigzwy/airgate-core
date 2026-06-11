@@ -338,9 +338,9 @@ export function AccountTestModal({ open, account, onClose }: AccountTestModalPro
     >
               <div className="space-y-4">
                 {/* 账号信息卡片 */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-[var(--ag-bg-surface)] border border-[var(--ag-glass-border)]">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm text-[var(--ag-text)] truncate">
+                    <div className="font-medium text-sm text-[var(--foreground)] truncate">
                       {account.name}
                     </div>
                     <div className="flex items-center gap-2 mt-1">

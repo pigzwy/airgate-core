@@ -40,7 +40,7 @@ export function BalanceModal({ open, user, defaultAction, onClose, onSubmit, loa
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="sm">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '460px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -49,13 +49,13 @@ export function BalanceModal({ open, user, defaultAction, onClose, onSubmit, loa
             </Modal.Header>
             <Modal.Body>
               <div className="space-y-4">
-                <div className="flex items-center gap-3 rounded-lg border border-glass-border bg-bg-elevated px-4 py-3">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-subtle text-base font-semibold text-primary">
+                <div className="flex items-center gap-3 rounded-lg border border-border bg-overlay px-4 py-3">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent-soft text-base font-semibold text-accent">
                     {avatarLetter}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-text">{user.email}</p>
-                    <p className="mt-0.5 font-mono text-xs text-text-tertiary">
+                    <p className="truncate text-sm font-medium text-foreground">{user.email}</p>
+                    <p className="mt-0.5 font-mono text-xs text-muted">
                       {t('users.current_balance')}: ${user.balance.toFixed(7)}
                     </p>
                   </div>
@@ -65,7 +65,7 @@ export function BalanceModal({ open, user, defaultAction, onClose, onSubmit, loa
                   <HeroTextField fullWidth isRequired>
                     <Label>{isRefund ? t('users.refund_amount', '退款金额') : t('users.topup_amount', '充值金额')}</Label>
                     <div className="relative">
-                      <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-text-tertiary">$</span>
+                      <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-sm text-muted">$</span>
                       <Input
                         className="pl-7"
                         type="number"
@@ -97,11 +97,11 @@ export function BalanceModal({ open, user, defaultAction, onClose, onSubmit, loa
                   />
                 </HeroTextField>
 
-                <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary-subtle px-4 py-3">
-                  <span className="text-sm text-text-secondary">
+                <div className="flex items-center justify-between rounded-lg border border-accent/30 bg-accent-soft px-4 py-3">
+                  <span className="text-sm text-muted">
                     {t('users.balance_after_op', '操作后余额')}:
                   </span>
-                  <span className={`font-mono text-lg font-bold ${afterBalance < 0 ? 'text-danger' : 'text-text'}`}>
+                  <span className={`font-mono text-lg font-bold ${afterBalance < 0 ? 'text-danger' : 'text-foreground'}`}>
                     ${afterBalance.toFixed(7)}
                   </span>
                 </div>

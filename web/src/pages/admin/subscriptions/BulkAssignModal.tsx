@@ -83,7 +83,7 @@ export function BulkAssignModal({
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '560px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -97,12 +97,12 @@ export function BulkAssignModal({
                     <Label>
                       {t('subscriptions.select_users')} <span className="text-danger">*</span>
                     </Label>
-                    <span className="font-mono text-xs text-text-tertiary">
+                    <span className="font-mono text-xs text-muted">
                       {t('subscriptions.selected_count', { count: selectedUserIds.length })}
                     </span>
                   </div>
                   <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                     <Input
                       className="pl-9"
                       value={userKeyword}
@@ -110,9 +110,9 @@ export function BulkAssignModal({
                       placeholder={t('users.search_placeholder')}
                     />
                   </div>
-                  <div className="grid max-h-56 gap-2 overflow-y-auto rounded-md border border-glass-border bg-surface p-2">
+                  <div className="grid max-h-56 gap-2 overflow-y-auto rounded-md border border-border bg-surface p-2">
                     {filteredUsers.length === 0 ? (
-                      <div className="flex min-h-20 items-center justify-center text-sm text-text-tertiary">
+                      <div className="flex min-h-20 items-center justify-center text-sm text-muted">
                         {t('common.no_data')}
                       </div>
                     ) : filteredUsers.map((user) => {
@@ -122,21 +122,21 @@ export function BulkAssignModal({
                           key={user.id}
                           className={`w-full rounded-md border p-2.5 transition-colors ${
                             isSelected
-                              ? 'border-primary bg-primary-subtle'
-                              : 'border-border-subtle bg-bg-surface hover:bg-bg-hover'
+                              ? 'border-accent bg-accent-soft'
+                              : 'border-separator bg-surface hover:bg-default-hover'
                           }`}
                           isSelected={isSelected}
                           onChange={(selected) => toggleUser(user.id, selected)}
                         >
-                          <Checkbox.Control className={isSelected ? 'border-primary bg-primary text-primary-foreground' : undefined}>
+                          <Checkbox.Control className={isSelected ? 'border-accent bg-accent text-accent-foreground' : undefined}>
                             <Checkbox.Indicator />
                           </Checkbox.Control>
                           <Checkbox.Content>
                             <span className="flex min-w-0 items-center gap-2">
-                              <User className={isSelected ? 'h-3.5 w-3.5 shrink-0 text-primary' : 'h-3.5 w-3.5 shrink-0 text-text-tertiary'} />
+                              <User className={isSelected ? 'h-3.5 w-3.5 shrink-0 text-accent' : 'h-3.5 w-3.5 shrink-0 text-muted'} />
                               <span className="min-w-0 text-left">
-                                <span className="block truncate text-sm font-medium text-text">{user.email}</span>
-                                <span className="block truncate text-xs text-text-tertiary">{user.username || '-'}</span>
+                                <span className="block truncate text-sm font-medium text-foreground">{user.email}</span>
+                                <span className="block truncate text-xs text-muted">{user.username || '-'}</span>
                               </span>
                             </span>
                           </Checkbox.Content>
@@ -155,7 +155,7 @@ export function BulkAssignModal({
                   <Label>{t('subscriptions.group')}</Label>
                   <Select.Trigger>
                     <Select.Value>
-                      {selectedGroupLabel ?? <span className="text-text-tertiary">{t('subscriptions.select_group')}</span>}
+                      {selectedGroupLabel ?? <span className="text-muted">{t('subscriptions.select_group')}</span>}
                     </Select.Value>
                     <Select.Indicator />
                   </Select.Trigger>

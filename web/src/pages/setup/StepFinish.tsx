@@ -123,7 +123,7 @@ export default function StepFinish({ dbConfig, redisConfig, adminConfig, envDBPr
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-text-secondary">
+      <p className="text-sm text-muted">
         {t('setup.confirm_config')}
       </p>
 
@@ -135,8 +135,8 @@ export default function StepFinish({ dbConfig, redisConfig, adminConfig, envDBPr
             <Card key={item.title}>
               <Card.Content className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Icon className="w-4 h-4 text-primary" />
-                  <h4 className="text-sm font-semibold text-text">{item.title}</h4>
+                  <Icon className="w-4 h-4 text-accent" />
+                  <h4 className="text-sm font-semibold text-foreground">{item.title}</h4>
                   {item.fromEnv && (
                     <Chip className="ml-auto font-mono uppercaser" color="accent" size="sm" variant="soft">
                       {t('setup.from_env')}
@@ -146,8 +146,8 @@ export default function StepFinish({ dbConfig, redisConfig, adminConfig, envDBPr
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
                   {item.details.map((d) => (
                     <div key={d.label} className="flex items-center gap-2 text-xs">
-                      <span className="text-text-tertiary">{d.label}:</span>
-                      <span className="text-text-secondary font-mono">
+                      <span className="text-muted">{d.label}:</span>
+                      <span className="text-muted font-mono">
                         {d.value}
                       </span>
                     </div>

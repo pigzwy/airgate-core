@@ -4,7 +4,7 @@ import type {
   PluginFrontendModule,
   PluginPlatformIconProps,
   UsageRecordSurfaceProps,
-} from '@doudou-start/airgate-theme/plugin';
+} from './plugin-types';
 
 type RegistryListener = () => void;
 

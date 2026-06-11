@@ -1,5 +1,23 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { injectThemeStyle, setTheme, getStoredTheme, type ThemeName } from '@doudou-start/airgate-theme';
+
+type ThemeName = 'light' | 'dark';
+
+const THEME_STORAGE_KEY = 'ag-theme';
+
+function isThemeName(value: unknown): value is ThemeName {
+  return value === 'light' || value === 'dark';
+}
+
+function getStoredTheme(): ThemeName {
+  if (typeof window === 'undefined') return 'dark';
+
+  try {
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return isThemeName(stored) ? stored : 'dark';
+  } catch {
+    return 'dark';
+  }
+}
 
 interface ThemeContextValue {
   theme: ThemeName;
@@ -13,17 +31,20 @@ function syncHeroUIThemeClass(theme: ThemeName) {
   document.documentElement.classList.toggle('dark', theme === 'dark');
 }
 
+function setStoredTheme(theme: ThemeName) {
+  document.documentElement.dataset.theme = theme;
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // localStorage can be unavailable in restricted browser modes.
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeName>(getStoredTheme);
 
-  // 初始化：注入 AirGate CSS 变量。
   useEffect(() => {
-    injectThemeStyle();
-  }, []);
-
-  // 主题变化时同步 AirGate data-theme 与 HeroUI light/dark class。
-  useEffect(() => {
-    setTheme(theme);
+    setStoredTheme(theme);
     syncHeroUIThemeClass(theme);
   }, [theme]);
 

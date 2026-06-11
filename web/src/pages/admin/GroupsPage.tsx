@@ -143,8 +143,8 @@ export default function GroupsPage() {
       {/* 表格 */}
       <CommonTable
         ariaLabel={t('groups.title', 'Groups')}
-        className="ag-groups-table"
-        contentClassName="ag-groups-table-content"
+
+
         footer={(
           <TablePaginationFooter
             page={page}
@@ -200,11 +200,11 @@ export default function GroupsPage() {
                     <CommonTable.Cell>
                       <span className="inline-flex max-w-[9.5rem] items-center gap-1.5">
                         {isImageGroup(row) ? (
-                          <Image className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--ag-primary)' }} />
+                          <Image className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--accent)' }} />
                         ) : (
-                          <Text className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--ag-text-tertiary)' }} />
+                          <Text className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--muted)' }} />
                         )}
-                        <span style={{ color: 'var(--ag-text)' }} className="truncate font-medium">
+                        <span style={{ color: 'var(--foreground)' }} className="truncate font-medium">
                           {row.name}
                         </span>
                       </span>
@@ -222,7 +222,7 @@ export default function GroupsPage() {
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <div className="min-w-0">
-                        <span className="font-mono" style={{ color: 'var(--ag-primary)' }}>
+                        <span className="font-mono" style={{ color: 'var(--accent)' }}>
                           {row.rate_multiplier}x
                         </span>
                       </div>
@@ -234,9 +234,9 @@ export default function GroupsPage() {
                         <Chip color="default" size="sm" variant="soft">{t('groups.type_public')}</Chip>
                       )}
                     </CommonTable.Cell>
-                    <CommonTable.Cell className="ag-groups-metric-cell">
+                    <CommonTable.Cell>
                       <MetricChips
-                        className="ag-metric-chips--stack ag-metric-chips--markup ag-metric-chips--account-stats ag-metric-chips--compact-y"
+
                         items={[
                           {
                             color: 'default' as const,
@@ -251,9 +251,9 @@ export default function GroupsPage() {
                         ]}
                       />
                     </CommonTable.Cell>
-                    <CommonTable.Cell className="ag-groups-metric-cell">
+                    <CommonTable.Cell>
                       <MetricChips
-                        className="ag-metric-chips--stack ag-metric-chips--markup ag-metric-chips--compact-y"
+
                         items={[
                           {
                             amount: row.today_cost,
@@ -274,21 +274,21 @@ export default function GroupsPage() {
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <div className="inline-flex min-w-[6.75rem] items-center justify-end whitespace-nowrap font-mono tabular-nums">
-                        <span className="font-mono" style={{ color: row.capacity_used > 0 ? 'var(--ag-primary)' : undefined }}>
+                        <span className="font-mono" style={{ color: row.capacity_used > 0 ? 'var(--accent)' : undefined }}>
                           {row.capacity_used}
                         </span>
-                        <span className="mx-0.5" style={{ color: 'var(--ag-text-tertiary)' }}>/</span>
+                        <span className="mx-0.5" style={{ color: 'var(--muted)' }}>/</span>
                         <span className="font-mono">{row.capacity_total}</span>
                       </div>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <span className="inline-flex items-center gap-1 font-mono">
-                        <ArrowUpDown className="w-3 h-3" style={{ color: 'var(--ag-text-tertiary)' }} />
+                        <ArrowUpDown className="w-3 h-3" style={{ color: 'var(--muted)' }} />
                         {row.sort_weight}
                       </span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <div className="ag-table-row-actions flex items-center justify-center gap-0.5">
+                      <div className="flex items-center justify-center gap-0.5">
                         <Button
                           isIconOnly
                           size="sm"
@@ -371,7 +371,7 @@ export default function GroupsPage() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('groups.delete_title')}</AlertDialog.Heading>

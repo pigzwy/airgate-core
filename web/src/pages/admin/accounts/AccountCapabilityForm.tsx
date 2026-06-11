@@ -81,7 +81,7 @@ export function AccountCapabilityForm({
 
       <div className="grid gap-3 md:grid-cols-2">
         <div className="space-y-2">
-          <p className="text-xs font-medium text-text-secondary">{t('accounts.allowed_workloads')}</p>
+          <p className="text-xs font-medium text-muted">{t('accounts.allowed_workloads')}</p>
           {WORKLOADS.map((workload) => (
             <Checkbox
               key={workload}
@@ -93,14 +93,14 @@ export function AccountCapabilityForm({
                 <Checkbox.Indicator />
               </Checkbox.Control>
               <Checkbox.Content>
-                <span className="text-sm text-text">{t(`accounts.workload_${workload}`)}</span>
+                <span className="text-sm text-foreground">{t(`accounts.workload_${workload}`)}</span>
               </Checkbox.Content>
             </Checkbox>
           ))}
         </div>
 
         <div className={imageEnabled ? 'space-y-2' : 'space-y-2 opacity-50'}>
-          <p className="text-xs font-medium text-text-secondary">{t('accounts.image_protocols')}</p>
+          <p className="text-xs font-medium text-muted">{t('accounts.image_protocols')}</p>
           {IMAGE_PROTOCOLS.map((protocol) => (
             <Checkbox
               key={protocol}
@@ -113,7 +113,7 @@ export function AccountCapabilityForm({
                 <Checkbox.Indicator />
               </Checkbox.Control>
               <Checkbox.Content>
-                <span className="text-sm text-text">{t(`accounts.image_protocol_${protocol}`)}</span>
+                <span className="text-sm text-foreground">{t(`accounts.image_protocol_${protocol}`)}</span>
               </Checkbox.Content>
             </Checkbox>
           ))}

@@ -29,6 +29,9 @@ const UsageTokenTrendChart = lazy(() =>
 );
 
 const PIE_COLORS = PIE_CHART_COLORS;
+const METRIC_CARD_CLASS = 'min-h-[72px] 2xl:min-h-[78px]';
+const METRIC_CONTENT_CLASS = 'flex min-w-0 flex-1 flex-row items-center justify-between gap-3 p-3 text-left 2xl:p-3.5';
+const METRIC_COPY_CLASS = 'min-w-0 flex-1 text-left';
 
 function SectionCard({
   children,
@@ -40,11 +43,11 @@ function SectionCard({
   title: string;
 }) {
   return (
-    <Card className="ag-dashboard-panel">
+    <Card>
       <div
         className="flex min-w-0 items-center justify-between gap-3 p-3 pb-2 2xl:p-4 2xl:pb-2"
       >
-        <h3 className="min-w-0 truncate text-base font-semibold leading-none text-text">{title}</h3>
+        <h3 className="min-w-0 truncate text-base font-semibold leading-none text-foreground">{title}</h3>
         {extra ? (
           <div className="min-w-0 shrink">{extra}</div>
         ) : null}
@@ -66,12 +69,12 @@ function StatCard({
   value: ReactNode;
 }) {
   return (
-    <Card className="ag-dashboard-metric min-h-[72px] 2xl:min-h-[78px]">
-      <Card.Content className="ag-dashboard-metric-content p-3 2xl:p-3.5">
-        <div className="ag-dashboard-metric-copy">
-          <div className="truncate text-sm font-semibold tracking-normal text-text-tertiary">{title}</div>
+    <Card className={METRIC_CARD_CLASS}>
+      <Card.Content className={METRIC_CONTENT_CLASS}>
+        <div className={METRIC_COPY_CLASS}>
+          <div className="truncate text-sm font-semibold tracking-normal text-muted">{title}</div>
           <div className="mt-1 flex min-w-0 items-baseline gap-2">
-            <div className="min-w-0 truncate font-mono text-[22px] font-semibold leading-none text-text 2xl:text-2xl">{value}</div>
+            <div className="min-w-0 truncate font-mono text-[22px] font-semibold leading-none text-foreground 2xl:text-2xl">{value}</div>
           </div>
         </div>
         <div
@@ -142,7 +145,7 @@ function DistributionCard({
     [data, metric],
   );
   const metricTabs = (
-    <Tabs className="ag-segmented-tabs ag-segmented-tabs-compact" selectedKey={metric} onSelectionChange={(key) => setMetric(key as PieMetric)}>
+    <Tabs selectedKey={metric} onSelectionChange={(key) => setMetric(key as PieMetric)}>
       <Tabs.List>
         <Tabs.Tab id="token">
           <Tabs.Indicator />
@@ -159,17 +162,17 @@ function DistributionCard({
 
   return (
     <SectionCard title={title} extra={metricTabs}>
-      <div className="ag-distribution-card-body grid items-start gap-3 2xl:grid-cols-[176px_minmax(0,1fr)]">
-        <div className="ag-distribution-chart-frame">
+      <div className="grid items-start gap-3 2xl:grid-cols-[176px_minmax(0,1fr)]">
+        <div>
           <Suspense fallback={<div className="h-[176px] w-[176px]" />}>
             <UsagePieChart data={pieData} />
           </Suspense>
         </div>
 
-        <div className="ag-distribution-table-scroll">
+        <div>
           <CompactDataTable
             ariaLabel={title}
-            className="ag-compact-data-table--dense"
+
             emptyText={t('common.no_data')}
             minWidth={480}
             rowKey={(row) => row.name}
@@ -181,9 +184,9 @@ function DistributionCard({
                 width: firstColumnWidth,
                 render: (item, index) => (
                   <>
-                    <span className="shrink-0 font-mono text-[11px] font-semibold text-text-tertiary">#{index + 1}</span>
+                    <span className="shrink-0 font-mono text-[11px] font-semibold text-muted">#{index + 1}</span>
                     <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: PIE_COLORS[index % PIE_COLORS.length] }} />
-                    <span className="min-w-0 truncate font-medium text-text" title={item.name}>{item.name}</span>
+                    <span className="min-w-0 truncate font-medium text-foreground" title={item.name}>{item.name}</span>
                   </>
                 ),
               },
@@ -192,14 +195,14 @@ function DistributionCard({
                 key: 'requests',
                 title: t('usage.requests'),
                 width: '16%',
-                render: (item) => <span className="truncate font-mono text-text-secondary">{item.requests.toLocaleString()}</span>,
+                render: (item) => <span className="truncate font-mono text-muted">{item.requests.toLocaleString()}</span>,
               },
               {
                 align: 'end',
                 key: 'tokens',
                 title: t('usage.tokens'),
                 width: '18%',
-                render: (item) => <span className="truncate font-mono text-text-secondary">{fmtNum(item.tokens)}</span>,
+                render: (item) => <span className="truncate font-mono text-muted">{fmtNum(item.tokens)}</span>,
               },
               {
                 align: 'end',
@@ -248,7 +251,7 @@ function GroupStatsCard({
       title={t('usage.group_stats')}
       extra={
         <Tabs
-          className="ag-segmented-tabs ag-segmented-tabs-compact ag-segmented-tabs-auto"
+
           selectedKey={activeKey}
           onSelectionChange={(key) => {
             const nextKey = String(key);
@@ -272,7 +275,7 @@ function GroupStatsCard({
       <div className="h-[248px] min-w-0 overflow-auto 2xl:h-[288px]">
         <CompactDataTable
           ariaLabel={t('usage.group_stats')}
-          className="ag-compact-data-table--dense"
+
           emptyText={t('common.no_data')}
           minWidth={520}
           rowKey={(row) => row.key}
@@ -284,9 +287,9 @@ function GroupStatsCard({
               width: '30%',
               render: (row, index) => (
                 <>
-                  <span className="shrink-0 font-mono text-[11px] font-semibold text-text-tertiary">#{index + 1}</span>
+                  <span className="shrink-0 font-mono text-[11px] font-semibold text-muted">#{index + 1}</span>
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: PIE_COLORS[index % PIE_COLORS.length] }} />
-                  <span className="min-w-0 truncate font-medium text-text" title={row.name}>{row.name}</span>
+                  <span className="min-w-0 truncate font-medium text-foreground" title={row.name}>{row.name}</span>
                 </>
               ),
             },
@@ -295,14 +298,14 @@ function GroupStatsCard({
               key: 'requests',
               title: t('usage.requests'),
               width: '16%',
-              render: (row) => <span className="truncate font-mono text-text-secondary">{row.requests.toLocaleString()}</span>,
+              render: (row) => <span className="truncate font-mono text-muted">{row.requests.toLocaleString()}</span>,
             },
             {
               align: 'end',
               key: 'tokens',
               title: t('usage.tokens'),
               width: '18%',
-              render: (row) => <span className="truncate font-mono text-text-secondary">{fmtNum(row.tokens)}</span>,
+              render: (row) => <span className="truncate font-mono text-muted">{fmtNum(row.tokens)}</span>,
             },
             {
               align: 'end',
@@ -347,7 +350,7 @@ function TokenTrendCard({
     cacheCumulativeRatio: t('usage.cache_cumulative_ratio'),
   };
   const granularityTabs = (
-    <Tabs className="ag-segmented-tabs ag-segmented-tabs-compact" selectedKey={granularity} onSelectionChange={(key) => onGranularityChange(String(key))}>
+    <Tabs selectedKey={granularity} onSelectionChange={(key) => onGranularityChange(String(key))}>
       <Tabs.List>
         {(['hour', 'day'] as const).map((g, index) => (
           <Tabs.Tab id={g} key={g}>
@@ -363,7 +366,7 @@ function TokenTrendCard({
   if (data.length === 0) {
     return (
       <SectionCard title={t('usage.token_trend')} extra={granularityTabs}>
-        <div className="flex h-[248px] items-center justify-center text-sm text-text-tertiary 2xl:h-[288px]">
+        <div className="flex h-[248px] items-center justify-center text-sm text-muted 2xl:h-[288px]">
           {t('common.no_data')}
         </div>
       </SectionCard>
@@ -614,8 +617,8 @@ export default function UsagePage() {
 
           return (
             <div className="flex min-w-0 items-center gap-1.5">
-              <span className="shrink-0 font-mono text-xs text-text-tertiary">{row.user_id > 0 ? `#${row.user_id}` : '-'}</span>
-              <span className={`min-w-0 truncate text-[13px] font-medium ${row.user_deleted ? 'text-text-tertiary' : 'text-text'}`} title={label}>
+              <span className="shrink-0 font-mono text-xs text-muted">{row.user_id > 0 ? `#${row.user_id}` : '-'}</span>
+              <span className={`min-w-0 truncate text-[13px] font-medium ${row.user_deleted ? 'text-muted' : 'text-foreground'}`} title={label}>
                 {label}
               </span>
             </div>
@@ -635,7 +638,7 @@ export default function UsagePage() {
       width: '180px',
       hideOnMobile: true,
       render: (row) => (
-        <span className="block truncate font-mono text-xs leading-tight text-text-secondary" title={row.endpoint || '-'}>
+        <span className="block truncate font-mono text-xs leading-tight text-muted" title={row.endpoint || '-'}>
           {row.endpoint || '-'}
         </span>
       ),
@@ -647,11 +650,11 @@ export default function UsagePage() {
       hideOnMobile: true,
       render: (row) => {
         if (row.api_key_deleted) {
-          return <span className="block max-w-full truncate text-[13px] text-text-tertiary">{t('usage.api_key_deleted')}</span>;
+          return <span className="block max-w-full truncate text-[13px] text-muted">{t('usage.api_key_deleted')}</span>;
         }
         const name = row.api_key_name || '-';
         return (
-          <span className="block max-w-full truncate text-xs text-text-secondary" title={name}>{name}</span>
+          <span className="block max-w-full truncate text-xs text-muted" title={name}>{name}</span>
         );
       },
     };
@@ -666,9 +669,9 @@ export default function UsagePage() {
         const title = email && name !== '-' ? `${name}\n${email}` : name;
         return (
           <div className="flex w-full min-w-0 flex-col items-center text-center" title={title}>
-            <span className="block max-w-full truncate text-xs font-medium text-text-secondary">{name}</span>
+            <span className="block max-w-full truncate text-xs font-medium text-muted">{name}</span>
             {email && name !== '-' ? (
-              <span className="block max-w-full truncate text-[11px] leading-tight text-text-tertiary">{email}</span>
+              <span className="block max-w-full truncate text-[11px] leading-tight text-muted">{email}</span>
             ) : null}
           </div>
         );
@@ -697,25 +700,25 @@ export default function UsagePage() {
               title={t('usage.total_requests')}
               value={activeStats.total_requests.toLocaleString()}
               icon={<Activity className="w-5 h-5" />}
-              accentColor="var(--ag-primary)"
+              accentColor="var(--accent)"
             />
             <StatCard
               title={t('usage.total_tokens')}
               value={fmtNum(activeStats.total_tokens)}
               icon={<Hash className="w-5 h-5" />}
-              accentColor="var(--ag-info)"
+              accentColor="var(--accent)"
             />
             <StatCard
               title={t('usage.actual_cost')}
               value={<CostValue value={activeStats.total_actual_cost} decimals={4} tone="actual" />}
               icon={<Coins className="w-5 h-5" />}
-              accentColor="var(--ag-warning)"
+              accentColor="var(--warning)"
             />
             <StatCard
               title={t('usage.total_cost')}
               value={<CostValue value={activeStats.total_cost} decimals={4} tone="standard" />}
               icon={<DollarSign className="w-5 h-5" />}
-              accentColor="var(--ag-success)"
+              accentColor="var(--success)"
             />
           </div>
 
@@ -773,7 +776,7 @@ export default function UsagePage() {
             <Select.Trigger>
               <Select.Value>
                 {filters.platform ? selectedPlatformLabel : (
-                  <span className="text-text-tertiary">{t('usage.platform')}</span>
+                  <span className="text-muted">{t('usage.platform')}</span>
                 )}
               </Select.Value>
               <Select.Indicator />
@@ -828,14 +831,14 @@ export default function UsagePage() {
             }}
           >
             <ComboBox.InputGroup className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
               <Input className="pl-9" placeholder={t('usage.search_user')} />
             </ComboBox.InputGroup>
             <ComboBox.Popover>
               <ListBox
                 items={visibleUserOptions}
                 renderEmptyState={() => (
-                  <div className="px-3 py-6 text-center text-xs text-text-tertiary">
+                  <div className="px-3 py-6 text-center text-xs text-muted">
                     {userKeyword.trim() ? t('common.no_data') : t('usage.search_user')}
                   </div>
                 )}
@@ -845,7 +848,7 @@ export default function UsagePage() {
                     <div className="min-w-0">
                       <div className="truncate">{item.label}</div>
                       {item.description ? (
-                        <div className="truncate text-xs text-text-tertiary">{item.description}</div>
+                        <div className="truncate text-xs text-muted">{item.description}</div>
                       ) : null}
                     </div>
                   </ListBox.Item>
@@ -885,14 +888,14 @@ export default function UsagePage() {
             }}
           >
             <ComboBox.InputGroup className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
               <Input className="pl-9" placeholder={t('usage.search_api_key', '搜索 API Key')} />
             </ComboBox.InputGroup>
             <ComboBox.Popover>
               <ListBox
                 items={visibleAPIKeyOptions}
                 renderEmptyState={() => (
-                  <div className="px-3 py-6 text-center text-xs text-text-tertiary">
+                  <div className="px-3 py-6 text-center text-xs text-muted">
                     {apiKeyKeyword.trim() ? t('common.no_data') : t('usage.search_api_key', '搜索 API Key')}
                   </div>
                 )}
@@ -902,7 +905,7 @@ export default function UsagePage() {
                     <div className="min-w-0">
                       <div className="truncate">{item.label}</div>
                       {item.description ? (
-                        <div className="truncate text-xs text-text-tertiary">{item.description}</div>
+                        <div className="truncate text-xs text-muted">{item.description}</div>
                       ) : null}
                     </div>
                   </ListBox.Item>

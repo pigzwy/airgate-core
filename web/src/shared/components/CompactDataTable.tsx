@@ -34,11 +34,11 @@ export function CompactDataTable<T>({
   rows,
 }: CompactDataTableProps<T>) {
   return (
-    <div className={cx('ag-compact-data-table', className)}>
-      <div data-slot="wrapper">
+    <div className={cx('overflow-hidden rounded-[var(--radius)] border border-border bg-surface', className)}>
+      <div className="overflow-x-auto" data-slot="wrapper">
         <table
           aria-label={ariaLabel}
-          className="ag-compact-data-table-content"
+          className="w-full border-collapse text-sm"
           data-slot="table"
           style={minWidth ? { minWidth } : undefined}
         >
@@ -51,12 +51,15 @@ export function CompactDataTable<T>({
                   id={column.key}
                   key={column.key}
                   scope="col"
-                  className={column.align === 'end' ? 'text-right' : undefined}
+                  className={cx(
+                    'border-b border-separator bg-default px-3 py-2 text-xs font-semibold text-muted',
+                    column.align === 'end' ? 'text-right' : undefined,
+                  )}
                   style={column.width ? { width: column.width } : undefined}
                 >
                   <span
                     className={cx(
-                      'ag-compact-data-table-heading',
+                      'flex items-center',
                       column.align === 'end' ? 'justify-end text-right' : 'justify-start text-left',
                     )}
                   >
@@ -70,7 +73,7 @@ export function CompactDataTable<T>({
             {rows.length === 0 ? (
               <tr data-key="empty" data-slot="tr">
                 <td colSpan={columns.length} data-slot="td">
-                  <div className="ag-compact-data-table-empty">{emptyText}</div>
+                  <div className="flex min-h-28 items-center justify-center px-3 py-8 text-sm text-muted">{emptyText}</div>
                 </td>
               </tr>
             ) : rows.map((row, rowIndex) => {
@@ -82,11 +85,14 @@ export function CompactDataTable<T>({
                       <td
                         data-slot="td"
                         key={column.key}
-                        className={column.align === 'end' ? 'text-right' : undefined}
+                        className={cx(
+                          'border-b border-separator px-3 py-2 align-middle text-foreground',
+                          column.align === 'end' ? 'text-right' : undefined,
+                        )}
                       >
                         <div
                           className={cx(
-                            'ag-compact-data-table-cell',
+                            'flex min-h-8 items-center',
                             column.align === 'end' ? 'justify-end text-right' : 'justify-start text-left',
                           )}
                         >

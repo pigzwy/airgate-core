@@ -87,11 +87,11 @@ export function SchemaCredentialsForm({
   return (
     <div
       className="space-y-4 pt-4"
-      style={{ borderTop: '1px solid var(--ag-border)' }}
+      style={{ borderTop: '1px solid var(--border)' }}
     >
       <p
         className="text-xs font-medium uppercaser"
-        style={{ color: 'var(--ag-text-secondary)' }}
+        style={{ color: 'var(--muted)' }}
       >
         {t('accounts.credentials')}
       </p>
@@ -119,7 +119,7 @@ export function SchemaCredentialsForm({
             </Select.Popover>
           </Select>
           {selectedType?.description && (
-            <p className="text-xs text-text-tertiary -mt-2">
+            <p className="text-xs text-muted -mt-2">
               {selectedType.description}
             </p>
           )}
@@ -176,7 +176,7 @@ export function GroupCheckboxList({
           className="select__trigger select__trigger--full-width"
         >
           <span className="select__value">
-            <span className={selectedGroups.length === 0 ? 'block min-w-0 truncate text-text-tertiary' : 'block min-w-0 truncate'}>
+            <span className={selectedGroups.length === 0 ? 'block min-w-0 truncate text-muted' : 'block min-w-0 truncate'}>
               {selectedLabel}
             </span>
           </span>
@@ -214,8 +214,8 @@ export function GroupCheckboxList({
                           <Checkbox.Indicator />
                         </Checkbox.Control>
                       </Checkbox>
-                      <span className="min-w-0 truncate text-sm text-text">{g.name}</span>
-                      <span className="shrink-0 rounded border border-border-subtle px-1.5 py-0 text-[10px] leading-4 text-text-tertiary">
+                      <span className="min-w-0 truncate text-sm text-foreground">{g.name}</span>
+                      <span className="shrink-0 rounded border border-separator px-1.5 py-0 text-[10px] leading-4 text-muted">
                         {g.platform}
                       </span>
                     </span>

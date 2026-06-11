@@ -37,7 +37,7 @@ function PieNameTooltip({
   if (!active || name == null || name === '') return null;
 
   return (
-    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-text shadow-lg">
+    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-foreground shadow-lg">
       {String(name)}
     </div>
   );
@@ -148,7 +148,7 @@ export function AccountStatsModal({
                       value={customStart}
                       onChange={setCustomStart}
                     />
-                    <span className="text-text-tertiary text-xs">—</span>
+                    <span className="text-muted text-xs">—</span>
                     <CommonDatePicker
                       className="w-full sm:w-40"
                       label={t('accounts.stats_end_date')}
@@ -160,7 +160,7 @@ export function AccountStatsModal({
               </div>
 
               {isLoading ? (
-                <div className="flex items-center justify-center py-16 text-text-tertiary text-sm">
+                <div className="flex items-center justify-center py-16 text-muted text-sm">
                   {t('common.loading')}
                 </div>
               ) : data ? (
@@ -191,15 +191,15 @@ function StatsContent({ data, lifetimeImageCount }: { data: AccountStatsResp; li
   return (
     <div className="space-y-5">
       {/* 头部信息 */}
-      <div className="flex items-center gap-3 p-4 rounded-lg bg-gradient-to-r from-primary-subtle/50 to-transparent border border-border-subtle">
-        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-subtle">
+      <div className="flex items-center gap-3 p-4 rounded-lg bg-gradient-to-r from-accent-soft/50 to-transparent border border-separator">
+        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent-soft">
           <PlatformIcon platform={data.platform} className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm text-text truncate">{data.name}</span>
+            <span className="font-semibold text-sm text-foreground truncate">{data.name}</span>
           </div>
-          <span className="text-xs text-text-tertiary">
+          <span className="text-xs text-muted">
             {rangeLabel} · {t('accounts.stats_range_summary', { days: data.total_days, active: activeDays })}
           </span>
         </div>
@@ -215,35 +215,35 @@ function StatsContent({ data, lifetimeImageCount }: { data: AccountStatsResp; li
           value={fmtCost(range.account_cost, 2)}
           sub={`${t('accounts.stats_actual')}: ${fmtCost(range.actual_cost, 2)}`}
           icon={<DollarSign className="w-4 h-4" />}
-          color="var(--ag-warning)"
+          color="var(--warning)"
         />
         <MiniStatCard
           label={t('accounts.stats_range_requests')}
           value={fmtNum(range.count)}
           sub={t('accounts.stats_total_calls')}
           icon={<Activity className="w-4 h-4" />}
-          color="var(--ag-info)"
+          color="var(--accent)"
         />
         <MiniStatCard
           label={t('accounts.stats_daily_cost')}
           value={fmtCost(dailyAvgCost, 2)}
           sub={t('accounts.stats_based_on_days', { days: activeDays })}
           icon={<TrendingUp className="w-4 h-4" />}
-          color="var(--ag-success)"
+          color="var(--success)"
         />
         <MiniStatCard
           label={t('accounts.stats_daily_requests')}
           value={fmtNum(Math.round(dailyAvgRequests))}
           sub={t('accounts.stats_avg_daily')}
           icon={<Zap className="w-4 h-4" />}
-          color="var(--ag-danger)"
+          color="var(--danger)"
         />
       </div>
 
       {/* 中间 3 个信息卡片 */}
       <div className="grid grid-cols-3 gap-3">
         {/* 今日概览 */}
-        <InfoCard title={t('accounts.stats_today')} icon={<Clock className="w-4 h-4" />} color="var(--ag-info)">
+        <InfoCard title={t('accounts.stats_today')} icon={<Clock className="w-4 h-4" />} color="var(--accent)">
           <InfoRow label={t('accounts.stats_cost')} value={fmtCost(data.today.account_cost)} />
           <InfoRow label={t('accounts.stats_actual_cost')} value={fmtCost(data.today.actual_cost)} />
           <InfoRow label={t('accounts.stats_requests')} value={data.today.count.toLocaleString()} />
@@ -257,7 +257,7 @@ function StatsContent({ data, lifetimeImageCount }: { data: AccountStatsResp; li
         </InfoCard>
 
         {/* 最高费用日 */}
-        <InfoCard title={t('accounts.stats_peak_cost_day')} icon={<DollarSign className="w-4 h-4" />} color="var(--ag-warning)">
+        <InfoCard title={t('accounts.stats_peak_cost_day')} icon={<DollarSign className="w-4 h-4" />} color="var(--warning)">
           <InfoRow label={t('accounts.stats_date')} value={data.peak_cost_day.date ? fmtDate(data.peak_cost_day.date) : '-'} />
           <InfoRow label={t('accounts.stats_cost')} value={fmtCost(data.peak_cost_day.account_cost)} highlight />
           <InfoRow label={t('accounts.stats_actual_cost')} value={fmtCost(data.peak_cost_day.actual_cost)} />
@@ -265,7 +265,7 @@ function StatsContent({ data, lifetimeImageCount }: { data: AccountStatsResp; li
         </InfoCard>
 
         {/* 最高请求日 */}
-        <InfoCard title={t('accounts.stats_peak_request_day')} icon={<Activity className="w-4 h-4" />} color="var(--ag-success)">
+        <InfoCard title={t('accounts.stats_peak_request_day')} icon={<Activity className="w-4 h-4" />} color="var(--success)">
           <InfoRow label={t('accounts.stats_date')} value={data.peak_request_day.date ? fmtDate(data.peak_request_day.date) : '-'} />
           <InfoRow label={t('accounts.stats_requests')} value={fmtNum(data.peak_request_day.count)} highlight />
           <InfoRow label={t('accounts.stats_cost')} value={fmtCost(data.peak_request_day.account_cost)} />
@@ -276,19 +276,19 @@ function StatsContent({ data, lifetimeImageCount }: { data: AccountStatsResp; li
       {/* 下方 3 个信息卡片 */}
       <div className="grid grid-cols-3 gap-3">
         {/* 累计 Token */}
-        <InfoCard title={t('accounts.stats_total_tokens')} icon={<Cpu className="w-4 h-4" />} color="var(--ag-primary)">
+        <InfoCard title={t('accounts.stats_total_tokens')} icon={<Cpu className="w-4 h-4" />} color="var(--accent)">
           <InfoRow label={t('accounts.stats_range_total')} value={fmtNum(totalTokens)} />
           <InfoRow label={t('accounts.stats_daily_avg_token')} value={fmtNum(Math.round(dailyAvgTokens))} />
         </InfoCard>
 
         {/* 性能 */}
-        <InfoCard title={t('accounts.stats_performance')} icon={<Zap className="w-4 h-4" />} color="var(--ag-warning)">
+        <InfoCard title={t('accounts.stats_performance')} icon={<Zap className="w-4 h-4" />} color="var(--warning)">
           <InfoRow label={t('accounts.stats_avg_response')} value={`${(data.avg_duration_ms / 1000).toFixed(2)}s`} />
           <InfoRow label={t('accounts.stats_active_days')} value={`${data.active_days} / ${data.total_days}`} />
         </InfoCard>
 
         {/* 最近统计 */}
-        <InfoCard title={t('accounts.stats_recent')} icon={<Calendar className="w-4 h-4" />} color="var(--ag-info)">
+        <InfoCard title={t('accounts.stats_recent')} icon={<Calendar className="w-4 h-4" />} color="var(--accent)">
           <InfoRow label={t('accounts.stats_today_requests')} value={data.today.count.toLocaleString()} />
           <InfoRow label={t('accounts.stats_today_tokens')} value={fmtNum(data.today.input_tokens + data.today.output_tokens)} />
           <InfoRow label={t('accounts.stats_today_cost')} value={fmtCost(data.today.account_cost)} />
@@ -325,16 +325,16 @@ function MiniStatCard({
   label: string; value: string; sub: string; icon: React.ReactNode; color: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-border-subtle p-3.5 transition-colors hover:border-border">
+    <div className="relative overflow-hidden rounded-lg border border-separator p-3.5 transition-colors hover:border-border">
       <div className="absolute top-0 left-0 right-0 h-px opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
       <div className="flex items-start justify-between mb-2">
-        <span className="text-[11px] text-text-tertiary font-medium">{label}</span>
+        <span className="text-[11px] text-muted font-medium">{label}</span>
         <div className="flex items-center justify-center w-7 h-7 rounded-md" style={{ background: `color-mix(in srgb, ${color} 12%, transparent)`, color }}>
           {icon}
         </div>
       </div>
-      <div className="text-xl font-bold text-text font-mono">{value}</div>
-      <div className="text-[10px] text-text-tertiary mt-1">{sub}</div>
+      <div className="text-xl font-bold text-foreground font-mono">{value}</div>
+      <div className="text-[10px] text-muted mt-1">{sub}</div>
     </div>
   );
 }
@@ -347,10 +347,10 @@ function InfoCard({
   title: string; icon: React.ReactNode; color: string; children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-border-subtle p-3.5 space-y-2">
+    <div className="rounded-lg border border-separator p-3.5 space-y-2">
       <div className="flex items-center gap-1.5">
         <div className="flex items-center justify-center w-5 h-5 rounded" style={{ color }}>{icon}</div>
-        <span className="text-xs font-semibold text-text">{title}</span>
+        <span className="text-xs font-semibold text-foreground">{title}</span>
       </div>
       <div className="space-y-1.5">{children}</div>
     </div>
@@ -360,8 +360,8 @@ function InfoCard({
 function InfoRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex items-center justify-between text-xs">
-      <span className="text-text-tertiary">{label}</span>
-      <span className={`font-mono ${highlight ? 'text-warning font-semibold' : 'text-text-secondary'}`}>{value}</span>
+      <span className="text-muted">{label}</span>
+      <span className={`font-mono ${highlight ? 'text-warning font-semibold' : 'text-muted'}`}>{value}</span>
     </div>
   );
 }
@@ -385,20 +385,20 @@ function TrendChart({ data }: { data: AccountStatsResp }) {
   if (chartData.length === 0) return null;
 
   return (
-    <div className="rounded-lg border border-border-subtle p-4">
-      <h4 className="text-xs font-semibold text-text mb-3">{t('accounts.stats_trend_title')}</h4>
+    <div className="rounded-lg border border-separator p-4">
+      <h4 className="text-xs font-semibold text-foreground mb-3">{t('accounts.stats_trend_title')}</h4>
       <ResponsiveContainer width="100%" height={260} debounce={80}>
         <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--ag-border-subtle)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--separator)" />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 10, fill: 'var(--ag-text-tertiary)' }}
-            axisLine={{ stroke: 'var(--ag-border)' }}
+            tick={{ fontSize: 10, fill: 'var(--muted)' }}
+            axisLine={{ stroke: 'var(--border)' }}
             tickLine={false}
           />
           <YAxis
             yAxisId="cost"
-            tick={{ fontSize: 10, fill: 'var(--ag-text-tertiary)' }}
+            tick={{ fontSize: 10, fill: 'var(--muted)' }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v: number) => `$${v}`}
@@ -406,20 +406,20 @@ function TrendChart({ data }: { data: AccountStatsResp }) {
           <YAxis
             yAxisId="count"
             orientation="right"
-            tick={{ fontSize: 10, fill: 'var(--ag-text-tertiary)' }}
+            tick={{ fontSize: 10, fill: 'var(--muted)' }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v: number) => fmtNum(v)}
           />
           <RechartsTooltip
             contentStyle={{
-              background: 'var(--ag-bg-elevated)',
-              border: '1px solid var(--ag-border)',
+              background: 'var(--overlay)',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               fontSize: 12,
               padding: '8px 12px',
             }}
-            labelStyle={{ color: 'var(--ag-text)', fontWeight: 600, marginBottom: 4 }}
+            labelStyle={{ color: 'var(--foreground)', fontWeight: 600, marginBottom: 4 }}
             itemStyle={{ padding: '2px 0' }}
             formatter={(value, name) => {
               const v = Number(value);
@@ -443,7 +443,7 @@ function TrendChart({ data }: { data: AccountStatsResp }) {
 
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
-    <div className="flex items-center gap-1.5 text-[11px] text-text-tertiary">
+    <div className="flex items-center gap-1.5 text-[11px] text-muted">
       <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
       {label}
     </div>
@@ -462,8 +462,8 @@ function ModelDistribution({ data }: { data: AccountStatsResp }) {
   );
 
   return (
-    <div className="rounded-lg border border-border-subtle p-4">
-      <h4 className="text-xs font-semibold text-text mb-3">{t('accounts.stats_model_distribution')}</h4>
+    <div className="rounded-lg border border-separator p-4">
+      <h4 className="text-xs font-semibold text-foreground mb-3">{t('accounts.stats_model_distribution')}</h4>
       <div className="flex flex-col gap-4 xl:flex-row">
         {/* 饼图 */}
         <div className="w-48 h-48 flex-shrink-0">
@@ -477,7 +477,7 @@ function ModelDistribution({ data }: { data: AccountStatsResp }) {
               dataKey="value"
               isAnimationActive={false}
               minAngle={3}
-              stroke="var(--ag-bg-elevated)"
+              stroke="var(--overlay)"
               strokeWidth={1}
             >
               {pieData.map((_, i) => (
@@ -509,7 +509,7 @@ function ModelDistribution({ data }: { data: AccountStatsResp }) {
                 render: (row, index) => (
                   <>
                     <span className="w-2 h-2 shrink-0 rounded-full" style={{ background: PIE_COLORS[index % PIE_COLORS.length] }} />
-                    <span className="min-w-0 truncate font-medium text-text" title={row.model}>{row.model}</span>
+                    <span className="min-w-0 truncate font-medium text-foreground" title={row.model}>{row.model}</span>
                   </>
                 ),
               },
@@ -518,14 +518,14 @@ function ModelDistribution({ data }: { data: AccountStatsResp }) {
                 key: 'requests',
                 title: t('accounts.stats_requests'),
                 width: '16%',
-                render: (row) => <span className="truncate font-mono text-text-secondary">{row.count.toLocaleString()}</span>,
+                render: (row) => <span className="truncate font-mono text-muted">{row.count.toLocaleString()}</span>,
               },
               {
                 align: 'end',
                 key: 'tokens',
                 title: 'Token',
                 width: '18%',
-                render: (row) => <span className="truncate font-mono text-text-secondary">{fmtNum(row.input_tokens + row.output_tokens)}</span>,
+                render: (row) => <span className="truncate font-mono text-muted">{fmtNum(row.input_tokens + row.output_tokens)}</span>,
               },
               {
                 align: 'end',
@@ -539,7 +539,7 @@ function ModelDistribution({ data }: { data: AccountStatsResp }) {
                 key: 'standard',
                 title: t('accounts.stats_standard'),
                 width: '18%',
-                render: (row) => <span className="truncate font-mono text-text-secondary">{fmtCost(row.total_cost, 2)}</span>,
+                render: (row) => <span className="truncate font-mono text-muted">{fmtCost(row.total_cost, 2)}</span>,
               },
             ]}
           />

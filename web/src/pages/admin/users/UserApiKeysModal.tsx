@@ -45,7 +45,7 @@ export function UserApiKeysModal({ open, user, onClose }: UserApiKeysModalProps)
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '700px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -95,7 +95,7 @@ export function UserApiKeysModal({ open, user, onClose }: UserApiKeysModalProps)
                   <CommonTable.Row id={String(row.id)} key={row.id}>
                     <CommonTable.Cell>{row.name}</CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="font-mono text-xs text-text-secondary">{row.key_prefix}</span>
+                      <span className="font-mono text-xs text-muted">{row.key_prefix}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <span className="font-mono text-xs">
@@ -106,7 +106,7 @@ export function UserApiKeysModal({ open, user, onClose }: UserApiKeysModalProps)
                       <StatusChip status={row.status} />
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="text-xs text-text-secondary">{formatDate(row.created_at)}</span>
+                      <span className="text-xs text-muted">{formatDate(row.created_at)}</span>
                     </CommonTable.Cell>
                   </CommonTable.Row>
                 ))

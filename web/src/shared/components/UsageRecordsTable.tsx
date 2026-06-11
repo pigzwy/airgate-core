@@ -8,7 +8,7 @@ import { TablePaginationFooter } from './TablePaginationFooter';
 
 const FULL_CELL_CONTENT_COLUMNS = new Set(['cost', 'tokens']);
 const LEFT_ALIGNED_CONTENT_COLUMNS = new Set<string>(['model']);
-const NEW_ROW_ANIMATION_NAME = 'ag-usage-row-new-enter';
+const USAGE_TABLE_ROW_HEIGHT_CLASS = 'h-10';
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
@@ -25,10 +25,6 @@ function ColumnHeader({ children }: { children: ReactNode }) {
       {children}
     </span>
   );
-}
-
-function getColumnClassName(key: string) {
-  return `ag-usage-col-${key.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 }
 
 function useNewRowMarkers<T extends UsageRow>({
@@ -118,7 +114,7 @@ const UsageTableRow = memo(function UsageTableRow({
   }, [isNew]);
   const handleAnimationEnd = (event: AnimationEvent<HTMLTableRowElement>) => {
     if (animationEndedRef.current) return;
-    if (event.animationName !== NEW_ROW_ANIMATION_NAME) return;
+    if (!event.animationName) return;
     animationEndedRef.current = true;
     onNewAnimationEnd(rowId);
   };
@@ -127,7 +123,7 @@ const UsageTableRow = memo(function UsageTableRow({
     <tr
       data-key={rowId}
       data-slot="tr"
-      className={isNew ? 'ag-usage-table-row--new' : undefined}
+      className={isNew ? '' : undefined}
       onAnimationEnd={isNew ? handleAnimationEnd : undefined}
     >
       {columns.map((column) => {
@@ -138,11 +134,14 @@ const UsageTableRow = memo(function UsageTableRow({
           <td
             data-slot="td"
             key={column.key}
-            className={cx(getColumnClassName(column.key), leftAlignedContent ? 'text-left' : 'text-center')}
+            className={cx(
+              'border-b border-separator px-0 py-0 text-foreground last:border-b-0',
+              leftAlignedContent ? 'text-left' : 'text-center',
+            )}
           >
             <div
               className={cx(
-                'flex h-[var(--ag-usage-table-row-height)] w-full items-center overflow-hidden',
+                `flex ${USAGE_TABLE_ROW_HEIGHT_CLASS} w-full items-center overflow-hidden`,
                 leftAlignedContent ? 'justify-start text-left' : 'justify-center text-center',
                 fullCellContent ? 'px-1 py-0.5' : 'px-2.5 py-0.5',
               )}
@@ -194,20 +193,9 @@ export function UsageRecordsTable<T extends UsageRow>({
     () => Math.max(760, columns.reduce((sum, column) => sum + parseColumnWidth(column.width), 0) + 24),
     [columns],
   );
-  const tableMobileWidthDelta = useMemo(
-    () => columns.reduce((sum, column) => {
-      if (column.key !== 'created_at') return sum;
-      return sum + Math.max(0, parseColumnWidth(column.width) - 92);
-    }, 0),
-    [columns],
-  );
   const tableStyle = useMemo(
-    () => ({
-      minWidth: tableMinWidth,
-      '--ag-usage-table-min-width': `${tableMinWidth}px`,
-      '--ag-usage-table-mobile-delta': `${tableMobileWidthDelta}px`,
-    }) as CSSProperties,
-    [tableMinWidth, tableMobileWidthDelta],
+    () => ({ minWidth: tableMinWidth }) as CSSProperties,
+    [tableMinWidth],
   );
   const { clearMarkedRowId, markedRowIds } = useNewRowMarkers({
     dataVersion,
@@ -223,20 +211,20 @@ export function UsageRecordsTable<T extends UsageRow>({
         <Inbox className="h-5 w-5" />
       </div>
       <div className="space-y-1">
-        <div className="text-sm font-medium text-text">{emptyTitle}</div>
+        <div className="text-sm font-medium text-foreground">{emptyTitle}</div>
         {emptyDescription ? (
-          <div className="text-xs text-text-tertiary">{emptyDescription}</div>
+          <div className="text-xs text-muted">{emptyDescription}</div>
         ) : null}
       </div>
     </EmptyState>
   );
 
   return (
-    <div className="ag-usage-records-table min-h-[240px]">
-      <div className="ag-usage-table-scroll" data-slot="wrapper">
+    <div className="min-h-[240px] overflow-hidden rounded-[var(--radius)] border border-border bg-surface">
+      <div className="overflow-x-auto" data-slot="wrapper">
         <table
           aria-label={ariaLabel}
-          className="ag-usage-table"
+          className="w-full table-fixed border-collapse text-sm"
           data-slot="table"
           style={tableStyle}
         >
@@ -250,7 +238,7 @@ export function UsageRecordsTable<T extends UsageRow>({
                   key={column.key}
                   scope="col"
                   className={cx(
-                    getColumnClassName(column.key),
+                    'border-b border-separator bg-default px-0 py-0 text-muted',
                     index === 0 && 'after:hidden',
                   )}
                   style={column.width ? { width: column.width } : undefined}
@@ -283,7 +271,7 @@ export function UsageRecordsTable<T extends UsageRow>({
           </tbody>
         </table>
       </div>
-      <div className="table__footer" data-slot="table-footer">
+      <div className="border-t border-separator bg-surface px-3 py-2" data-slot="table-footer">
         <TablePaginationFooter
           page={page}
           pageSize={pageSize}

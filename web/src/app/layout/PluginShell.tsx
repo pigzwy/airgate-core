@@ -63,8 +63,8 @@ export function PluginShell({
   };
 
   return (
-    <div className="fixed inset-0 flex min-h-0 flex-col overflow-hidden bg-bg text-text">
-      <header className="ag-topbar flex h-12 shrink-0 items-center justify-between gap-3 px-2.5 sm:px-4">
+    <div className="fixed inset-0 flex min-h-0 flex-col overflow-hidden bg-background text-foreground">
+      <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border bg-background px-2.5 sm:px-4">
         <div className="min-w-0 flex-1">
           <PluginBreadcrumbs pluginName={pluginName} items={breadcrumbItems} />
         </div>
@@ -100,20 +100,20 @@ export function PluginShell({
               <div className="hidden min-w-0 items-center gap-2.5 sm:flex">
                 {!isAPIKeySession && (
                   <div className="hidden min-w-0 text-right md:block">
-                    <p className="max-w-36 truncate text-sm font-medium leading-tight text-text">
+                    <p className="max-w-36 truncate text-sm font-medium leading-tight text-foreground">
                       {displayName}
                     </p>
-                    <p className="max-w-44 truncate text-xs leading-tight text-text-tertiary">
+                    <p className="max-w-44 truncate text-xs leading-tight text-muted">
                       {user.email}
                     </p>
                   </div>
                 )}
                 {isAdmin ? (
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-primary">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-accent">
                     <ShieldCheck className="h-5 w-5" />
                   </div>
                 ) : (
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-sm font-bold text-primary">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-sm font-bold text-accent">
                     {displayName.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -124,7 +124,7 @@ export function PluginShell({
           <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
           <Button
             aria-label={t('common.logout')}
-            className="h-10 w-10 text-text-secondary hover:bg-danger/10 hover:text-danger"
+            className="h-10 w-10 text-muted hover:bg-danger/10 hover:text-danger"
             isIconOnly
             size="sm"
             variant="ghost"

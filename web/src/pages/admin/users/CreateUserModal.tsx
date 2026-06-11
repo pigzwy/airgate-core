@@ -73,7 +73,7 @@ export function CreateUserModal({ open, onClose, onSubmit, loading, defaultMaxCo
       <DialogTriggerShim />
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
-          <Modal.Dialog className="ag-elevation-modal">
+          <Modal.Dialog>
             <Modal.Header>
               <Modal.Heading>{t('users.create')}</Modal.Heading>
               <Modal.CloseTrigger />

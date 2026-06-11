@@ -65,7 +65,7 @@ export function EditKeyModal({ open, apiKey, groups, onClose, onSubmit, loading 
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '560px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -77,7 +77,7 @@ export function EditKeyModal({ open, apiKey, groups, onClose, onSubmit, loading 
         <HeroTextField fullWidth>
           <Label>{t('common.name')}</Label>
           <div className="relative">
-            <Key className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+            <Key className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
             <Input
               className="pl-9"
               value={form.name ?? ''}

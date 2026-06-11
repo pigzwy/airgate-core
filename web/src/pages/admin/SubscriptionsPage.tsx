@@ -222,14 +222,14 @@ export default function SubscriptionsPage() {
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <span className="inline-flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5 text-text-tertiary" />
+                        <User className="h-3.5 w-3.5 text-muted" />
                         {getUserEmail(row.user_id)}
                       </span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
                       <span className="inline-flex items-center gap-1.5">
-                        <Layers className="h-3.5 w-3.5 text-text-tertiary" />
-                        <span className="font-medium text-text">{row.group_name}</span>
+                        <Layers className="h-3.5 w-3.5 text-muted" />
+                        <span className="font-medium text-foreground">{row.group_name}</span>
                       </span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
@@ -242,7 +242,7 @@ export default function SubscriptionsPage() {
                       <StatusChip status={row.status} />
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <div className="ag-table-row-actions flex justify-center">
+                      <div className="flex justify-center">
                         <Button
                           size="sm"
                           variant="secondary"

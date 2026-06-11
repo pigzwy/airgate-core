@@ -64,12 +64,12 @@ export function BulkActionsBar({
   if (selectedCount === 0) return null;
 
   const selectedCountLabel = (
-    <span className="flex h-8 shrink-0 items-center gap-0.5 whitespace-nowrap text-[15px] font-semibold leading-none text-primary">
+    <span className="flex h-8 shrink-0 items-center gap-0.5 whitespace-nowrap text-[15px] font-semibold leading-none text-accent">
       <span>{selectedTextBefore}</span>
       {countIndex >= 0 ? (
         <span
           key={countPulseToken}
-          className="ag-bulk-selected-count"
+
           data-pulse={isCountPulsing || undefined}
         >
           {selectedCountText}
@@ -106,7 +106,7 @@ export function BulkActionsBar({
   if (overlay) {
     return (
       <div
-        className="ag-accounts-bulk-header-bar absolute left-0 top-0 z-20 flex w-full items-center gap-2 overflow-hidden border border-border bg-background px-2 animate-in fade-in duration-150"
+        className="absolute left-0 top-0 z-20 flex w-full items-center gap-2 overflow-hidden border border-border bg-background px-2 animate-in fade-in duration-150"
         style={{
           background: 'linear-gradient(90deg, var(--surface-tertiary) 0%, var(--surface-secondary) 42%, var(--background) 100%)',
           backgroundColor: 'var(--background)',
@@ -145,11 +145,11 @@ export function BulkActionsBar({
     <div
       className="mb-3 flex flex-wrap items-center gap-2 rounded-[var(--radius)] px-4 py-2.5"
       style={{
-        background: 'var(--ag-primary-subtle)',
-        border: '1px solid color-mix(in oklab, var(--ag-primary) 52%, transparent)',
+        background: 'var(--color-accent-soft)',
+        border: '1px solid color-mix(in oklab, var(--accent) 52%, transparent)',
       }}
     >
-      <span className="text-sm font-medium" style={{ color: 'var(--ag-primary)' }}>
+      <span className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
         {t('accounts.bulk_selected', { count: selectedCount })}
       </span>
       <Button
@@ -183,7 +183,7 @@ function ActionButton({
     <Button
       size="sm"
       variant="outline"
-      className={`ag-bulk-action-button min-w-0 max-w-full shrink-0 items-center gap-1.5 leading-none ${danger ? 'text-danger' : ''}`}
+      className={`min-w-0 max-w-full shrink-0 items-center gap-1.5 leading-none ${danger ? 'text-danger' : ''}`}
       onPress={onClick}
     >
       {icon}

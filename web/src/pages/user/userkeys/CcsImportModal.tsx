@@ -162,7 +162,7 @@ export function CcsImportModal({
       <DialogTriggerShim />
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
-          <Modal.Dialog className="ag-elevation-modal">
+          <Modal.Dialog>
             <Modal.Header>
               <Modal.Heading>{t('user_keys.ccs_select_client')}</Modal.Heading>
               <Modal.CloseTrigger />
@@ -171,7 +171,7 @@ export function CcsImportModal({
       {ccsKeyValue ? (
         ccsPlatform ? (
           <div className="space-y-3">
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-muted">
               {t('user_keys.ccs_select_desc')}
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -184,11 +184,11 @@ export function CcsImportModal({
                   onClose();
                 }}
               >
-                <div className="w-10 h-10 rounded-lg bg-info-subtle flex items-center justify-center">
-                  <Terminal className="w-5 h-5 text-info" />
+                <div className="w-10 h-10 rounded-lg bg-accent-soft flex items-center justify-center">
+                  <Terminal className="w-5 h-5 text-accent" />
                 </div>
-                <span className="text-sm font-medium text-text">Claude Code</span>
-                <span className="text-xs text-text-tertiary text-center">
+                <span className="text-sm font-medium text-foreground">Claude Code</span>
+                <span className="text-xs text-muted text-center">
                   {t('user_keys.ccs_claude_desc')}
                 </span>
               </Button>
@@ -203,11 +203,11 @@ export function CcsImportModal({
                     onClose();
                   }}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-success-subtle flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-success-soft flex items-center justify-center">
                     <Terminal className="w-5 h-5 text-success" />
                   </div>
-                  <span className="text-sm font-medium text-text">Codex CLI</span>
-                  <span className="text-xs text-text-tertiary text-center">
+                  <span className="text-sm font-medium text-foreground">Codex CLI</span>
+                  <span className="text-xs text-muted text-center">
                     {t('user_keys.ccs_codex_desc')}
                   </span>
                 </Button>
@@ -215,12 +215,12 @@ export function CcsImportModal({
             </div>
           </div>
         ) : (
-          <div className="rounded-md border border-glass-border bg-surface p-4 text-sm text-text-secondary">
+          <div className="rounded-md border border-border bg-surface p-4 text-sm text-muted">
             {t('user_keys.group_unbound_hint')}
           </div>
         )
       ) : (
-        <div className="flex items-center justify-center py-8 text-text-tertiary text-sm">
+        <div className="flex items-center justify-center py-8 text-muted text-sm">
           {t('common.loading')}
         </div>
       )}

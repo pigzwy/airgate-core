@@ -23,6 +23,9 @@ import { FETCH_ALL_PARAMS } from '../../shared/constants';
 import { USER_AUTO_REFRESH_OPTIONS, usePersistentAutoRefresh } from '../../shared/hooks/usePersistentAutoRefresh';
 
 const USER_USAGE_AUTO_UPDATE_STORAGE_KEY = 'airgate.user.usage.auto_update';
+const METRIC_CARD_CLASS = 'min-h-[72px] 2xl:min-h-[78px]';
+const METRIC_CONTENT_CLASS = 'flex min-w-0 flex-1 flex-row items-center justify-between gap-3 p-3 text-left 2xl:p-3.5';
+const METRIC_COPY_CLASS = 'min-w-0 flex-1 text-left';
 
 function StatCard({
   accentColor,
@@ -36,12 +39,12 @@ function StatCard({
   value: ReactNode;
 }) {
   return (
-    <Card className="ag-dashboard-metric min-h-[72px] 2xl:min-h-[78px]">
-      <Card.Content className="ag-dashboard-metric-content p-3 2xl:p-3.5">
-        <div className="ag-dashboard-metric-copy">
-          <div className="truncate text-sm font-semibold tracking-normal text-text-tertiary">{title}</div>
+    <Card className={METRIC_CARD_CLASS}>
+      <Card.Content className={METRIC_CONTENT_CLASS}>
+        <div className={METRIC_COPY_CLASS}>
+          <div className="truncate text-sm font-semibold tracking-normal text-muted">{title}</div>
           <div className="mt-1 flex min-w-0 items-baseline gap-2">
-            <div className="min-w-0 truncate font-mono text-[22px] font-semibold leading-none text-text 2xl:text-2xl">{value}</div>
+            <div className="min-w-0 truncate font-mono text-[22px] font-semibold leading-none text-foreground 2xl:text-2xl">{value}</div>
           </div>
         </div>
         <div
@@ -105,9 +108,9 @@ function APIKeyInfoBar() {
       <Card.Content className="flex items-center gap-4 px-4 py-3 text-sm flex-wrap">
         {quota > 0 && (
           <div className="flex items-center gap-2">
-            <Gauge className="w-3.5 h-3.5 text-text-tertiary" />
-            <span className="text-text-tertiary">{t('auth.apikey_quota')}:</span>
-            <span className={pct >= 90 ? 'text-danger font-medium' : 'text-text-secondary'}>
+            <Gauge className="w-3.5 h-3.5 text-muted" />
+            <span className="text-muted">{t('auth.apikey_quota')}:</span>
+            <span className={pct >= 90 ? 'text-danger font-medium' : 'text-muted'}>
               ${used.toFixed(4)} / ${quota.toFixed(2)}
             </span>
             <Meter
@@ -127,7 +130,7 @@ function APIKeyInfoBar() {
         )}
 
         {quota === 0 && (
-          <div className="flex items-center gap-2 text-text-tertiary">
+          <div className="flex items-center gap-2 text-muted">
             <Gauge className="w-3.5 h-3.5" />
             <span>{t('auth.apikey_quota')}: {t('auth.apikey_unlimited')}</span>
           </div>
@@ -135,16 +138,16 @@ function APIKeyInfoBar() {
 
         {expiresAt && (
           <div className="flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5 text-text-tertiary" />
-            <span className="text-text-tertiary">{t('auth.apikey_expires')}:</span>
-            <span className={expiresWarning ? 'text-warning font-medium' : 'text-text-secondary'}>
+            <Clock className="w-3.5 h-3.5 text-muted" />
+            <span className="text-muted">{t('auth.apikey_expires')}:</span>
+            <span className={expiresWarning ? 'text-warning font-medium' : 'text-muted'}>
               {expiresLabel}
             </span>
           </div>
         )}
 
         {!expiresAt && (
-          <div className="flex items-center gap-2 text-text-tertiary">
+          <div className="flex items-center gap-2 text-muted">
             <Clock className="w-3.5 h-3.5" />
             <span>{t('auth.apikey_expires')}: {t('auth.apikey_never')}</span>
           </div>
@@ -152,9 +155,9 @@ function APIKeyInfoBar() {
 
         {effectiveRate > 0 && (
           <div className="flex items-center gap-2">
-            <Percent className="w-3.5 h-3.5 text-text-tertiary" />
-            <span className="text-text-tertiary">{t('auth.apikey_rate', '倍率')}:</span>
-            <span className="text-text-secondary font-mono">{effectiveRate.toFixed(2)}x</span>
+            <Percent className="w-3.5 h-3.5 text-muted" />
+            <span className="text-muted">{t('auth.apikey_rate', '倍率')}:</span>
+            <span className="text-muted font-mono">{effectiveRate.toFixed(2)}x</span>
           </div>
         )}
 
@@ -286,7 +289,7 @@ export default function UserUsageContent() {
       const endpoint = 'endpoint' in row && row.endpoint ? row.endpoint : '-';
 
       return (
-        <span className="block truncate font-mono text-xs leading-tight text-text-secondary" title={endpoint}>
+        <span className="block truncate font-mono text-xs leading-tight text-muted" title={endpoint}>
           {endpoint}
         </span>
       );
@@ -299,13 +302,13 @@ export default function UserUsageContent() {
     hideOnMobile: true,
     render: (row) => {
       if ('api_key_deleted' in row && row.api_key_deleted) {
-        return <span className="block max-w-full truncate text-[13px] text-text-tertiary">{t('usage.api_key_deleted')}</span>;
+        return <span className="block max-w-full truncate text-[13px] text-muted">{t('usage.api_key_deleted')}</span>;
       }
 
       const name = 'api_key_name' in row && row.api_key_name ? row.api_key_name : '-';
 
       return (
-        <span className="block max-w-full truncate text-xs text-text-secondary" title={name}>{name}</span>
+        <span className="block max-w-full truncate text-xs text-muted" title={name}>{name}</span>
       );
     },
   };
@@ -336,26 +339,26 @@ export default function UserUsageContent() {
           title={t('usage.total_requests')}
           value={(stats?.total_requests ?? 0).toLocaleString()}
           icon={<Activity className="w-5 h-5" />}
-          accentColor="var(--ag-primary)"
+          accentColor="var(--accent)"
         />
         <StatCard
           title={t('usage.total_tokens')}
           value={fmtNum(stats?.total_tokens ?? 0)}
           icon={<Hash className="w-5 h-5" />}
-          accentColor="var(--ag-info)"
+          accentColor="var(--accent)"
         />
         <StatCard
           title={t('usage.actual_cost')}
           value={<CostValue value={visibleActualCost} decimals={4} tone="actual" />}
           icon={<Coins className="w-5 h-5" />}
-          accentColor="var(--ag-warning)"
+          accentColor="var(--warning)"
         />
         {!customerScope && (
           <StatCard
             title={t('usage.total_cost')}
             value={<CostValue value={stats?.total_cost ?? 0} decimals={4} tone="standard" />}
             icon={<DollarSign className="w-5 h-5" />}
-            accentColor="var(--ag-success)"
+            accentColor="var(--success)"
           />
         )}
       </div>
@@ -384,7 +387,7 @@ export default function UserUsageContent() {
             <Select.Trigger>
               <Select.Value>
                 {filters.platform ? selectedPlatformLabel : (
-                  <span className="text-text-tertiary">{t('usage.platform')}</span>
+                  <span className="text-muted">{t('usage.platform')}</span>
                 )}
               </Select.Value>
               <Select.Indicator />
@@ -411,7 +414,7 @@ export default function UserUsageContent() {
               <Select.Trigger>
                 <Select.Value>
                   {filters.api_key_id ? selectedApiKeyLabel : (
-                    <span className="text-text-tertiary">API Key</span>
+                    <span className="text-muted">API Key</span>
                   )}
                 </Select.Value>
                 <Select.Indicator />

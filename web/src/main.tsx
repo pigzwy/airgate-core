@@ -100,7 +100,7 @@ function PluginAPIBridge() {
       <DialogTriggerShim />
       <AlertDialog.Backdrop>
         <AlertDialog.Container placement="center" size="sm">
-          <AlertDialog.Dialog className="ag-elevation-modal">
+          <AlertDialog.Dialog>
             <AlertDialog.Header>
               <AlertDialog.Icon status={pending?.danger ? 'danger' : 'accent'} />
               <AlertDialog.Heading>{pending?.title ?? '请确认'}</AlertDialog.Heading>

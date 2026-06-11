@@ -28,20 +28,23 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { decorativePalette } from '@doudou-start/airgate-theme';
 import { dashboardApi } from '../shared/api/dashboard';
 import { usersApi } from '../shared/api/users';
 import { queryKeys } from '../shared/queryKeys';
-import { PIE_CHART_COLORS, USAGE_TOKEN_COLORS } from '../shared/constants';
+import { AVATAR_COLORS, PIE_CHART_COLORS, USAGE_TOKEN_COLORS } from '../shared/constants';
 import { CompactDataTable } from '../shared/components/CompactDataTable';
 import { useDebouncedValue } from '../shared/hooks/useDebouncedValue';
 import { CostPair, CostValue } from '../shared/components/CostValue';
 import type { DashboardStatsResp, DashboardTrendResp } from '../shared/types';
 
 const PIE_COLORS = PIE_CHART_COLORS;
-const USER_COLORS = [...decorativePalette];
+const USER_COLORS = [...AVATAR_COLORS];
 const TOKEN_TREND_LINE_ORDER: Array<keyof typeof USAGE_TOKEN_COLORS> = ['input', 'output', 'cacheCreation', 'cacheRead', 'cacheRatio', 'cacheCumulativeRatio'];
 const TOKEN_TREND_RATIO_KEYS = new Set<keyof typeof USAGE_TOKEN_COLORS>(['cacheRatio', 'cacheCumulativeRatio']);
+const METRIC_CARD_CLASS = 'min-h-[72px] 2xl:min-h-[78px]';
+const METRIC_CONTENT_CLASS = 'flex min-w-0 flex-1 flex-row items-center justify-between gap-3 p-3 text-left 2xl:p-3.5';
+const METRIC_COPY_CLASS = 'min-w-0 flex-1 text-left';
+const TRENDS_CLASS = 'mt-8 space-y-4 2xl:mt-10 2xl:space-y-5';
 
 type PieTooltipPayload = Array<{
   name?: unknown;
@@ -61,7 +64,7 @@ function PieNameTooltip({
   if (!active || name == null || name === '') return null;
 
   return (
-    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-text shadow-lg">
+    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-foreground shadow-lg">
       {String(name)}
     </div>
   );
@@ -77,7 +80,7 @@ type MetaTone = 'default' | 'success' | 'warning' | 'danger' | 'accent';
 const METRIC_TONE_CLASSES: Record<MetricTone, string> = {
   amber: 'bg-amber-100 text-amber-600 ring-amber-200 dark:bg-amber-400/15 dark:text-amber-300 dark:ring-amber-400/25',
   blue: 'bg-blue-100 text-blue-600 ring-blue-200 dark:bg-blue-400/15 dark:text-blue-300 dark:ring-blue-400/25',
-  emerald: 'bg-success-subtle text-success ring-success/25',
+  emerald: 'bg-success-soft text-success ring-success/25',
   indigo: 'bg-indigo-100 text-indigo-600 ring-indigo-200 dark:bg-indigo-400/15 dark:text-indigo-300 dark:ring-indigo-400/25',
   purple: 'bg-purple-100 text-purple-600 ring-purple-200 dark:bg-purple-400/15 dark:text-purple-300 dark:ring-purple-400/25',
   rose: 'bg-rose-100 text-rose-600 ring-rose-200 dark:bg-rose-400/15 dark:text-rose-300 dark:ring-rose-400/25',
@@ -86,9 +89,9 @@ const METRIC_TONE_CLASSES: Record<MetricTone, string> = {
 };
 
 const META_TONE_CLASSES: Record<MetaTone, string> = {
-  accent: 'text-primary',
+  accent: 'text-accent',
   danger: 'text-danger',
-  default: 'text-text',
+  default: 'text-foreground',
   success: 'text-emerald-600 dark:text-emerald-400',
   warning: 'text-amber-600 dark:text-amber-400',
 };
@@ -131,12 +134,12 @@ function DashboardCard({
   const hasHeader = Boolean(title || extra);
 
   return (
-    <Card className="ag-dashboard-panel">
+    <Card>
       {hasHeader ? (
         <div
           className={`flex items-center gap-3 p-3 pb-2 2xl:p-4 2xl:pb-2 ${title ? 'justify-between' : 'justify-end'}`}
         >
-          {title ? <h3 className="text-base font-semibold leading-none text-text">{title}</h3> : null}
+          {title ? <h3 className="text-base font-semibold leading-none text-foreground">{title}</h3> : null}
           {extra ? (
             <div className="shrink-0">{extra}</div>
           ) : null}
@@ -165,14 +168,14 @@ function MetricCard({
   valueSuffix?: string;
 }) {
   return (
-    <Card className="ag-dashboard-metric min-h-[72px] 2xl:min-h-[78px]">
-      <Card.Content className="ag-dashboard-metric-content p-3 2xl:p-3.5">
-        <div className="ag-dashboard-metric-copy">
-          <div className="truncate text-sm font-semibold tracking-normal text-text-tertiary">{title}</div>
+    <Card className={METRIC_CARD_CLASS}>
+      <Card.Content className={METRIC_CONTENT_CLASS}>
+        <div className={METRIC_COPY_CLASS}>
+          <div className="truncate text-sm font-semibold tracking-normal text-muted">{title}</div>
           <div className="mt-1 flex min-w-0 items-baseline gap-2">
-            <div className="flex min-w-0 items-baseline font-mono text-xl font-semibold leading-none text-text 2xl:text-2xl">
+            <div className="flex min-w-0 items-baseline font-mono text-xl font-semibold leading-none text-foreground 2xl:text-2xl">
               {value}
-              {valueSuffix ? <span className="ml-1.5 text-xs font-medium text-text-tertiary 2xl:text-sm">{valueSuffix}</span> : null}
+              {valueSuffix ? <span className="ml-1.5 text-xs font-medium text-muted 2xl:text-sm">{valueSuffix}</span> : null}
             </div>
             <div className={`min-w-0 truncate text-xs font-semibold ${META_TONE_CLASSES[metaTone]}`}>{meta}</div>
           </div>
@@ -189,9 +192,9 @@ function StatsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 2xl:gap-4">
       {Array.from({ length: 8 }).map((_, index) => (
-        <Card className="ag-dashboard-metric min-h-[72px] 2xl:min-h-[78px]" key={index}>
-          <Card.Content className="ag-dashboard-metric-content p-3 2xl:p-3.5">
-            <div className="ag-dashboard-metric-copy space-y-2">
+        <Card className={METRIC_CARD_CLASS} key={index}>
+          <Card.Content className={METRIC_CONTENT_CLASS}>
+            <div className={`${METRIC_COPY_CLASS} space-y-2`}>
               <Skeleton className="h-3 w-24" />
               <div className="flex items-baseline gap-2">
                 <Skeleton className="h-6 w-24" />
@@ -292,13 +295,13 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-[var(--radius)] border border-border bg-surface px-3 py-2 text-xs text-text shadow-lg">
+    <div className="rounded-[var(--radius)] border border-border bg-surface px-3 py-2 text-xs text-foreground shadow-lg">
       <div className="mb-1 font-medium">{label}</div>
       <div className="space-y-1">
         {payload.map((item) => (
           <div key={`${item.dataKey}-${item.name}`} className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full" style={{ background: item.color }} />
-            <span className="text-text">{item.name ?? item.dataKey}</span>
+            <span className="text-foreground">{item.name ?? item.dataKey}</span>
             <span className="font-mono">{fmtNum(Number(item.value ?? 0))}</span>
           </div>
         ))}
@@ -334,20 +337,20 @@ function TokenTrendTooltip({
   });
 
   return (
-    <div className="rounded-[var(--radius)] border border-border bg-surface px-3 py-2 text-xs text-text shadow-lg">
+    <div className="rounded-[var(--radius)] border border-border bg-surface px-3 py-2 text-xs text-foreground shadow-lg">
       <div className="mb-1 font-medium">{label}</div>
       <div className="space-y-1">
         {orderedPayload.map((item) => (
           <div key={item.dataKey} className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full" style={{ background: item.color }} />
-            <span className="text-text">{labels[item.dataKey ?? ''] ?? item.dataKey}</span>
+            <span className="text-foreground">{labels[item.dataKey ?? ''] ?? item.dataKey}</span>
             <span className="font-mono">
               {TOKEN_TREND_RATIO_KEYS.has(item.dataKey as keyof typeof USAGE_TOKEN_COLORS) ? `${Number(item.value ?? 0).toFixed(1)}%` : fmtNum(Number(item.value ?? 0))}
             </span>
           </div>
         ))}
       </div>
-      <div className="mt-2 border-t border-border pt-2 text-text">
+      <div className="mt-2 border-t border-border pt-2 text-foreground">
         {t('dashboard.actual')}: <CostValue className="font-mono" value={datum?.actualCost} tone="actual" />
         {' / '}
         {t('dashboard.standard')}: <CostValue className="font-mono" value={datum?.standardCost} tone="standard" />
@@ -406,7 +409,7 @@ function ModelDistributionCard({ trend }: { trend: DashboardTrendResp }) {
   );
   const firstColumnTitle = tab === 'model' ? t('dashboard.model') : t('dashboard.email');
   const distributionTabs = (
-    <Tabs className="ag-segmented-tabs ag-segmented-tabs-compact" selectedKey={tab} onSelectionChange={(key) => setTab(key as 'model' | 'user')}>
+    <Tabs selectedKey={tab} onSelectionChange={(key) => setTab(key as 'model' | 'user')}>
       <Tabs.List>
         <Tabs.Tab id="model">
           <Tabs.Indicator />
@@ -423,11 +426,11 @@ function ModelDistributionCard({ trend }: { trend: DashboardTrendResp }) {
 
   return (
     <DashboardCard title={activeTitle} extra={distributionTabs}>
-      <div className="ag-distribution-card-body grid items-start gap-3 2xl:grid-cols-[176px_minmax(0,1fr)]">
-        <div className="ag-distribution-chart-frame">
+      <div className="grid items-start gap-3 2xl:grid-cols-[176px_minmax(0,1fr)]">
+        <div>
           {activePieData.length > 0 ? (
             <PieChart width={176} height={176}>
-              <Pie data={activePieData} cx="50%" cy="50%" dataKey="value" innerRadius={42} isAnimationActive={false} minAngle={3} outerRadius={68} stroke="var(--ag-surface)" strokeWidth={2}>
+              <Pie data={activePieData} cx="50%" cy="50%" dataKey="value" innerRadius={42} isAnimationActive={false} minAngle={3} outerRadius={68} stroke="var(--surface)" strokeWidth={2}>
                 {activePieData.map((_, index) => (
                   <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                 ))}
@@ -440,14 +443,14 @@ function ModelDistributionCard({ trend }: { trend: DashboardTrendResp }) {
               />
             </PieChart>
           ) : (
-            <div className="flex h-44 w-44 items-center justify-center text-xs text-text">{t('common.no_data')}</div>
+            <div className="flex h-44 w-44 items-center justify-center text-xs text-foreground">{t('common.no_data')}</div>
           )}
         </div>
 
-        <div className="ag-distribution-table-scroll">
+        <div>
           <CompactDataTable
             ariaLabel={activeTitle}
-            className="ag-compact-data-table--dense"
+
             emptyText={t('common.no_data')}
             minWidth={480}
             rowKey={(row) => row.key}
@@ -459,9 +462,9 @@ function ModelDistributionCard({ trend }: { trend: DashboardTrendResp }) {
                 width: DASHBOARD_DISTRIBUTION_COLUMN_WIDTHS.name,
                 render: (row, index) => (
                   <>
-                    <span className="shrink-0 font-mono text-[11px] font-semibold text-text">#{index + 1}</span>
+                    <span className="shrink-0 font-mono text-[11px] font-semibold text-foreground">#{index + 1}</span>
                     <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: PIE_COLORS[index % PIE_COLORS.length] }} />
-                    <span className="min-w-0 truncate font-medium text-text" title={row.name}>{row.name}</span>
+                    <span className="min-w-0 truncate font-medium text-foreground" title={row.name}>{row.name}</span>
                   </>
                 ),
               },
@@ -470,14 +473,14 @@ function ModelDistributionCard({ trend }: { trend: DashboardTrendResp }) {
                 key: 'requests',
                 title: t('dashboard.requests'),
                 width: DASHBOARD_DISTRIBUTION_COLUMN_WIDTHS.requests,
-                render: (row) => <span className="truncate font-mono text-text">{row.requests.toLocaleString()}</span>,
+                render: (row) => <span className="truncate font-mono text-foreground">{row.requests.toLocaleString()}</span>,
               },
               {
                 align: 'end',
                 key: 'tokens',
                 title: t('dashboard.tokens'),
                 width: DASHBOARD_DISTRIBUTION_COLUMN_WIDTHS.tokens,
-                render: (row) => <span className="truncate font-mono text-text">{fmtNum(row.tokens)}</span>,
+                render: (row) => <span className="truncate font-mono text-foreground">{fmtNum(row.tokens)}</span>,
               },
               {
                 align: 'end',
@@ -549,15 +552,15 @@ function TokenTrendCard({ trend }: { trend: DashboardTrendResp }) {
         <div className="h-[248px] w-full min-w-0 2xl:h-[288px]">
           <ResponsiveContainer width="100%" height="100%" debounce={80} initialDimension={{ width: 600, height: 248 }}>
             <LineChart data={chartData} margin={{ bottom: 0, left: -18, right: 4, top: 4 }}>
-              <CartesianGrid stroke="var(--ag-border-subtle)" vertical={false} />
-              <XAxis axisLine={false} dataKey="time" tick={{ fill: 'var(--ag-text)', fontSize: 11 }} tickLine={false} />
-              <YAxis yAxisId="tokens" axisLine={false} tick={{ fill: 'var(--ag-text)', fontSize: 11 }} tickFormatter={fmtNum} tickLine={false} />
+              <CartesianGrid stroke="var(--separator)" vertical={false} />
+              <XAxis axisLine={false} dataKey="time" tick={{ fill: 'var(--foreground)', fontSize: 11 }} tickLine={false} />
+              <YAxis yAxisId="tokens" axisLine={false} tick={{ fill: 'var(--foreground)', fontSize: 11 }} tickFormatter={fmtNum} tickLine={false} />
               <YAxis
                 yAxisId="ratio"
                 axisLine={false}
                 domain={[0, 100]}
                 orientation="right"
-                tick={{ fill: 'var(--ag-text)', fontSize: 11 }}
+                tick={{ fill: 'var(--foreground)', fontSize: 11 }}
                 tickFormatter={(value: number) => `${Math.round(value)}%`}
                 tickLine={false}
                 width={32}
@@ -566,7 +569,7 @@ function TokenTrendCard({ trend }: { trend: DashboardTrendResp }) {
               <Legend
                 height={24}
                 content={() => (
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-1 text-[11px] text-text">
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-1 text-[11px] text-foreground">
                     {TOKEN_TREND_LINE_ORDER.map((key) => (
                       <span key={key} className="inline-flex items-center gap-1.5">
                         {TOKEN_TREND_RATIO_KEYS.has(key) ? (
@@ -590,7 +593,7 @@ function TokenTrendCard({ trend }: { trend: DashboardTrendResp }) {
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="flex h-[248px] items-center justify-center text-sm text-text 2xl:h-[288px]">{t('common.no_data')}</div>
+        <div className="flex h-[248px] items-center justify-center text-sm text-foreground 2xl:h-[288px]">{t('common.no_data')}</div>
       )}
     </DashboardCard>
   );
@@ -618,11 +621,11 @@ function TopUsersCard({ trend }: { trend: DashboardTrendResp }) {
         <div className="h-[268px] w-full min-w-0 2xl:h-[320px]">
           <ResponsiveContainer width="100%" height="100%" debounce={80} initialDimension={{ width: 1200, height: 268 }}>
             <LineChart data={chartData} margin={{ bottom: 0, left: -18, right: 8, top: 4 }}>
-              <CartesianGrid stroke="var(--ag-border-subtle)" vertical={false} />
-              <XAxis axisLine={false} dataKey="time" tick={{ fill: 'var(--ag-text)', fontSize: 11 }} tickLine={false} />
-              <YAxis axisLine={false} tick={{ fill: 'var(--ag-text)', fontSize: 11 }} tickFormatter={fmtNum} tickLine={false} />
+              <CartesianGrid stroke="var(--separator)" vertical={false} />
+              <XAxis axisLine={false} dataKey="time" tick={{ fill: 'var(--foreground)', fontSize: 11 }} tickLine={false} />
+              <YAxis axisLine={false} tick={{ fill: 'var(--foreground)', fontSize: 11 }} tickFormatter={fmtNum} tickLine={false} />
               <RechartsTooltip content={<ChartTooltip />} />
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ color: 'var(--ag-text)', fontSize: 11 }} />
+              <Legend iconSize={8} iconType="circle" wrapperStyle={{ color: 'var(--foreground)', fontSize: 11 }} />
               {topUsers.map((user, index) => (
                 <Line key={user.user_id} dataKey={user.email} dot={false} isAnimationActive={false} stroke={USER_COLORS[index % USER_COLORS.length]} strokeWidth={2.5} type="monotone" />
               ))}
@@ -630,7 +633,7 @@ function TopUsersCard({ trend }: { trend: DashboardTrendResp }) {
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="flex h-[268px] items-center justify-center text-sm text-text 2xl:h-[320px]">{t('common.no_data')}</div>
+        <div className="flex h-[268px] items-center justify-center text-sm text-foreground 2xl:h-[320px]">{t('common.no_data')}</div>
       )}
     </DashboardCard>
   );
@@ -638,7 +641,7 @@ function TopUsersCard({ trend }: { trend: DashboardTrendResp }) {
 
 function TrendCharts({ trend }: { trend: DashboardTrendResp }) {
   return (
-    <div className="ag-dashboard-trends space-y-4 2xl:space-y-5">
+    <div className={TRENDS_CLASS}>
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <ModelDistributionCard trend={trend} />
         <TokenTrendCard trend={trend} />
@@ -725,10 +728,10 @@ export default function DashboardPage() {
 
       {statsQuery.isLoading ? <StatsSkeleton /> : statsQuery.data ? <StatsCards stats={statsQuery.data} /> : null}
 
-      <div className="ag-dashboard-toolbar flex flex-col gap-3 p-4 2xl:p-5 xl:flex-row xl:items-center xl:justify-between">
+      <div className="flex flex-col gap-3 p-4 2xl:p-5 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <span className="shrink-0 text-sm font-semibold text-text">{t('dashboard.time_range')}</span>
-          <Tabs className="ag-segmented-tabs ag-segmented-tabs-compact" selectedKey={range} onSelectionChange={(key) => setRange(key as RangePreset)}>
+          <span className="shrink-0 text-sm font-semibold text-foreground">{t('dashboard.time_range')}</span>
+          <Tabs selectedKey={range} onSelectionChange={(key) => setRange(key as RangePreset)}>
             <Tabs.List>
               {RANGE_PRESETS.map((item, index) => (
                 <Tabs.Tab id={item} key={item}>
@@ -746,7 +749,7 @@ export default function DashboardPage() {
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <span className="shrink-0 text-sm font-semibold text-text">{t('dashboard.filter_user')}</span>
+            <span className="shrink-0 text-sm font-semibold text-foreground">{t('dashboard.filter_user')}</span>
             <div className="w-full sm:w-48">
               <ComboBox
                 aria-label={t('dashboard.filter_user')}
@@ -784,14 +787,14 @@ export default function DashboardPage() {
                 }}
               >
                 <ComboBox.InputGroup className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                   <Input className="pl-9" placeholder={t('dashboard.all_users')} />
                 </ComboBox.InputGroup>
                 <ComboBox.Popover>
                   <ListBox
                     items={visibleUserOptions}
                     renderEmptyState={() => (
-                      <div className="px-3 py-6 text-center text-xs text-text-tertiary">
+                      <div className="px-3 py-6 text-center text-xs text-muted">
                         {userKeyword.trim() ? t('common.no_data') : t('dashboard.filter_user')}
                       </div>
                     )}
@@ -801,7 +804,7 @@ export default function DashboardPage() {
                         <div className="min-w-0">
                           <div className="truncate">{item.label}</div>
                           {item.description ? (
-                            <div className="truncate text-xs text-text-tertiary">{item.description}</div>
+                            <div className="truncate text-xs text-muted">{item.description}</div>
                           ) : null}
                         </div>
                       </ListBox.Item>
@@ -813,7 +816,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <span className="shrink-0 text-sm font-semibold text-text">{t('dashboard.granularity')}</span>
+            <span className="shrink-0 text-sm font-semibold text-foreground">{t('dashboard.granularity')}</span>
             <div className="w-full sm:w-48">
               <Select
                 fullWidth
@@ -823,7 +826,7 @@ export default function DashboardPage() {
               >
                 <Label className="sr-only">{t('dashboard.granularity')}</Label>
                 <Select.Trigger>
-                  <CalendarDays className="mr-2 h-4 w-4 text-text" />
+                  <CalendarDays className="mr-2 h-4 w-4 text-foreground" />
                   <Select.Value>{selectedGranularityLabel}</Select.Value>
                   <Select.Indicator />
                 </Select.Trigger>
@@ -843,17 +846,17 @@ export default function DashboardPage() {
       </div>
 
       {trendQuery.isLoading && !trendQuery.data ? (
-        <div className="ag-dashboard-trends space-y-4 2xl:space-y-5">
+        <div className={TRENDS_CLASS}>
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             {Array.from({ length: 2 }).map((_, index) => (
-              <Card className="ag-dashboard-panel" key={index}>
+              <Card key={index}>
                 <Card.Content>
                   <Skeleton className="h-[280px] w-full 2xl:h-[320px]" />
                 </Card.Content>
               </Card>
             ))}
           </div>
-          <Card className="ag-dashboard-panel">
+          <Card>
             <Card.Content>
               <Skeleton className="h-[300px] w-full 2xl:h-[360px]" />
             </Card.Content>

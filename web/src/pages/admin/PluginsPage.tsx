@@ -116,15 +116,14 @@ export default function PluginsPage() {
   const installedRows = pluginsData?.list ?? [];
 
   return (
-    <div className="ag-plugins-page">
+    <div>
       <Tabs
-        className="ag-plugins-tabs"
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(key as typeof activeTab)}
       >
         {/* Tab 切换 + 操作按钮 */}
-        <div className="ag-page-toolbar">
-          <Tabs.ListContainer className="ag-page-tabs w-full sm:w-auto">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <Tabs.ListContainer className="w-full sm:w-auto">
             <Tabs.List>
               {tabs.map((tab, index) => {
                 const Icon = tab.icon;
@@ -161,10 +160,10 @@ export default function PluginsPage() {
         </div>
 
       {/* 已安装 Tab */}
-      <Tabs.Panel id="installed" className="ag-tabs-panel-flush">
+      <Tabs.Panel id="installed">
         <CommonTable
           ariaLabel={t('plugins.installed_tab', 'Installed plugins')}
-          className="ag-plugins-installed-table"
+
         >
           <CommonTable.Header>
             <CommonTable.Column id="name" isRowHeader>{t('common.name')}</CommonTable.Column>
@@ -199,11 +198,11 @@ export default function PluginsPage() {
                 <CommonTable.Row id={row.name} key={row.name}>
                   <CommonTable.Cell>
                         <div className="min-w-0 inline-flex items-center gap-2">
-                          <div className="text-text font-medium">
+                          <div className="text-foreground font-medium">
                             {row.display_name || row.name}
                           </div>
                           {row.display_name && row.display_name !== row.name && (
-                            <span className="text-xs text-text-tertiary font-mono">
+                            <span className="text-xs text-muted font-mono">
                               {row.name}
                             </span>
                           )}
@@ -215,10 +214,10 @@ export default function PluginsPage() {
                             {row.type || 'gateway'}
                           </Chip>
                           {row.platform && (
-                            <span className="text-xs text-text-tertiary">{row.platform}</span>
+                            <span className="text-xs text-muted">{row.platform}</span>
                           )}
                           {row.version && (
-                            <span className="text-xs text-text-tertiary">
+                            <span className="text-xs text-muted">
                               {t('common.version')}: {row.version}
                             </span>
                           )}
@@ -230,7 +229,7 @@ export default function PluginsPage() {
                         </div>
                   </CommonTable.Cell>
                   <CommonTable.Cell>
-                        <div className="ag-table-row-actions flex gap-1 justify-center">
+                        <div className="flex gap-1 justify-center">
                           {row.config_schema && row.config_schema.length > 0 && (
                             <Button
                               size="sm"
@@ -277,12 +276,12 @@ export default function PluginsPage() {
       </Tabs.Panel>
 
       {/* 插件市场 Tab */}
-      <Tabs.Panel id="marketplace" className="ag-tabs-panel-flush">
+      <Tabs.Panel id="marketplace">
         <div>
           {marketLoading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-5 h-5 animate-spin text-primary" />
-              <span className="ml-2 text-sm text-text-tertiary">{t('common.loading')}</span>
+              <Loader2 className="w-5 h-5 animate-spin text-accent" />
+              <span className="ml-2 text-sm text-muted">{t('common.loading')}</span>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -295,7 +294,7 @@ export default function PluginsPage() {
                 />
               ))}
               {(marketData?.list ?? []).length === 0 && (
-                <div className="col-span-full text-center py-16 text-text-tertiary">
+                <div className="col-span-full text-center py-16 text-muted">
                   {t('plugins.no_plugins')}
                 </div>
               )}
@@ -326,7 +325,7 @@ export default function PluginsPage() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('plugins.uninstall_title')}</AlertDialog.Heading>
@@ -441,7 +440,7 @@ function PluginConfigModal({
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '640px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -451,7 +450,7 @@ function PluginConfigModal({
             <Modal.Body>
               {isLoading ? (
                 <div className="flex items-center justify-center py-10">
-                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  <Loader2 className="w-5 h-5 animate-spin text-accent" />
                 </div>
               ) : (
                 <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
@@ -474,7 +473,7 @@ function PluginConfigModal({
                     {field.required && <span className="text-danger ml-1">*</span>}
                   </Checkbox>
                   {field.description && (
-                    <p className="mt-1 ml-6 text-xs text-text-tertiary">{field.description}</p>
+                    <p className="mt-1 ml-6 text-xs text-muted">{field.description}</p>
                   )}
                 </div>
               );
@@ -500,7 +499,7 @@ function PluginConfigModal({
             );
           })}
           {(!plugin?.config_schema || plugin.config_schema.length === 0) && (
-            <p className="text-sm text-text-tertiary text-center py-4">
+            <p className="text-sm text-muted text-center py-4">
               该插件未声明任何配置项
             </p>
           )}
@@ -629,7 +628,7 @@ function InstallPluginModal({
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '520px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -638,7 +637,6 @@ function InstallPluginModal({
             </Modal.Header>
             <Modal.Body>
               <Tabs
-                className="ag-install-tabs ag-page-tabs ag-page-tabs-compact"
                 selectedKey={installTab}
                 onSelectionChange={(key) => {
                   if (installing) return;
@@ -658,18 +656,18 @@ function InstallPluginModal({
                   </Tabs.List>
                 </Tabs.ListContainer>
 
-                <Tabs.Panel id="upload" className="ag-tabs-panel-flush">
+                <Tabs.Panel id="upload">
                   <div className="space-y-4">
                     <div>
-                      <Label className="block text-xs font-medium text-text-secondary uppercaser mb-1.5">
+                      <Label className="block text-xs font-medium text-muted uppercaser mb-1.5">
                         {t('plugins.plugin_file')} <span className="text-danger">*</span>
                       </Label>
                       <div
                         className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer transition-colors ${selectedFile
-                            ? 'border-primary bg-primary-subtle'
+                            ? 'border-accent bg-accent-soft'
                             : dragActive
-                              ? 'border-border-focus bg-[var(--ag-bg-muted)]'
-                              : 'border-glass-border hover:border-border-focus'
+                              ? 'border-focus bg-[var(--surface-secondary)]'
+                              : 'border-border hover:border-focus'
                           }`}
                         onClick={() => fileInputRef.current?.click()}
                         onDragOver={handleDragEvent}
@@ -685,16 +683,16 @@ function InstallPluginModal({
                         />
                         {selectedFile ? (
                           <div className="flex items-center justify-center gap-2">
-                            <Package className="w-5 h-5 text-primary" />
-                            <span className="text-sm text-text">{selectedFile.name}</span>
-                            <span className="text-xs text-text-tertiary">
+                            <Package className="w-5 h-5 text-accent" />
+                            <span className="text-sm text-foreground">{selectedFile.name}</span>
+                            <span className="text-xs text-muted">
                               ({(selectedFile.size / 1024 / 1024).toFixed(1)} MB)
                             </span>
                           </div>
                         ) : (
                           <div>
-                            <Upload className={`w-8 h-8 mx-auto mb-2 ${dragActive ? 'text-primary' : 'text-text-tertiary'}`} />
-                            <p className="text-sm text-text-tertiary">
+                            <Upload className={`w-8 h-8 mx-auto mb-2 ${dragActive ? 'text-accent' : 'text-muted'}`} />
+                            <p className="text-sm text-muted">
                               {t('plugins.upload_hint')}
                             </p>
                           </div>
@@ -712,7 +710,7 @@ function InstallPluginModal({
                   </div>
                 </Tabs.Panel>
 
-                <Tabs.Panel id="github" className="ag-tabs-panel-flush">
+                <Tabs.Panel id="github">
                   <div className="space-y-4">
                     <HeroTextField fullWidth isRequired>
                       <Label>{t('plugins.github_repo')}</Label>
@@ -723,7 +721,7 @@ function InstallPluginModal({
                         required
                       />
                     </HeroTextField>
-                    <p className="text-xs text-text-tertiary">
+                    <p className="text-xs text-muted">
                       {t('plugins.github_hint')}
                     </p>
                   </div>
@@ -779,17 +777,17 @@ function MarketplaceCard({
       <Card.Content className="flex flex-col h-full">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Package className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold text-text">{plugin.name}</h3>
+            <Package className="w-4 h-4 text-accent" />
+            <h3 className="font-semibold text-foreground">{plugin.name}</h3>
           </div>
           <Chip color={typeVariant[plugin.type] || 'default'} size="sm" variant="soft">
             {plugin.type}
           </Chip>
         </div>
-        <p className="text-sm text-text-tertiary flex-1 mb-4 leading-relaxed">
+        <p className="text-sm text-muted flex-1 mb-4 leading-relaxed">
           {plugin.description || t('common.no_data_desc')}
         </p>
-        <div className="flex items-center justify-between text-xs text-text-tertiary mb-3">
+        <div className="flex items-center justify-between text-xs text-muted mb-3">
           <span className="flex items-center gap-1">
             <User className="w-3 h-3" />
             {plugin.author}
@@ -800,7 +798,7 @@ function MarketplaceCard({
           </span>
         </div>
         {plugin.github_repo && (
-          <div className="flex items-center gap-1 text-xs text-text-tertiary mb-3 font-mono">
+          <div className="flex items-center gap-1 text-xs text-muted mb-3 font-mono">
             <Github className="w-3 h-3" />
             {plugin.github_repo}
           </div>
@@ -819,7 +817,7 @@ function MarketplaceCard({
                   {t('plugins.update_to', { version: plugin.version })}
                 </Button>
                 {plugin.installed_version && (
-                  <span className="text-xs text-text-tertiary font-mono">
+                  <span className="text-xs text-muted font-mono">
                     v{plugin.installed_version} → v{plugin.version}
                   </span>
                 )}

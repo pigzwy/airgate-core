@@ -56,6 +56,7 @@ import {
   UNGROUPED_GROUP_FILTER,
   columnAlignClass,
   columnWidthStyle,
+  getAccountTableMinWidth,
   mergeCachedUsageWindows,
   runAfterInputFrame,
   useLatestRef,
@@ -581,6 +582,7 @@ export default function AccountsPageContent() {
     platformsKey,
     usageData,
   });
+  const accountTableMinWidth = useMemo(() => getAccountTableMinWidth(columns), [columns]);
   const total = data?.total ?? 0;
   const totalPages = getTotalPages(total, pageSize);
   const visibleRowIds = useMemo(() => rows.map((row) => row.id), [rows]);
@@ -689,7 +691,7 @@ export default function AccountsPageContent() {
             <div className="w-full sm:w-48">
               <HeroTextField fullWidth aria-label={t('accounts.search_placeholder', '搜索账号名称...')}>
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                   <Input
                     className="pl-9"
                     value={keyword}
@@ -797,8 +799,8 @@ export default function AccountsPageContent() {
       />
 
       {/* 表格 */}
-      <div className="ag-resource-table ag-accounts-table">
-        <div className="ag-resource-table-scroll" data-slot="wrapper">
+      <div className="overflow-hidden rounded-[var(--radius)] border border-border bg-surface">
+        <div className="relative overflow-x-auto" data-slot="wrapper">
           {selectedCount > 0 ? (
             <div onClick={(event) => event.stopPropagation()}>
               <BulkActionsBar
@@ -816,13 +818,13 @@ export default function AccountsPageContent() {
           ) : null}
           <table
             aria-label={t('accounts.title', 'Accounts')}
-            className="ag-resource-table-content ag-accounts-table-content"
+            className="w-full border-collapse text-sm"
             data-slot="table"
-            style={{ minWidth: 'var(--ag-accounts-current-table-width)' }}
+            style={{ minWidth: accountTableMinWidth }}
           >
             <thead data-slot="thead">
               <tr data-slot="tr">
-                <th data-slot="th" scope="col" className="text-center" style={ACCOUNT_SELECTION_COLUMN_STYLE}>
+                <th data-slot="th" scope="col" className="border-b border-separator bg-default px-2 py-2 text-center text-muted" style={ACCOUNT_SELECTION_COLUMN_STYLE}>
                   <div className="inline-flex" onClick={(event) => event.stopPropagation()}>
                     <TableSelectionCheckbox
                       ariaLabel={selectAllAriaLabel}
@@ -838,7 +840,7 @@ export default function AccountsPageContent() {
                     id={column.key}
                     key={column.key}
                     scope="col"
-                    className={columnAlignClass(column.align)}
+                    className={`border-b border-separator bg-default px-3 py-2 text-xs font-semibold text-muted ${columnAlignClass(column.align)}`}
                     style={columnWidthStyle(column)}
                   >
                     {column.title}
@@ -851,7 +853,7 @@ export default function AccountsPageContent() {
                 <AccountsTableLoadingRow colSpan={columns.length + 1} />
               ) : rows.length === 0 ? (
                 <tr data-slot="tr" data-key="empty">
-                  <td data-slot="td" colSpan={columns.length + 1}>
+                  <td data-slot="td" colSpan={columns.length + 1} className="px-3 py-8">
                     <EmptyState>
                       <div className="text-sm text-default-500">{t('common.no_data')}</div>
                     </EmptyState>
@@ -872,15 +874,17 @@ export default function AccountsPageContent() {
             </tbody>
           </table>
         </div>
-        <TablePaginationFooter
-          page={page}
-          pageSize={pageSize}
-          pageSizeOptions={PAGE_SIZE_OPTIONS}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          total={total}
-          totalPages={totalPages}
-        />
+        <div className="border-t border-separator bg-surface px-3 py-2">
+          <TablePaginationFooter
+            page={page}
+            pageSize={pageSize}
+            pageSizeOptions={PAGE_SIZE_OPTIONS}
+            setPage={setPage}
+            setPageSize={setPageSize}
+            total={total}
+            totalPages={totalPages}
+          />
+        </div>
       </div>
 
       {/* 创建弹窗 */}
@@ -927,7 +931,7 @@ export default function AccountsPageContent() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('accounts.delete_title')}</AlertDialog.Heading>
@@ -968,7 +972,7 @@ export default function AccountsPageContent() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('accounts.bulk_delete_title')}</AlertDialog.Heading>

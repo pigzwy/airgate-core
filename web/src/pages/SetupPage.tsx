@@ -50,13 +50,13 @@ function Stepper({ current, steps }: { current: number; steps: StepKey[] }) {
                 className={[
                   'relative flex items-center justify-center w-9 h-9 rounded-[var(--radius)] border transition-colors duration-150',
                   isCompleted || isCurrent
-                    ? 'border-primary bg-primary text-text-inverse'
-                    : 'border-glass-border bg-surface text-text-tertiary',
+                    ? 'border-accent bg-accent text-foreground-inverse'
+                    : 'border-border bg-surface text-muted',
                   '',
                 ].filter(Boolean).join(' ')}
               >
                 {isCompleted ? (
-                  <CheckCircle2 className="w-4 h-4 text-text-inverse" />
+                  <CheckCircle2 className="w-4 h-4 text-foreground-inverse" />
                 ) : (
                   <Icon className="w-4 h-4" />
                 )}
@@ -64,7 +64,7 @@ function Stepper({ current, steps }: { current: number; steps: StepKey[] }) {
               <span
                 className={[
                   'text-[10px] mt-1.5 whitespace-nowrap font-medium font-mono uppercase transition-colors',
-                  isCompleted || isCurrent ? 'text-primary' : 'text-text-tertiary',
+                  isCompleted || isCurrent ? 'text-accent' : 'text-muted',
                 ].join(' ')}
               >
                 {t(step.labelKey)}
@@ -74,7 +74,7 @@ function Stepper({ current, steps }: { current: number; steps: StepKey[] }) {
               <div
                 className={[
                   'w-12 h-px mx-2.5 mb-5 rounded-[var(--radius)] transition-colors duration-150',
-                  isCompleted ? 'bg-primary' : 'bg-glass-border',
+                  isCompleted ? 'bg-accent' : 'bg-surface-border',
                 ].join(' ')}
               />
             )}
@@ -170,13 +170,13 @@ export default function SetupPage() {
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
-            backgroundImage: `linear-gradient(var(--ag-text-tertiary) 1px, transparent 1px), linear-gradient(90deg, var(--ag-text-tertiary) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(var(--muted) 1px, transparent 1px), linear-gradient(90deg, var(--muted) 1px, transparent 1px)`,
             backgroundSize: '64px 64px',
           }}
         />
         <div
           className="absolute top-0 left-0 right-0 h-px"
-          style={{ background: 'linear-gradient(90deg, transparent, var(--ag-primary-glow), transparent)' }}
+          style={{ background: 'linear-gradient(90deg, transparent, color-mix(in oklab, var(--accent) 20%, transparent), transparent)' }}
         />
       </div>
 
@@ -185,13 +185,13 @@ export default function SetupPage() {
       >
         {/* 标题 */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-[var(--radius)] bg-primary-subtle mb-4 shadow-glow">
-            <Zap className="w-6 h-6 text-primary" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-[var(--radius)] bg-accent-soft mb-4 shadow-glow">
+            <Zap className="w-6 h-6 text-accent" />
           </div>
-          <h1 className="text-xl font-semibold text-text">
+          <h1 className="text-xl font-semibold text-foreground">
             AirGate
           </h1>
-          <p className="text-xs text-text-tertiary mt-1.5 font-mono uppercase">
+          <p className="text-xs text-muted mt-1.5 font-mono uppercase">
             {t('setup.title')}
           </p>
         </div>
@@ -236,7 +236,7 @@ export default function SetupPage() {
         </Card>
 
         {/* 底部 */}
-        <p className="text-center text-[10px] text-text-tertiary mt-8 font-mono uppercase">
+        <p className="text-center text-[10px] text-muted mt-8 font-mono uppercase">
           Powered by AirGate
         </p>
       </div>

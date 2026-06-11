@@ -188,7 +188,7 @@ export function GroupFormModal({
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '560px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -200,7 +200,7 @@ export function GroupFormModal({
         <HeroTextField fullWidth isRequired>
           <Label>{t('common.name')}</Label>
           <div className="relative">
-            <Layers className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+            <Layers className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
             <Input
               className="pl-9"
               value={form.name}
@@ -244,7 +244,7 @@ export function GroupFormModal({
 
         {!isEdit ? (
           <div>
-            <p className="mb-1.5 text-xs font-medium uppercaser text-text-secondary">
+            <p className="mb-1.5 text-xs font-medium uppercaser text-muted">
               {t('groups.copy_accounts_title')}
             </p>
             {copyFromGroupIds.length > 0 ? (
@@ -293,7 +293,7 @@ export function GroupFormModal({
                 </ListBox>
               </Select.Popover>
             </Select>
-            <p className="mt-1 text-[11px] text-text-tertiary">{t('groups.copy_accounts_hint')}</p>
+            <p className="mt-1 text-[11px] text-muted">{t('groups.copy_accounts_hint')}</p>
           </div>
         ) : null}
 
@@ -310,13 +310,13 @@ export function GroupFormModal({
         <div className="grid grid-cols-2 gap-3">
           <NativeSwitch
             isSelected={form.is_exclusive}
-            label={<span className="text-sm text-text">{t('groups.exclusive_hint')}</span>}
+            label={<span className="text-sm text-foreground">{t('groups.exclusive_hint')}</span>}
             onChange={(selected) => setForm({ ...form, is_exclusive: selected })}
           />
 
           <NativeSwitch
             isSelected={form.status_visible}
-            label={<span className="text-sm text-text">{t('groups.status_visible_hint')}</span>}
+            label={<span className="text-sm text-foreground">{t('groups.status_visible_hint')}</span>}
             onChange={(selected) => setForm({ ...form, status_visible: selected })}
           />
         </div>
@@ -347,7 +347,7 @@ export function GroupFormModal({
         <HeroTextField fullWidth>
           <Label>{t('groups.sort_weight')}</Label>
           <div className="relative">
-            <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+            <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
             <Input
               className="pl-9"
               type="number"
@@ -370,10 +370,10 @@ export function GroupFormModal({
 
         {presets.length > 0 ? (
           <div>
-            <p className="mb-1.5 text-xs font-medium uppercaser text-text-secondary">
+            <p className="mb-1.5 text-xs font-medium uppercaser text-muted">
               {t('groups.force_instructions')}
             </p>
-            <p className="mb-2 text-[11px] text-text-tertiary">{t('groups.force_instructions_hint')}</p>
+            <p className="mb-2 text-[11px] text-muted">{t('groups.force_instructions_hint')}</p>
             <div className="mb-2 flex flex-wrap gap-2">
               {['', ...presets].map((preset) => (
                 <Button
@@ -405,7 +405,7 @@ export function GroupFormModal({
             label={(
               <span>
                 <span className="block text-sm">仅 Claude Code 客户端</span>
-                <span className="mt-1 block text-[11px] text-text-tertiary">
+                <span className="mt-1 block text-[11px] text-muted">
                   开启后，本分组的账号只接受官方 Claude CLI 发起的流量；非 CLI 请求返回 403。
                 </span>
               </span>
@@ -418,16 +418,16 @@ export function GroupFormModal({
           <div className="space-y-3">
             <NativeSwitch
               isSelected={imageEnabled}
-              label={<span className="text-sm text-text">{t('groups.image_generation')}</span>}
+              label={<span className="text-sm text-foreground">{t('groups.image_generation')}</span>}
               onChange={setImageEnabled}
             />
 
             {imageEnabled ? (
               <div>
-                <p className="mb-1.5 text-xs font-medium uppercaser text-text-secondary">
+                <p className="mb-1.5 text-xs font-medium uppercaser text-muted">
                   {t('groups.image_pricing')}
                 </p>
-                <p className="mb-2 text-[11px] text-text-tertiary">{t('groups.image_pricing_hint')}</p>
+                <p className="mb-2 text-[11px] text-muted">{t('groups.image_pricing_hint')}</p>
                 <div className="grid grid-cols-3 gap-3">
                   {IMAGE_PRICE_FIELDS.map((field) => (
                     <HeroTextField key={field.key} fullWidth>
@@ -452,10 +452,10 @@ export function GroupFormModal({
 
         {form.subscription_type === 'subscription' ? (
           <div>
-            <p className="mb-1.5 text-xs font-medium uppercaser text-text-secondary">
+            <p className="mb-1.5 text-xs font-medium uppercaser text-muted">
               {t('groups.quotas')}
             </p>
-            <p className="mb-2 text-[11px] text-text-tertiary">{t('groups.quota_hint')}</p>
+            <p className="mb-2 text-[11px] text-muted">{t('groups.quota_hint')}</p>
             <div className="grid grid-cols-3 gap-3">
               <HeroTextField fullWidth>
                 <Label>{t('groups.quota_daily')}</Label>

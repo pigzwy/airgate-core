@@ -36,7 +36,7 @@ export const UsageModelFilterInput = memo(function UsageModelFilterInput({
   return (
     <HeroTextField fullWidth>
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
         <Input
           aria-label={ariaLabel}
           className="pl-9"

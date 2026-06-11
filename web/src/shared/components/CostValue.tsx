@@ -4,7 +4,7 @@ type CostTone = 'actual' | 'default' | 'standard' | 'success' | 'warning';
 
 const COST_TONE_CLASS: Record<CostTone, string> = {
   actual: 'text-warning',
-  default: 'text-text',
+  default: 'text-foreground',
   standard: 'text-success',
   success: 'text-success',
   warning: 'text-warning',
@@ -34,7 +34,7 @@ export function CostValue({
   return (
     <span className={className}>
       <span className={COST_TONE_CLASS[tone]}>$</span>
-      <span className="text-text">{amount}</span>
+      <span className="text-foreground">{amount}</span>
     </span>
   );
 }
@@ -53,7 +53,7 @@ export function CostPair({
   return (
     <span className={`inline-flex min-w-0 items-baseline gap-1 ${className}`}>
       <CostValue value={actual} tone="actual" />
-      <span className="text-text-tertiary">{separator}</span>
+      <span className="text-muted">{separator}</span>
       <CostValue value={standard} tone="standard" />
     </span>
   );

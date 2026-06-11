@@ -36,7 +36,7 @@ export function EditUserModal({ open, user, onClose, onSubmit, loading }: EditUs
       <DialogTriggerShim />
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
-          <Modal.Dialog className="ag-elevation-modal">
+          <Modal.Dialog>
             <Modal.Header>
               <Modal.Heading>{t('users.edit')}</Modal.Heading>
               <Modal.CloseTrigger />
@@ -93,7 +93,7 @@ export function EditUserModal({ open, user, onClose, onSubmit, loading }: EditUs
                 <NativeSwitch
                   isSelected={form.status === 'active'}
                   contentClassName="text-xs"
-                  contentStyle={{ color: form.status === 'active' ? 'var(--ag-success)' : 'var(--ag-text-tertiary)' }}
+                  contentStyle={{ color: form.status === 'active' ? 'var(--success)' : 'var(--muted)' }}
                   label={form.status === 'active' ? t('status.enabled') : t('status.disabled')}
                   onChange={(isSelected) =>
                     setForm({ ...form, status: isSelected ? 'active' : 'disabled' })

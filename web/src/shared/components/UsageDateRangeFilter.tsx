@@ -44,7 +44,7 @@ export function UsageDateRangeFilter({
   return (
     <DateRangePicker
       aria-label={label}
-      className={`ag-usage-date-range ${className}`}
+      className={className}
       endName="endDate"
       startName="startDate"
       value={value}
@@ -65,7 +65,6 @@ export function UsageDateRangeFilter({
           {value ? (
             <Button
               aria-label={clearLabel}
-              className="ag-date-range-clear"
               isIconOnly
               size="sm"
               type="button"
@@ -76,7 +75,7 @@ export function UsageDateRangeFilter({
             </Button>
           ) : null}
           {!value ? (
-            <DateRangePicker.Trigger className="ag-date-range-trigger">
+            <DateRangePicker.Trigger>
               <DateRangePicker.TriggerIndicator />
             </DateRangePicker.Trigger>
           ) : null}

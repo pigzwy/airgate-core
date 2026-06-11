@@ -123,7 +123,7 @@ export function BulkEditAccountModal({
       title={`${t('accounts.bulk_update_title')} (${count})`}
     >
       <Form className="space-y-4" onSubmit={(event) => event.preventDefault()}>
-        <p className="rounded-md border border-border bg-surface px-3 py-2 text-xs leading-5 text-text-secondary">
+        <p className="rounded-md border border-border bg-surface px-3 py-2 text-xs leading-5 text-muted">
           {t('accounts.bulk_update_hint')}
         </p>
 
@@ -137,7 +137,7 @@ export function BulkEditAccountModal({
             isDisabled={!enableStatus}
             isSelected={status === 'active'}
             label={(
-              <span className={enableStatus ? 'text-sm text-text' : 'text-sm text-text-tertiary'}>
+              <span className={enableStatus ? 'text-sm text-foreground' : 'text-sm text-muted'}>
                 {status === 'active' ? t('common.enabled', '已启用') : t('common.disabled', '已禁用')}
               </span>
             )}
@@ -153,7 +153,7 @@ export function BulkEditAccountModal({
         >
           <HeroTextField fullWidth isDisabled={!enablePriority}>
             <div className="relative">
-              <Hash className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+              <Hash className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
               <Input
                 className="pl-9"
                 type="number"
@@ -179,7 +179,7 @@ export function BulkEditAccountModal({
         >
           <HeroTextField fullWidth isDisabled={!enableConcurrency}>
             <div className="relative">
-              <Gauge className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+              <Gauge className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
               <Input
                 className="pl-9"
                 type="number"
@@ -248,9 +248,9 @@ export function BulkEditAccountModal({
                 {(item) => (
                   <ListBox.Item id={item.id} textValue={item.label}>
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-medium text-text">{item.label}</div>
+                      <div className="truncate text-sm font-medium text-foreground">{item.label}</div>
                       {item.endpoint ? (
-                        <div className="truncate text-xs text-text-tertiary">{item.endpoint}</div>
+                        <div className="truncate text-xs text-muted">{item.endpoint}</div>
                       ) : null}
                     </div>
                   </ListBox.Item>
@@ -276,7 +276,7 @@ function FieldRow({
   children: ReactNode;
 }) {
   return (
-    <div className="grid items-center gap-3 border-t border-border-subtle pt-4 sm:grid-cols-[10rem_minmax(0,1fr)]">
+    <div className="grid items-center gap-3 border-t border-separator pt-4 sm:grid-cols-[10rem_minmax(0,1fr)]">
       <Checkbox
         className="self-center"
         isSelected={enabled}
@@ -286,7 +286,7 @@ function FieldRow({
           <Checkbox.Indicator />
         </Checkbox.Control>
         <Checkbox.Content>
-          <span className={enabled ? 'text-sm text-text' : 'text-sm text-text-tertiary'}>
+          <span className={enabled ? 'text-sm text-foreground' : 'text-sm text-muted'}>
             {label}
           </span>
         </Checkbox.Content>

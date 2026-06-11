@@ -79,6 +79,17 @@ const apiKeyMenuItems: MenuItem[] = [
 ];
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = 'airgate:sidebar:collapsed';
+const SIDEBAR_WIDTH = 260;
+const SIDEBAR_COLLAPSED_WIDTH = 72;
+const TOPBAR_CLASS_NAME = 'border-b border-border bg-background';
+const SIDEBAR_COLLAPSE_BUTTON_CLASS = 'h-10 w-10 min-w-10 text-muted [&_svg]:stroke-[2.5]';
+const SIDEBAR_NAV_ITEM_CLASS = [
+  'group relative flex min-h-9 items-center gap-3 rounded-[var(--radius)]',
+  'text-[0.9375rem] font-normal leading-5 text-foreground transition-colors duration-150',
+  'hover:bg-default hover:text-foreground data-[active=true]:bg-default data-[active=true]:font-medium',
+  '[&_svg]:h-5 [&_svg]:w-5 [&_svg]:text-muted [&_svg]:stroke-[2.1]',
+  'data-[active=true]:[&_svg]:text-foreground',
+].join(' ');
 
 /**
  * 拉取插件菜单：所有登录用户均可调用 /plugins/menu，再按 page.audience 过滤显示。
@@ -251,29 +262,29 @@ export function AppShell({ children }: AppShellProps) {
     <>
       <div className="flex h-20 items-center px-4">
         <div className={`flex min-w-0 ${sidebarCollapsed ? 'w-full flex-col items-center justify-center' : 'w-full items-center gap-3'}`}>
-          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius)] bg-primary-subtle">
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius)] bg-accent-soft">
             <img src={site.site_logo || defaultLogoUrl} alt="" className="h-full w-full object-cover" />
           </div>
           {!sidebarCollapsed && (
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-1.5">
-                <h1 className="truncate text-sm font-semibold text-text">{displayName}</h1>
+                <h1 className="truncate text-sm font-semibold text-foreground">{displayName}</h1>
                 {coreVersion?.version && (
                   <span
-                    className="shrink-0 text-[9px] text-text-tertiary font-mono"
+                    className="shrink-0 text-[9px] text-muted font-mono"
                     title={`${coreVersion.version} · ${coreVersion.platform} · ${coreVersion.go_version}`}
                   >
                     {coreVersion.version}
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 truncate text-xs text-text-tertiary">{roleLabel}</p>
+              <p className="mt-0.5 truncate text-xs text-muted">{roleLabel}</p>
             </div>
           )}
           {!isMobile && !sidebarCollapsed && (
             <Button
               aria-label={t('nav.collapse_sidebar', 'Collapse sidebar')}
-              className="ag-sidebar-collapse-button shrink-0"
+              className={`${SIDEBAR_COLLAPSE_BUTTON_CLASS} shrink-0`}
               isIconOnly
               size="sm"
               variant="ghost"
@@ -289,7 +300,7 @@ export function AppShell({ children }: AppShellProps) {
         <div className="mb-1 flex justify-center">
           <Button
             aria-label={t('nav.expand_sidebar', 'Expand sidebar')}
-            className="ag-sidebar-collapse-button"
+            className={SIDEBAR_COLLAPSE_BUTTON_CLASS}
             isIconOnly
             size="sm"
             variant="ghost"
@@ -300,11 +311,11 @@ export function AppShell({ children }: AppShellProps) {
         </div>
       )}
 
-      <nav className={`ag-sidebar-nav flex-1 overflow-y-auto pb-4 space-y-5 ${sidebarCollapsed ? 'px-0' : 'px-3'}`}>
+      <nav className={`flex-1 overflow-y-auto pb-4 space-y-5 ${sidebarCollapsed ? 'px-0' : 'px-3'}`}>
         {sections.map((section, si) => (
           <div key={si}>
             {section.titleKey && !sidebarCollapsed && (
-              <p className="px-2.5 pb-2 text-[10px] font-medium uppercase text-text-tertiary">
+              <p className="px-2.5 pb-2 text-[10px] font-medium uppercase text-muted">
                 {t(section.titleKey)}
               </p>
             )}
@@ -328,11 +339,11 @@ export function AppShell({ children }: AppShellProps) {
                     to={item.path}
                     preload={false}
                     data-active={active ? 'true' : undefined}
-                    className={`ag-sidebar-nav-item group relative flex items-center transition-colors duration-150 ${sidebarCollapsed ? 'mx-auto h-10 w-10 justify-center p-0' : 'px-2 py-1.5'}`}
+                    className={`${SIDEBAR_NAV_ITEM_CLASS} ${sidebarCollapsed ? 'mx-auto h-10 w-10 justify-center p-0' : 'px-2 py-1.5'}`}
                   >
                     <span className="flex shrink-0 items-center justify-center">{item.icon}</span>
                     {!sidebarCollapsed && (
-                      <span className="ag-sidebar-nav-item-label truncate">{label}</span>
+                      <span className="pointer-events-none min-w-0 select-none truncate">{label}</span>
                     )}
                   </Link>
                 );
@@ -378,7 +389,7 @@ export function AppShell({ children }: AppShellProps) {
   );
 
   return (
-    <div className="fixed inset-0 flex overflow-hidden bg-bg text-text">
+    <div className="fixed inset-0 flex overflow-hidden bg-background text-foreground">
       <TopLoadingLine active={topLoadingActive} />
 
       {/* Mobile backdrop */}
@@ -393,14 +404,14 @@ export function AppShell({ children }: AppShellProps) {
       {isMobile ? (
         <aside
           className="fixed inset-y-0 left-0 z-50 flex flex-col bg-surface border-r border-border transition-transform duration-150 ease-out"
-          style={{ width: 'var(--ag-sidebar-width)', transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)' }}
+          style={{ width: SIDEBAR_WIDTH, transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)' }}
         >
           {sidebarContent}
         </aside>
       ) : (
         <aside
           className="relative flex flex-col border-r border-border bg-surface transition-[width] duration-150 ease-out"
-          style={{ width: collapsed ? 'var(--ag-sidebar-collapsed)' : 'var(--ag-sidebar-width)' }}
+          style={{ width: collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH }}
         >
           {sidebarContent}
         </aside>
@@ -408,7 +419,7 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main content */}
       <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="ag-topbar pointer-events-auto absolute inset-x-0 top-0 z-20 flex h-12 items-center justify-between gap-3 px-4 md:px-5">
+        <header className={`${TOPBAR_CLASS_NAME} pointer-events-auto absolute inset-x-0 top-0 z-20 flex h-12 items-center justify-between gap-3 px-4 md:px-5`}>
           <div className="flex shrink-0 items-center gap-3">
             {isMobile && (
               <Button
@@ -433,7 +444,7 @@ export function AppShell({ children }: AppShellProps) {
               <HeroLink
                 href="/status"
                 aria-label={t('nav.status')}
-                className="flex h-10 w-10 items-center justify-center rounded-[var(--radius)] text-text-secondary transition-colors hover:text-text"
+                className="flex h-10 w-10 items-center justify-center rounded-[var(--radius)] text-muted transition-colors hover:text-foreground"
               >
                 <Activity className="h-5 w-5" />
               </HeroLink>
@@ -444,7 +455,7 @@ export function AppShell({ children }: AppShellProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
-              className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius)] text-text-secondary transition-colors hover:text-text sm:flex"
+              className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius)] text-muted transition-colors hover:text-foreground sm:flex"
             >
               <Github className="h-5 w-5" />
             </HeroLink>
@@ -456,7 +467,7 @@ export function AppShell({ children }: AppShellProps) {
                   href={docs.href}
                   {...(docs.isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   aria-label={t('nav.docs')}
-                  className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius)] text-text-secondary transition-colors hover:text-text sm:flex"
+                  className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius)] text-muted transition-colors hover:text-foreground sm:flex"
                 >
                   <BookOpen className="h-5 w-5" />
                 </HeroLink>
@@ -464,7 +475,7 @@ export function AppShell({ children }: AppShellProps) {
             })()}
             {/* Contact */}
             {site.contact_info && (
-              <div className="hidden items-center gap-2 text-text-tertiary lg:flex">
+              <div className="hidden items-center gap-2 text-muted lg:flex">
                 <MessageCircle className="h-5 w-5 shrink-0" />
                 <span className="text-sm">{site.contact_info}</span>
               </div>
@@ -497,20 +508,20 @@ export function AppShell({ children }: AppShellProps) {
             <div className="hidden items-center gap-2.5 pl-1 sm:flex">
               {!isAPIKeySession && (
                 <div className="hidden text-right md:block">
-                  <p className="text-sm font-medium leading-tight text-text">
+                  <p className="text-sm font-medium leading-tight text-foreground">
                     {displayName}
                   </p>
-                  <p className="text-xs leading-tight text-text-tertiary">
+                  <p className="text-xs leading-tight text-muted">
                     {user?.email}
                   </p>
                 </div>
               )}
               {isAdmin ? (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-primary">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-accent">
                   <ShieldCheck className="h-5 w-5" />
                 </div>
               ) : (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-sm font-bold text-primary">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius)] text-sm font-bold text-accent">
                   {(user?.username || user?.email || 'U').charAt(0).toUpperCase()}
                 </div>
               )}
@@ -520,7 +531,7 @@ export function AppShell({ children }: AppShellProps) {
             <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
             <Button
               aria-label={t('common.logout')}
-              className="h-10 w-10 text-text-secondary hover:bg-danger/10 hover:text-danger"
+              className="h-10 w-10 text-muted hover:bg-danger/10 hover:text-danger"
               isIconOnly
               size="sm"
               variant="ghost"
@@ -531,8 +542,8 @@ export function AppShell({ children }: AppShellProps) {
           </div>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-auto bg-bg pt-12 ag-main">
-          <div className="ag-main-content mx-auto w-full max-w-[1920px] p-4 md:p-6 2xl:p-8">
+        <main className="min-h-0 flex-1 overflow-auto bg-background pt-12 ">
+          <div className="mx-auto w-full max-w-[1920px] p-4 md:p-6 2xl:p-8">
             {children}
           </div>
         </main>

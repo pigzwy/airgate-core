@@ -63,7 +63,7 @@ export default function StepRedis({ data, onChange, onPrev, onNext }: StepRedisP
 
   return (
     <Form className="space-y-4" onSubmit={handleSubmit}>
-      <p className="text-sm text-text-secondary mb-2">
+      <p className="text-sm text-muted mb-2">
         {t('setup.step_redis_desc')}
       </p>
       <div className="grid grid-cols-2 gap-4">
@@ -116,8 +116,8 @@ export default function StepRedis({ data, onChange, onPrev, onNext }: StepRedisP
       <NativeSwitch
         isSelected={data.tls || false}
         label={(
-          <span className="flex items-center gap-2 text-sm font-medium text-text">
-            <ShieldCheck className="w-4 h-4 text-text-tertiary" />
+          <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <ShieldCheck className="w-4 h-4 text-muted" />
             {t('setup.enable_tls')}
           </span>
         )}

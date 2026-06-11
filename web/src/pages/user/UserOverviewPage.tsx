@@ -18,6 +18,9 @@ import { PIE_CHART_COLORS, USAGE_TOKEN_COLORS } from '../../shared/constants';
 
 const PIE_COLORS = PIE_CHART_COLORS;
 const TOKEN_TREND_LINE_ORDER = ['input', 'output', 'cacheRead'] as const;
+const METRIC_CARD_CLASS = 'min-h-[72px] 2xl:min-h-[78px]';
+const METRIC_CONTENT_CLASS = 'flex min-w-0 flex-1 flex-row items-center justify-between gap-3 p-3 text-left 2xl:p-3.5';
+const METRIC_COPY_CLASS = 'min-w-0 flex-1 text-left';
 
 type PieTooltipPayload = Array<{
   name?: unknown;
@@ -37,7 +40,7 @@ function PieNameTooltip({
   if (!active || name == null || name === '') return null;
 
   return (
-    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-text shadow-lg">
+    <div className="max-w-56 truncate rounded-[var(--radius)] border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-foreground shadow-lg">
       {String(name)}
     </div>
   );
@@ -51,15 +54,15 @@ const RANGE_PRESETS = ['today', '7d', '30d', '90d'] as const;
 const METRIC_TONE_CLASSES: Record<MetricTone, string> = {
   amber: 'bg-amber-100 text-amber-600 ring-amber-200 dark:bg-amber-400/15 dark:text-amber-300 dark:ring-amber-400/25',
   blue: 'bg-blue-100 text-blue-600 ring-blue-200 dark:bg-blue-400/15 dark:text-blue-300 dark:ring-blue-400/25',
-  emerald: 'bg-success-subtle text-success ring-success/25',
+  emerald: 'bg-success-soft text-success ring-success/25',
   indigo: 'bg-indigo-100 text-indigo-600 ring-indigo-200 dark:bg-indigo-400/15 dark:text-indigo-300 dark:ring-indigo-400/25',
 };
 
 function DashboardCard({ children, title }: { children: ReactNode; title: string }) {
   return (
-    <Card className="ag-dashboard-panel">
+    <Card>
       <div className="flex items-center justify-between gap-3 p-3 pb-2 2xl:p-4 2xl:pb-2">
-        <h3 className="text-base font-semibold leading-none text-text">{title}</h3>
+        <h3 className="text-base font-semibold leading-none text-foreground">{title}</h3>
       </div>
       <Card.Content className="px-3 pb-3 2xl:px-4 2xl:pb-4">{children}</Card.Content>
     </Card>
@@ -78,12 +81,12 @@ function StatCard({
   value: ReactNode;
 }) {
   return (
-    <Card className="ag-dashboard-metric min-h-[72px] 2xl:min-h-[78px]">
-      <Card.Content className="ag-dashboard-metric-content p-3 2xl:p-3.5">
-        <div className="ag-dashboard-metric-copy">
-          <div className="truncate text-sm font-semibold tracking-normal text-text-tertiary">{title}</div>
+    <Card className={METRIC_CARD_CLASS}>
+      <Card.Content className={METRIC_CONTENT_CLASS}>
+        <div className={METRIC_COPY_CLASS}>
+          <div className="truncate text-sm font-semibold tracking-normal text-muted">{title}</div>
           <div className="mt-1 flex min-w-0 items-baseline gap-2">
-            <div className="flex min-w-0 items-baseline font-mono text-[22px] font-semibold leading-none text-text 2xl:text-2xl">
+            <div className="flex min-w-0 items-baseline font-mono text-[22px] font-semibold leading-none text-foreground 2xl:text-2xl">
               {value}
             </div>
           </div>
@@ -159,7 +162,7 @@ function TokenTrendTooltip({
   });
 
   return (
-    <div className="rounded-[var(--radius)] border border-border bg-surface px-3 py-2 text-xs text-text shadow-lg">
+    <div className="rounded-[var(--radius)] border border-border bg-surface px-3 py-2 text-xs text-foreground shadow-lg">
       <div className="mb-1 font-medium">{label}</div>
       <div className="space-y-1">
         {orderedPayload.map((item) => {
@@ -167,7 +170,7 @@ function TokenTrendTooltip({
           return (
             <div key={item.dataKey} className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full" style={{ background: item.color }} />
-              <span className="text-text">{labels[key] ?? item.name ?? item.dataKey}</span>
+              <span className="text-foreground">{labels[key] ?? item.name ?? item.dataKey}</span>
               <span className="font-mono">{fmtNum(Number(item.value ?? 0))}</span>
             </div>
           );
@@ -245,10 +248,10 @@ export default function UserOverviewPage() {
       </div>
 
       {/* 时间范围选择 */}
-      <div className="ag-dashboard-toolbar flex flex-col gap-3 p-4 2xl:p-5 sm:flex-row sm:items-center">
-        <span className="shrink-0 text-sm font-semibold text-text">{t('dashboard.time_range')}</span>
+      <div className="flex flex-col gap-3 p-4 2xl:p-5 sm:flex-row sm:items-center">
+        <span className="shrink-0 text-sm font-semibold text-foreground">{t('dashboard.time_range')}</span>
         <Tabs
-          className="ag-segmented-tabs ag-segmented-tabs-compact"
+
           selectedKey={range}
           onSelectionChange={(key) => setRange(key as RangePreset)}
         >
@@ -268,11 +271,11 @@ export default function UserOverviewPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* 模型分布饼图 */}
         <DashboardCard title={t('dashboard.model_distribution')}>
-          <div className="ag-distribution-card-body grid items-start gap-3 2xl:grid-cols-[176px_minmax(0,1fr)]">
-            <div className="ag-distribution-chart-frame">
+          <div className="grid items-start gap-3 2xl:grid-cols-[176px_minmax(0,1fr)]">
+            <div>
               {models.length > 0 ? (
                 <PieChart width={176} height={176}>
-                  <Pie data={models.map((m) => ({ name: m.model, value: m.tokens }))} cx="50%" cy="50%" innerRadius={42} outerRadius={68} dataKey="value" isAnimationActive={false} minAngle={3} stroke="var(--ag-surface)" strokeWidth={2}>
+                  <Pie data={models.map((m) => ({ name: m.model, value: m.tokens }))} cx="50%" cy="50%" innerRadius={42} outerRadius={68} dataKey="value" isAnimationActive={false} minAngle={3} stroke="var(--surface)" strokeWidth={2}>
                     {models.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Pie>
                   <RechartsTooltip
@@ -283,13 +286,13 @@ export default function UserOverviewPage() {
                   />
                 </PieChart>
               ) : (
-                <div className="flex h-44 w-44 items-center justify-center text-xs text-text">{t('common.no_data')}</div>
+                <div className="flex h-44 w-44 items-center justify-center text-xs text-foreground">{t('common.no_data')}</div>
               )}
             </div>
-            <div className="ag-distribution-table-scroll">
+            <div>
               <CompactDataTable
                 ariaLabel={t('dashboard.model_distribution')}
-                className="ag-compact-data-table--dense"
+
                 emptyText={t('common.no_data')}
                 minWidth={480}
                 rowKey={(row) => row.model}
@@ -301,9 +304,9 @@ export default function UserOverviewPage() {
                     width: '32%',
                     render: (row, index) => (
                       <>
-                        <span className="shrink-0 font-mono text-[11px] font-semibold text-text">#{index + 1}</span>
+                        <span className="shrink-0 font-mono text-[11px] font-semibold text-foreground">#{index + 1}</span>
                         <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: PIE_COLORS[index % PIE_COLORS.length] }} />
-                        <span className="min-w-0 truncate font-medium text-text" title={row.model}>{row.model}</span>
+                        <span className="min-w-0 truncate font-medium text-foreground" title={row.model}>{row.model}</span>
                       </>
                     ),
                   },
@@ -312,14 +315,14 @@ export default function UserOverviewPage() {
                     key: 'requests',
                     title: t('dashboard.requests'),
                     width: '20%',
-                    render: (row) => <span className="truncate font-mono text-text">{row.requests.toLocaleString()}</span>,
+                    render: (row) => <span className="truncate font-mono text-foreground">{row.requests.toLocaleString()}</span>,
                   },
                   {
                     align: 'end',
                     key: 'tokens',
                     title: t('dashboard.tokens'),
                     width: '24%',
-                    render: (row) => <span className="truncate font-mono text-text">{fmtNum(row.tokens)}</span>,
+                    render: (row) => <span className="truncate font-mono text-foreground">{fmtNum(row.tokens)}</span>,
                   },
                   {
                     align: 'end',
@@ -340,14 +343,14 @@ export default function UserOverviewPage() {
             <div className="h-[248px] w-full min-w-0 2xl:h-[288px]">
               <ResponsiveContainer width="100%" height="100%" debounce={80} initialDimension={{ width: 600, height: 248 }}>
                 <LineChart data={trendData} margin={{ bottom: 0, left: -18, right: 4, top: 4 }}>
-                  <CartesianGrid stroke="var(--ag-border-subtle)" vertical={false} />
-                  <XAxis axisLine={false} dataKey="time" tick={{ fill: 'var(--ag-text)', fontSize: 11 }} tickLine={false} />
-                  <YAxis axisLine={false} tick={{ fill: 'var(--ag-text)', fontSize: 11 }} tickFormatter={(v: number) => fmtNum(v)} tickLine={false} />
+                  <CartesianGrid stroke="var(--separator)" vertical={false} />
+                  <XAxis axisLine={false} dataKey="time" tick={{ fill: 'var(--foreground)', fontSize: 11 }} tickLine={false} />
+                  <YAxis axisLine={false} tick={{ fill: 'var(--foreground)', fontSize: 11 }} tickFormatter={(v: number) => fmtNum(v)} tickLine={false} />
                   <RechartsTooltip content={<TokenTrendTooltip />} />
                   <Legend
                     height={24}
                     content={() => (
-                      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-1 text-[11px] text-text">
+                      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-1 text-[11px] text-foreground">
                         {TOKEN_TREND_LINE_ORDER.map((key) => (
                           <span key={key} className="inline-flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full" style={{ background: USAGE_TOKEN_COLORS[key] }} />
@@ -364,7 +367,7 @@ export default function UserOverviewPage() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="flex h-[248px] items-center justify-center text-sm text-text 2xl:h-[288px]">{t('common.no_data')}</div>
+            <div className="flex h-[248px] items-center justify-center text-sm text-foreground 2xl:h-[288px]">{t('common.no_data')}</div>
           )}
         </DashboardCard>
       </div>

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { Switch } from '@heroui/react';
 
 interface NativeSwitchProps {
   ariaLabel?: string;
@@ -26,29 +27,27 @@ export function NativeSwitch({
   onChange,
 }: NativeSwitchProps) {
   const content = label ?? children;
-  const rootClassName = ['ag-native-switch', className].filter(Boolean).join(' ');
-  const labelClassName = ['ag-native-switch-content', contentClassName].filter(Boolean).join(' ');
+  const rootClassName = ['inline-flex items-center gap-3', className].filter(Boolean).join(' ');
+  const labelClassName = ['text-sm text-foreground', contentClassName].filter(Boolean).join(' ');
 
   return (
-    <label className={rootClassName} data-disabled={isDisabled ? 'true' : 'false'}>
-      <input
-        aria-label={ariaLabel}
-        checked={isSelected}
-        className="ag-native-switch-input"
-        disabled={isDisabled}
-        name={name}
-        role="switch"
-        type="checkbox"
-        onChange={(event) => onChange(event.currentTarget.checked)}
-      />
-      <span className="ag-native-switch-track" aria-hidden="true">
-        <span className="ag-native-switch-thumb" />
-      </span>
+    <Switch
+      aria-label={ariaLabel}
+      className={rootClassName}
+      isDisabled={isDisabled}
+      isSelected={isSelected}
+      name={name}
+      size="sm"
+      onChange={onChange}
+    >
+      <Switch.Control>
+        <Switch.Thumb />
+      </Switch.Control>
       {content ? (
-        <span className={labelClassName} style={contentStyle}>
+        <Switch.Content className={labelClassName} style={contentStyle}>
           {content}
-        </span>
+        </Switch.Content>
       ) : null}
-    </label>
+    </Switch>
   );
 }

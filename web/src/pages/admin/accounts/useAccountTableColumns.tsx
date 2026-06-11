@@ -23,9 +23,9 @@ import {
 type QuotaRefreshResult = Awaited<ReturnType<typeof accountsApi.refreshQuota>>;
 
 const ACCOUNT_GROUP_CARD_STYLE: CSSProperties = {
-  background: 'var(--ag-bg-surface)',
-  border: '1px solid var(--ag-glass-border)',
-  color: 'var(--ag-text-secondary)',
+  background: 'var(--surface)',
+  border: '1px solid var(--border)',
+  color: 'var(--muted)',
 };
 
 type UseAccountTableColumnsArgs = {
@@ -87,11 +87,11 @@ export function useAccountTableColumns({
         const email = row.credentials?.email;
         return (
           <div className="flex w-full min-w-0 flex-col items-center text-center">
-            <span style={{ color: 'var(--ag-text)' }} className="max-w-full truncate font-medium" title={row.name}>
+            <span style={{ color: 'var(--foreground)' }} className="max-w-full truncate font-medium" title={row.name}>
               {row.name}
             </span>
             {email && (
-              <span className="max-w-full truncate text-[11px]" style={{ color: 'var(--ag-text-tertiary)' }} title={email}>
+              <span className="max-w-full truncate text-[11px]" style={{ color: 'var(--muted)' }} title={email}>
                 {email}
               </span>
             )}
@@ -121,7 +121,7 @@ export function useAccountTableColumns({
             ) : (
               <div className="flex max-w-full items-center justify-center gap-1">
                 {row.type && (
-                  <span className="truncate rounded px-1 py-0 text-[10px]" style={{ background: 'var(--ag-bg-surface)', border: '1px solid var(--ag-glass-border)', color: 'var(--ag-text-secondary)' }}>
+                  <span className="truncate rounded px-1 py-0 text-[10px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--muted)' }}>
                     {{ oauth: 'OAuth', session_key: 'Session Key', apikey: 'API Key' }[row.type] ?? row.type}
                   </span>
                 )}
@@ -139,17 +139,17 @@ export function useAccountTableColumns({
       align: 'center',
       render: (row) => {
         if (!row.group_ids || row.group_ids.length === 0) {
-          return <span style={{ color: 'var(--ag-text-tertiary)' }}>-</span>;
+          return <span style={{ color: 'var(--muted)' }}>-</span>;
         }
         const groupNames = row.group_ids.map((gid) => groupMap.get(gid) ?? `#${gid}`);
         const visibleGroups = groupNames.length > 3 ? groupNames.slice(0, 2) : groupNames.slice(0, 3);
         const hiddenCount = Math.max(0, groupNames.length - visibleGroups.length);
         return (
-          <div className="ag-account-group-list" title={groupNames.join('\n')}>
+          <div title={groupNames.join('\n')}>
             {visibleGroups.map((name) => (
               <span
                 key={name}
-                className="ag-account-group-chip"
+
                 style={ACCOUNT_GROUP_CARD_STYLE}
               >
                 {name}
@@ -157,7 +157,7 @@ export function useAccountTableColumns({
             ))}
             {hiddenCount > 0 ? (
               <span
-                className="ag-account-group-chip ag-account-group-chip--more"
+
                 style={ACCOUNT_GROUP_CARD_STYLE}
               >
                 +{hiddenCount}
@@ -209,7 +209,7 @@ export function useAccountTableColumns({
       mobileWidth: '72px',
       align: 'center',
       render: (row) => (
-        <span className="font-mono" style={{ color: 'var(--ag-primary)' }}>
+        <span className="font-mono" style={{ color: 'var(--accent)' }}>
           {row.rate_multiplier}x
         </span>
       ),
@@ -246,12 +246,12 @@ export function useAccountTableColumns({
         if (!usage) {
           return (
             <div
-              className="flex items-center gap-1 cursor-pointer rounded px-1 py-0.5 transition-colors hover:bg-[var(--ag-glass-border)]"
+              className="flex items-center gap-1 cursor-pointer rounded px-1 py-0.5 transition-colors hover:bg-[var(--border)]"
               title={t('accounts.refresh_usage', '点击刷新用量')}
               onClick={handleRefreshClick}
             >
-              <span style={{ color: 'var(--ag-text-tertiary)' }}>-</span>
-              <RefreshCw size={11} style={{ color: 'var(--ag-text-tertiary)' }} />
+              <span style={{ color: 'var(--muted)' }}>-</span>
+              <RefreshCw size={11} style={{ color: 'var(--muted)' }} />
             </div>
           );
         }
@@ -289,14 +289,14 @@ export function useAccountTableColumns({
             <div
               className={
                 canRefresh
-                  ? 'flex items-center gap-1 cursor-pointer rounded px-1 py-0.5 transition-colors hover:bg-[var(--ag-glass-border)]'
+                  ? 'flex items-center gap-1 cursor-pointer rounded px-1 py-0.5 transition-colors hover:bg-[var(--border)]'
                   : 'flex items-center gap-1 rounded px-1 py-0.5'
               }
               title={canRefresh ? t('accounts.refresh_usage', '点击刷新用量') : undefined}
               onClick={canRefresh ? handleRefreshClick : undefined}
             >
-              <span style={{ color: 'var(--ag-text-tertiary)' }}>-</span>
-              {canRefresh && <RefreshCw size={11} style={{ color: 'var(--ag-text-tertiary)' }} />}
+              <span style={{ color: 'var(--muted)' }}>-</span>
+              {canRefresh && <RefreshCw size={11} style={{ color: 'var(--muted)' }} />}
             </div>
           );
         }
@@ -325,9 +325,9 @@ export function useAccountTableColumns({
         };
 
         const usageColor = (pct: number) => {
-          if (pct < 50) return 'var(--ag-success)';
-          if (pct < 80) return 'var(--ag-warning)';
-          return 'var(--ag-danger)';
+          if (pct < 50) return 'var(--success)';
+          if (pct < 80) return 'var(--warning)';
+          return 'var(--danger)';
         };
 
         const normalizeWindowToken = (value?: string) => value?.trim().toLowerCase().replace(/_/g, '-') || '';
@@ -406,10 +406,10 @@ export function useAccountTableColumns({
         };
         const windowRows = buildWindowRows(windows);
         const windowsClassName = windowRows.length > 2
-          ? 'ag-account-usage-windows ag-account-usage-windows--expanded'
-          : 'ag-account-usage-windows';
+          ? ''
+          : '';
 
-        const badgeStyle = { background: 'var(--ag-bg-surface)', border: '1px solid var(--ag-glass-border)' };
+        const badgeStyle = { background: 'var(--surface)', border: '1px solid var(--border)' };
         const todayImageCount = row.platform === 'openai' ? (row.today_image_count ?? 0) : 0;
         const showImageCount = row.platform === 'openai';
         const accessRequestsText = formatCompact(todayStats?.requests ?? 0, false);
@@ -420,7 +420,7 @@ export function useAccountTableColumns({
           ? (
             <span className="inline-flex min-w-0 items-center">
               <span className="truncate">{t('accounts.today_access_count', '访问')}</span>
-              <span aria-hidden="true" className="px-px text-text">/</span>
+              <span aria-hidden="true" className="px-px text-foreground">/</span>
               <span>{t('accounts.image_count_inline_label', '图').trim()}</span>
             </span>
           )
@@ -429,18 +429,18 @@ export function useAccountTableColumns({
           ? (
             <span className="inline-flex min-w-0 items-center justify-end">
               <span>{accessRequestsText}</span>
-              <span aria-hidden="true" className="px-px text-text">/</span>
-              <span className="text-text">{accessImageText}</span>
+              <span aria-hidden="true" className="px-px text-foreground">/</span>
+              <span className="text-foreground">{accessImageText}</span>
             </span>
           )
           : accessText;
-        const todayMetricClass = 'ag-account-usage-metric';
+        const todayMetricClass = '';
         const todayMetricStyle = (color: string, foreground = color) => ({
           background: `color-mix(in srgb, ${color} 10%, transparent)`,
-          borderColor: `color-mix(in srgb, ${color} 22%, var(--ag-border))`,
+          borderColor: `color-mix(in srgb, ${color} 22%, var(--border))`,
           color: foreground,
         });
-        const todayMetricColumnClass = 'ag-account-usage-metrics';
+        const todayMetricColumnClass = '';
         const todayMetricChips = hasTodayStats && todayStats ? (
           <div
             className={todayMetricColumnClass}
@@ -448,38 +448,38 @@ export function useAccountTableColumns({
           >
             <span
               className={todayMetricClass}
-              style={todayMetricStyle('var(--ag-info)')}
+              style={todayMetricStyle('var(--accent)')}
               title={showImageCount ? t('accounts.image_count_tooltip', '今日生图请求数（gpt-image 系列）') : undefined}
             >
               {hideAccessLabel ? null : (
-                <span className="ag-account-usage-metric-label text-text-secondary">{accessLabel}</span>
+                <span className="text-muted">{accessLabel}</span>
               )}
-              <span className={`ag-account-usage-metric-value ${hideAccessLabel ? 'ag-account-usage-metric-value--solo' : ''}`}>{accessValue}</span>
+              <span className={`${hideAccessLabel ? '' : ''}`}>{accessValue}</span>
             </span>
-            <span className={todayMetricClass} style={todayMetricStyle('var(--ag-primary)')}>
-              <span className="ag-account-usage-metric-label text-text-secondary">Token</span>
-              <span className="ag-account-usage-metric-value">{formatCompact(todayStats.tokens)}</span>
+            <span className={todayMetricClass} style={todayMetricStyle('var(--accent)')}>
+              <span className="text-muted">Token</span>
+              <span>{formatCompact(todayStats.tokens)}</span>
             </span>
             <span
               className={todayMetricClass}
-              style={todayMetricStyle('var(--ag-warning)')}
+              style={todayMetricStyle('var(--warning)')}
               title={t('accounts.window_user_cost', '用户消耗（平台计费）')}
             >
-              <span className="ag-account-usage-metric-label text-text-secondary">{t('accounts.user_cost_short', '消费')}</span>
-              <span className="ag-account-usage-metric-value">
-                <span style={{ color: 'var(--ag-warning)' }}>$</span>
-                <span className="text-text">{todayStats.user_cost.toFixed(2)}</span>
+              <span className="text-muted">{t('accounts.user_cost_short', '消费')}</span>
+              <span>
+                <span style={{ color: 'var(--warning)' }}>$</span>
+                <span className="text-foreground">{todayStats.user_cost.toFixed(2)}</span>
               </span>
             </span>
             <span
               className={todayMetricClass}
-              style={todayMetricStyle('var(--ag-success)', 'var(--ag-success-foreground)')}
+              style={todayMetricStyle('var(--success)', 'var(--success-foreground)')}
               title={t('accounts.window_account_cost', '账号成本（上游计费）')}
             >
-              <span className="ag-account-usage-metric-label text-text-secondary">{t('accounts.account_cost_short', '成本')}</span>
-              <span className="ag-account-usage-metric-value">
-                <span style={{ color: 'var(--ag-success)' }}>$</span>
-                <span className="text-text">{todayStats.account_cost.toFixed(2)}</span>
+              <span className="text-muted">{t('accounts.account_cost_short', '成本')}</span>
+              <span>
+                <span style={{ color: 'var(--success)' }}>$</span>
+                <span className="text-foreground">{todayStats.account_cost.toFixed(2)}</span>
               </span>
             </span>
           </div>
@@ -489,14 +489,14 @@ export function useAccountTableColumns({
           <div
             className={
               canRefresh
-                ? 'ag-account-usage-cell ag-account-usage-cell--refreshable'
-                : 'ag-account-usage-cell'
+                ? ''
+                : ''
             }
-            style={{ fontFamily: 'var(--ag-font-mono)' }}
+            style={{ fontFamily: 'var(--font-mono)' }}
             title={canRefresh ? t('accounts.refresh_usage', '点击刷新用量') : undefined}
             onClick={canRefresh ? handleRefreshClick : undefined}
           >
-            <div className={todayMetricChips ? 'ag-account-usage-layout' : 'ag-account-usage-layout ag-account-usage-layout--centered'}>
+            <div className={todayMetricChips ? '' : ''}>
               <div className={windowsClassName}>
                 {windowRows.map((item) => {
                   const w = item.window;
@@ -506,20 +506,20 @@ export function useAccountTableColumns({
                   const resetText = formatReset(getResetSeconds(w));
                   const display = getWindowDisplay(w);
                   return (
-                    <div key={item.id} className="ag-account-usage-window-row">
-                      <span className="ag-account-usage-window-label text-text-secondary" style={badgeStyle} title={display.title}>
+                    <div key={item.id}>
+                      <span className="text-muted" style={badgeStyle} title={display.title}>
                         {display.label}
                       </span>
-                      <div className="ag-account-usage-bar" style={{ background: 'var(--ag-glass-border)' }}>
+                      <div style={{ background: 'var(--border)' }}>
                         <div
                           className="h-full rounded-full"
                           style={{ width: `${barPercent}%`, background: color }}
                         />
                       </div>
-                      <span className="ag-account-usage-percent" style={{ color }}>
+                      <span style={{ color }}>
                         {percent}%
                       </span>
-                      <span className="ag-account-usage-reset" title={resetText}>
+                      <span title={resetText}>
                         {resetText}
                       </span>
                     </div>
@@ -530,7 +530,7 @@ export function useAccountTableColumns({
                     <span className="inline-flex items-center justify-center px-1 py-0 rounded text-[10px] font-medium" style={badgeStyle}>
                       $
                     </span>
-                    <span style={{ color: credits.unlimited ? 'var(--ag-success)' : credits.balance > 0 ? 'var(--ag-text)' : 'var(--ag-danger)' }}>
+                    <span style={{ color: credits.unlimited ? 'var(--success)' : credits.balance > 0 ? 'var(--foreground)' : 'var(--danger)' }}>
                       {credits.unlimited ? '∞' : `$${Number(credits.balance).toFixed(2)}`}
                     </span>
                   </div>
@@ -555,7 +555,7 @@ export function useAccountTableColumns({
       align: 'center',
       render: (row) => {
         if (!row.last_used_at) {
-          return <span style={{ color: 'var(--ag-text-tertiary)' }}>-</span>;
+          return <span style={{ color: 'var(--muted)' }}>-</span>;
         }
         const diff = Date.now() - new Date(row.last_used_at).getTime();
         const seconds = Math.floor(diff / 1000);
@@ -568,7 +568,7 @@ export function useAccountTableColumns({
         else if (hours < 24) relative = t('accounts.hours_ago', { n: hours });
         else relative = t('accounts.days_ago', { n: days });
         return (
-          <span className="text-xs" style={{ color: 'var(--ag-text-secondary)' }} title={new Date(row.last_used_at).toLocaleString()}>
+          <span className="text-xs" style={{ color: 'var(--muted)' }} title={new Date(row.last_used_at).toLocaleString()}>
             {relative}
           </span>
         );

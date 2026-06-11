@@ -104,7 +104,7 @@ export function AssignModal({
       <DialogTriggerShim />
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
-          <Modal.Dialog className="ag-elevation-modal">
+          <Modal.Dialog>
             <Modal.Header>
               <Modal.Heading>{t('subscriptions.assign')}</Modal.Heading>
               <Modal.CloseTrigger />
@@ -127,18 +127,18 @@ export function AssignModal({
                 >
                   <Label>{t('subscriptions.user')}</Label>
                   <ComboBox.InputGroup className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                     <Input className="pl-9 pr-10" placeholder={t('users.search_placeholder')} />
                     <ComboBox.Trigger
                       aria-label={t('subscriptions.select_user')}
-                      className="ag-combobox-preview-trigger absolute right-1 top-1/2 z-10 h-7 w-7 min-w-0 -translate-y-1/2 p-0 text-text-tertiary hover:text-text"
+                      className="absolute right-1 top-1/2 z-10 h-7 w-7 min-w-0 -translate-y-1/2 p-0 text-muted hover:text-foreground"
                     />
                   </ComboBox.InputGroup>
                   <ComboBox.Popover>
                     <ListBox
                       items={filteredUserOptions}
                       renderEmptyState={() => (
-                        <div className="px-3 py-6 text-center text-xs text-text-tertiary">
+                        <div className="px-3 py-6 text-center text-xs text-muted">
                           {userKeyword.trim() ? t('common.no_data') : t('users.search_placeholder')}
                         </div>
                       )}
@@ -146,8 +146,8 @@ export function AssignModal({
                       {(item) => (
                         <ListBox.Item id={item.id} textValue={`${item.label} ${item.description}`}>
                           <div className="min-w-0">
-                            <div className="truncate text-sm text-text">{item.label}</div>
-                            <div className="truncate text-xs text-text-tertiary">{item.description}</div>
+                            <div className="truncate text-sm text-foreground">{item.label}</div>
+                            <div className="truncate text-xs text-muted">{item.description}</div>
                           </div>
                         </ListBox.Item>
                       )}
@@ -164,7 +164,7 @@ export function AssignModal({
                   <Label>{t('subscriptions.group')}</Label>
                   <Select.Trigger>
                     <Select.Value>
-                      {selectedGroupLabel ?? <span className="text-text-tertiary">{t('subscriptions.select_group')}</span>}
+                      {selectedGroupLabel ?? <span className="text-muted">{t('subscriptions.select_group')}</span>}
                     </Select.Value>
                     <Select.Indicator />
                   </Select.Trigger>

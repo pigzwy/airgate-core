@@ -43,7 +43,7 @@ export function AdjustModal({
       <DialogTriggerShim />
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
-          <Modal.Dialog className="ag-elevation-modal">
+          <Modal.Dialog>
             <Modal.Header>
               <Modal.Heading>{t('subscriptions.adjust_title', { name: subscription.group_name })}</Modal.Heading>
               <Modal.CloseTrigger />

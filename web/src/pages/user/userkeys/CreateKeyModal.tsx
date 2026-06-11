@@ -27,7 +27,7 @@ export function CreateKeyModal({
       <DialogTriggerShim />
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
-          <Modal.Dialog className="ag-elevation-modal">
+          <Modal.Dialog>
             <Modal.Header>
               <Modal.Heading>{t('user_keys.create_success')}</Modal.Heading>
               <Modal.CloseTrigger />
@@ -42,7 +42,7 @@ export function CreateKeyModal({
                     <Alert.Description>{t('user_keys.key_created_warning')}</Alert.Description>
                   </Alert.Content>
                 </Alert>
-                <div className="break-all rounded-lg border border-glass-border bg-bg-elevated p-3 font-mono text-sm text-text shadow-sm">
+                <div className="break-all rounded-lg border border-border bg-overlay p-3 font-mono text-sm text-foreground shadow-sm">
                   {createdKey}
                 </div>
                 <Button

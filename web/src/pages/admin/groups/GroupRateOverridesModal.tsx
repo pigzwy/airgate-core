@@ -172,7 +172,7 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '720px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -180,19 +180,19 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
               <Modal.CloseTrigger />
             </Modal.Header>
             <Modal.Body>
-      <div className="mb-4 flex items-center gap-3 rounded-lg border border-glass-border px-3 py-2.5 text-sm">
+      <div className="mb-4 flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-sm">
         <PlatformIcon platform={group.platform} className="h-4 w-4" />
-        <span className="font-medium text-text">{group.name}</span>
-        <span className="text-text-tertiary">|</span>
-        <span className="text-text-tertiary">{group.platform}</span>
-        <span className="text-text-tertiary">|</span>
-        <span className="text-text-tertiary">
-          {t('groups.default_rate')}: <span className="font-mono text-primary">{group.rate_multiplier}x</span>
+        <span className="font-medium text-foreground">{group.name}</span>
+        <span className="text-muted">|</span>
+        <span className="text-muted">{group.platform}</span>
+        <span className="text-muted">|</span>
+        <span className="text-muted">
+          {t('groups.default_rate')}: <span className="font-mono text-accent">{group.rate_multiplier}x</span>
         </span>
       </div>
 
       <div className="mb-4">
-        <p className="mb-2 text-xs font-medium uppercaser text-text-secondary">
+        <p className="mb-2 text-xs font-medium uppercaser text-muted">
           {t('groups.rate_override_add')}
         </p>
         <div className="flex items-start gap-2">
@@ -225,17 +225,17 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
               }}
             >
               <ComboBox.InputGroup className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted" />
                 <Input className="pl-9 pr-10" placeholder={t('groups.rate_override_search_placeholder') ?? ''} />
                 <ComboBox.Trigger
-                  className="ag-combobox-preview-trigger absolute right-1 top-1/2 z-10 h-7 w-7 min-w-0 -translate-y-1/2 p-0 text-text-tertiary hover:text-text"
+                  className="absolute right-1 top-1/2 z-10 h-7 w-7 min-w-0 -translate-y-1/2 p-0 text-muted hover:text-foreground"
                 />
               </ComboBox.InputGroup>
               <ComboBox.Popover>
                 <ListBox
                   items={visibleSearchOptions}
                   renderEmptyState={() => (
-                    <div className="px-3 py-6 text-center text-xs text-text-tertiary">
+                    <div className="px-3 py-6 text-center text-xs text-muted">
                       {debouncedEmailQuery ? t('common.no_data') : t('users.search_placeholder')}
                     </div>
                   )}
@@ -243,9 +243,9 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
                   {(item) => (
                     <ListBox.Item id={item.id} textValue={item.textValue}>
                       <div className="min-w-0">
-                        <div className="truncate text-sm text-text">{item.label}</div>
+                        <div className="truncate text-sm text-foreground">{item.label}</div>
                         {item.description ? (
-                          <div className="truncate text-xs text-text-tertiary">{item.description}</div>
+                          <div className="truncate text-xs text-muted">{item.description}</div>
                         ) : null}
                       </div>
                     </ListBox.Item>
@@ -274,7 +274,7 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
         </div>
         {showImagePricing ? (
           <div className="mt-3">
-            <div className="mb-1 flex items-center justify-between text-[11px] text-text-tertiary">
+            <div className="mb-1 flex items-center justify-between text-[11px] text-muted">
               <span>{t('groups.image_pricing')}</span>
               <span>{t('groups.image_price_fallback')}</span>
             </div>
@@ -282,7 +282,7 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
               {IMAGE_PRICE_FIELDS.map((field) => (
                 <HeroTextField key={field.key} fullWidth>
                   <div className="relative">
-                    <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 text-[10px] text-text-tertiary">
+                    <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 text-[10px] text-muted">
                       {field.label}
                     </span>
                     <Input
@@ -304,26 +304,26 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-medium uppercaser text-text-secondary">
+        <p className="mb-2 text-xs font-medium uppercaser text-muted">
           {t('groups.rate_override_list', { count: overrides.length })}
         </p>
         {isLoading ? (
-          <p className="py-8 text-center text-sm text-text-tertiary">{t('common.loading')}</p>
+          <p className="py-8 text-center text-sm text-muted">{t('common.loading')}</p>
         ) : overrides.length === 0 ? (
-          <p className="py-8 text-center text-sm text-text-tertiary">{t('groups.rate_override_empty')}</p>
+          <p className="py-8 text-center text-sm text-muted">{t('groups.rate_override_empty')}</p>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-glass-border">
+          <div className="overflow-hidden rounded-lg border border-border">
             {(overrides as GroupRateOverrideResp[]).map((row, index) => {
               const isEditing = editingUserId === row.user_id;
               return (
                 <div
                   key={row.user_id}
-                  className={`flex items-center gap-3 px-3 py-2.5 text-sm ${index === 0 ? '' : 'border-t border-glass-border'}`}
+                  className={`flex items-center gap-3 px-3 py-2.5 text-sm ${index === 0 ? '' : 'border-t border-border'}`}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-text">{row.email}</div>
+                    <div className="truncate text-foreground">{row.email}</div>
                     {row.username ? (
-                      <div className="truncate text-[11px] text-text-tertiary">{row.username}</div>
+                      <div className="truncate text-[11px] text-muted">{row.username}</div>
                     ) : null}
                   </div>
                   {isEditing ? (
@@ -342,7 +342,7 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
                           {IMAGE_PRICE_FIELDS.map((field) => (
                             <HeroTextField key={field.key} fullWidth>
                               <div className="relative">
-                                <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 text-[10px] text-text-tertiary">
+                                <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 text-[10px] text-muted">
                                   {field.label}
                                 </span>
                                 <Input
@@ -387,10 +387,10 @@ export function GroupRateOverridesModal({ open, group, onClose }: GroupRateOverr
                           setEditingImagePrices(parseImagePrices(row.plugin_settings));
                         }}
                       >
-                        <span className="font-mono text-primary">{row.rate}x</span>
+                        <span className="font-mono text-accent">{row.rate}x</span>
                       </Button>
                       {showImagePricing && row.plugin_settings?.openai ? (
-                        <span className="font-mono text-[11px] text-text-tertiary">
+                        <span className="font-mono text-[11px] text-muted">
                           {[
                             row.plugin_settings.openai.image_price_1k,
                             row.plugin_settings.openai.image_price_2k,

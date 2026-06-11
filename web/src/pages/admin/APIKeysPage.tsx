@@ -132,7 +132,7 @@ export default function APIKeysPage() {
 
       <CommonTable
         ariaLabel={t('api_keys.title', 'API keys')}
-        className="ag-api-keys-table"
+
         footer={(
           <TablePaginationFooter
             page={page}
@@ -182,18 +182,18 @@ export default function APIKeysPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <span className="inline-flex items-center gap-1.5">
-                      <Key className="w-3.5 h-3.5" style={{ color: 'var(--ag-text-tertiary)' }} />
-                      <span style={{ color: 'var(--ag-text)' }} className="font-medium">{row.name}</span>
+                      <Key className="w-3.5 h-3.5" style={{ color: 'var(--muted)' }} />
+                      <span style={{ color: 'var(--foreground)' }} className="font-medium">{row.name}</span>
                     </span>
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <code
                       className="text-xs px-2 py-0.5 rounded"
                       style={{
-                        fontFamily: 'var(--ag-font-mono)',
-                        background: 'var(--ag-bg-surface)',
-                        color: 'var(--ag-text-secondary)',
-                        border: '1px solid var(--ag-border-subtle)',
+                        fontFamily: 'var(--font-mono)',
+                        background: 'var(--surface)',
+                        color: 'var(--muted)',
+                        border: '1px solid var(--separator)',
                       }}
                     >
                       {row.key_prefix}...
@@ -201,7 +201,7 @@ export default function APIKeysPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <span className="inline-flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5" style={{ color: 'var(--ag-text-tertiary)' }} />
+                      <Layers className="w-3.5 h-3.5" style={{ color: 'var(--muted)' }} />
                       {row.group_id == null ? t('api_keys.group_unbound') : group ? group.name : `#${row.group_id}`}
                     </span>
                   </CommonTable.Cell>
@@ -210,7 +210,7 @@ export default function APIKeysPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <MetricChips
-                      className="ag-metric-chips--quota"
+
                       items={[
                         {
                           amount: row.used_quota,
@@ -229,7 +229,7 @@ export default function APIKeysPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <MetricChips
-                      className="ag-metric-chips--stack ag-metric-chips--usage"
+
                       items={[
                         {
                           amount: row.today_cost,
@@ -252,7 +252,7 @@ export default function APIKeysPage() {
                     <span className="font-mono">{formatExpiry(row.expires_at)}</span>
                   </CommonTable.Cell>
                   <CommonTable.Cell>
-                    <div className="ag-table-row-actions flex justify-center gap-1">
+                    <div className="flex justify-center gap-1">
                       <Button
                         size="sm"
                         variant="secondary"
@@ -300,7 +300,7 @@ export default function APIKeysPage() {
         <DialogTriggerShim />
         <Modal.Backdrop>
           <Modal.Container placement="center" scroll="inside" size="md">
-            <Modal.Dialog className="ag-elevation-modal">
+            <Modal.Dialog>
               <Modal.Header>
                 <Modal.Heading>{t('api_keys.key_created')}</Modal.Heading>
                 <Modal.CloseTrigger />
@@ -316,7 +316,7 @@ export default function APIKeysPage() {
                     </Alert.Content>
                   </Alert>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 break-all rounded-md border border-glass-border bg-surface px-3 py-2 font-mono text-sm text-text">
+                    <code className="flex-1 break-all rounded-md border border-border bg-surface px-3 py-2 font-mono text-sm text-foreground">
                       {createdKey ?? ''}
                     </code>
                     <Button size="sm" variant="secondary" onPress={() => copy(createdKey ?? '')}>
@@ -340,7 +340,7 @@ export default function APIKeysPage() {
         <DialogTriggerShim />
         <Modal.Backdrop>
           <Modal.Container placement="center" scroll="inside" size="md">
-            <Modal.Dialog className="ag-elevation-modal">
+            <Modal.Dialog>
               <Modal.Header>
                 <Modal.Heading>{t('api_keys.reveal')}</Modal.Heading>
                 <Modal.CloseTrigger />
@@ -356,7 +356,7 @@ export default function APIKeysPage() {
                     </Alert.Content>
                   </Alert>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 break-all rounded-md border border-glass-border bg-surface px-3 py-2 font-mono text-sm text-text">
+                    <code className="flex-1 break-all rounded-md border border-border bg-surface px-3 py-2 font-mono text-sm text-foreground">
                       {revealedKey ?? ''}
                     </code>
                     <Button size="sm" variant="secondary" onPress={handleCopyRevealedKey}>
@@ -400,7 +400,7 @@ export default function APIKeysPage() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('api_keys.delete_key')}</AlertDialog.Heading>

@@ -56,7 +56,7 @@
 | 复用 | `web/src/shared/{api,hooks,components,ui,columns}` | API 封装、查询 hook、通用组件 |
 | 装配 | `web/src/app/{router,providers,layout}` | 路由、Provider、布局、插件前端加载 |
 
-约定：服务端状态用 TanStack Query，query key 统一于 `shared/queryKeys.ts`；HTTP 经 `shared/api`；样式用 Tailwind + `@doudou-start/airgate-theme`。新页面参照现有 `pages/admin` 页面。详见 skill `core-frontend-page`。
+约定：服务端状态用 TanStack Query，query key 统一于 `shared/queryKeys.ts`；HTTP 经 `shared/api`；样式用 Tailwind + HeroUI 原生样式入口。新页面参照现有 `pages/admin` 页面。详见 skill `core-frontend-page`。
 
 ## 常用命令（`airgate-core/`）
 

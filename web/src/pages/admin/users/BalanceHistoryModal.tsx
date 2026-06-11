@@ -58,7 +58,7 @@ export function BalanceHistoryModal({ open, user, onClose }: BalanceHistoryModal
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '750px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -66,8 +66,8 @@ export function BalanceHistoryModal({ open, user, onClose }: BalanceHistoryModal
               <Modal.CloseTrigger />
             </Modal.Header>
             <Modal.Body>
-              <div className="mb-4 rounded-md border border-glass-border bg-surface px-4 py-3">
-                <p className="text-xs uppercaser text-text-tertiary">{t('users.current_balance')}</p>
+              <div className="mb-4 rounded-md border border-border bg-surface px-4 py-3">
+                <p className="text-xs uppercaser text-muted">{t('users.current_balance')}</p>
                 <p className="mt-1 font-mono text-lg font-bold">${user.balance.toFixed(2)}</p>
               </div>
 
@@ -121,20 +121,20 @@ export function BalanceHistoryModal({ open, user, onClose }: BalanceHistoryModal
                       </Chip>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className={`font-mono text-xs font-semibold ${row.action === 'add' ? 'text-success' : row.action === 'subtract' ? 'text-danger' : 'text-info'}`}>
+                      <span className={`font-mono text-xs font-semibold ${row.action === 'add' ? 'text-success' : row.action === 'subtract' ? 'text-danger' : 'text-accent'}`}>
                         {row.action === 'add' ? '+' : row.action === 'subtract' ? '-' : '='}{row.amount.toFixed(2)}
                       </span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="font-mono text-xs text-text-secondary">
+                      <span className="font-mono text-xs text-muted">
                         ${row.before_balance.toFixed(2)} → ${row.after_balance.toFixed(2)}
                       </span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="text-xs text-text-tertiary">{row.remark || '-'}</span>
+                      <span className="text-xs text-muted">{row.remark || '-'}</span>
                     </CommonTable.Cell>
                     <CommonTable.Cell>
-                      <span className="text-xs text-text-secondary">
+                      <span className="text-xs text-muted">
                         {new Date(row.created_at).toLocaleString('zh-CN', {
                           day: '2-digit',
                           hour: '2-digit',

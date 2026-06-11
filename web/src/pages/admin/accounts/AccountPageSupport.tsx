@@ -318,7 +318,7 @@ export function TableSelectionCheckbox({
       type="checkbox"
       aria-label={ariaLabel}
       checked={isSelected}
-      className="ag-table-selection-checkbox"
+      className="h-4 w-4 rounded border-border accent-accent"
       onChange={(event) => onChange(event.currentTarget.checked)}
     />
   );
@@ -336,19 +336,29 @@ function cellJustifyClass(align?: AccountTableColumn['align']) {
   return 'justify-center';
 }
 
+export const ACCOUNT_SELECTION_COLUMN_WIDTH = 36;
+
 export const ACCOUNT_SELECTION_COLUMN_STYLE: CSSProperties = {
-  minWidth: 'var(--ag-accounts-selection-column-width)',
-  width: 'var(--ag-accounts-selection-column-width)',
+  minWidth: ACCOUNT_SELECTION_COLUMN_WIDTH,
+  width: ACCOUNT_SELECTION_COLUMN_WIDTH,
 };
+
+function parsePixelWidth(width?: string): number {
+  const match = width?.match(/^(\d+(?:\.\d+)?)px$/);
+  return match ? Number(match[1]) : 96;
+}
+
+export function getAccountTableMinWidth(columns: AccountTableColumn[]) {
+  return ACCOUNT_SELECTION_COLUMN_WIDTH + columns.reduce((sum, column) => {
+    return sum + parsePixelWidth(column.width);
+  }, 0);
+}
 
 export function columnWidthStyle(column: AccountTableColumn): CSSProperties | undefined {
   if (!column.width) return undefined;
-  const width = column.mobileWidth
-    ? `var(--ag-accounts-col-${column.key}-width, ${column.width})`
-    : column.width;
   return {
-    minWidth: width,
-    width,
+    minWidth: column.width,
+    width: column.width,
     maxWidth: column.maxWidth,
   };
 }
@@ -456,11 +466,11 @@ export const AccountRowActions = memo(function AccountRowActions({
   onClearCooldowns: (id: number) => void;
 }) {
   return (
-    <div className="ag-table-row-actions ag-account-row-actions mx-auto flex w-[92px] items-center justify-center gap-1">
+    <div className="mx-auto flex w-[92px] items-center justify-center gap-1">
       <button
         type="button"
         aria-label={labels.edit}
-        className="ag-account-row-action-button"
+        className="inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius)] text-muted transition-colors hover:bg-default hover:text-foreground"
         onClick={(event) => {
           event.stopPropagation();
           onEdit(row);
@@ -471,7 +481,7 @@ export const AccountRowActions = memo(function AccountRowActions({
       <button
         type="button"
         aria-label={labels.test}
-        className="ag-account-row-action-button"
+        className="inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius)] text-muted transition-colors hover:bg-default hover:text-foreground"
         onClick={(event) => {
           event.stopPropagation();
           onTest(row);
@@ -482,7 +492,7 @@ export const AccountRowActions = memo(function AccountRowActions({
       <Dropdown>
         <Dropdown.Trigger
           aria-label={labels.more}
-          className="ag-account-row-more-trigger ag-account-row-action-button h-7 w-7 min-w-7"
+          className="inline-flex h-7 w-7 min-w-7 items-center justify-center rounded-[var(--radius)] text-muted transition-colors hover:bg-default hover:text-foreground"
         >
           <MoreHorizontal className="w-3.5 h-3.5" />
         </Dropdown.Trigger>
@@ -508,21 +518,21 @@ export const AccountRowActions = memo(function AccountRowActions({
           >
             <Dropdown.Item id="stats" textValue={labels.stats}>
               <span className="flex items-center gap-2">
-                <BarChart3 className="w-3.5 h-3.5" style={{ color: 'var(--ag-primary)' }} />
+                <BarChart3 className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
                 {labels.stats}
               </span>
             </Dropdown.Item>
             {row.type === 'oauth' ? (
               <Dropdown.Item id="refresh_quota" textValue={labels.refreshQuota}>
                 <span className="flex items-center gap-2">
-                  <RefreshCw className="w-3.5 h-3.5" style={{ color: 'var(--ag-success)' }} />
+                  <RefreshCw className="w-3.5 h-3.5" style={{ color: 'var(--success)' }} />
                   {labels.refreshQuota}
                 </span>
               </Dropdown.Item>
             ) : null}
             <Dropdown.Item id="clear_cooldowns" textValue={labels.clearCooldowns}>
               <span className="flex items-center gap-2">
-                <Eraser className="w-3.5 h-3.5" style={{ color: 'var(--ag-warning)' }} />
+                <Eraser className="w-3.5 h-3.5" style={{ color: 'var(--warning)' }} />
                 {labels.clearCooldowns}
               </span>
             </Dropdown.Item>
@@ -562,8 +572,8 @@ export const AccountTableRow = memo(function AccountTableRow({
   onSelectedChange: (id: number, isSelected: boolean) => void;
 }) {
   return (
-    <tr data-slot="tr" data-key={row.id}>
-      <td data-slot="td" className="text-center" style={ACCOUNT_SELECTION_COLUMN_STYLE}>
+    <tr data-slot="tr" data-key={row.id} className="transition-colors hover:bg-default/60">
+      <td data-slot="td" className="border-b border-separator px-2 py-2 text-center" style={ACCOUNT_SELECTION_COLUMN_STYLE}>
         <AccountRowSelectionCell
           ariaLabel={selectRowAriaLabel}
           rowId={row.id}
@@ -575,6 +585,7 @@ export const AccountTableRow = memo(function AccountTableRow({
         <td
           data-slot="td"
           key={column.key}
+          className="border-b border-separator px-3 py-2 align-middle text-foreground"
           style={columnWidthStyle(column)}
         >
           <AccountTableCellContent column={column} row={row} />
@@ -593,7 +604,7 @@ export const AccountTableRow = memo(function AccountTableRow({
 export function AccountsTableLoadingRow({ colSpan, minHeight = 220 }: { colSpan: number; minHeight?: number }) {
   return (
     <tr data-slot="tr" data-key="loading">
-      <td data-slot="td" colSpan={colSpan}>
+      <td data-slot="td" colSpan={colSpan} className="px-3 py-8">
         <div aria-busy="true" aria-live="polite" className="w-full" style={{ minHeight }}>
           <span className="sr-only">Loading</span>
         </div>
@@ -739,15 +750,15 @@ export function AccountStatusCell({ row }: { row: AccountResp }) {
   if (row.state === 'rate_limited' && hasCountdown) {
     mainBadge = pill(
       `${t('accounts.rate_limited_label', '限流中')} ${formatCountdown(remainingMs)}`,
-      'var(--ag-warning-subtle)',
-      'var(--ag-warning)',
+      'var(--color-warning-soft)',
+      'var(--warning)',
       t('accounts.rate_limited_tooltip', '上游限流，到期自动恢复，不影响调度开关'),
     );
   } else if (row.state === 'degraded' && hasCountdown) {
     mainBadge = pill(
       `${t('accounts.degraded_label', '降级')} ${formatCountdown(remainingMs)}`,
-      'var(--ag-warning-subtle)',
-      'var(--ag-warning)',
+      'var(--color-warning-soft)',
+      'var(--warning)',
       t('accounts.degraded_tooltip', '上游池抖动，软降级仅做兜底，到期自动恢复'),
     );
   } else if (row.state === 'disabled') {
@@ -756,7 +767,7 @@ export function AccountStatusCell({ row }: { row: AccountResp }) {
       <div className="inline-flex min-w-0 max-w-full flex-col items-center gap-0.5">
         <StatusPill status="disabled" tooltip={reason || undefined} />
         {reason && (
-          <span className="block max-w-[5.75rem] truncate text-center text-[10px] leading-none text-[var(--ag-muted)]" title={reason}>
+          <span className="block max-w-[5.75rem] truncate text-center text-[10px] leading-none text-[var(--muted)]" title={reason}>
             {reason}
           </span>
         )}
@@ -791,8 +802,8 @@ export function AccountStatusCell({ row }: { row: AccountResp }) {
       {mainBadge}
       {pill(
         familyLabel,
-        'var(--ag-warning-subtle)',
-        'var(--ag-warning)',
+        'var(--color-warning-soft)',
+        'var(--warning)',
         familyTooltip,
       )}
     </div>
@@ -834,16 +845,15 @@ export function AccountCapacityChip({ current, max }: { current: number; max: nu
   return (
     <span
       key={pulseToken}
-      className="ag-account-capacity"
+
       data-state={state}
       data-pulse={isPulsing || undefined}
       data-pulse-tone={pulseTone}
       title={`${current} / ${max}`}
     >
-      <span className="ag-account-capacity-current">{current}</span>
-      <span className="ag-account-capacity-divider">/</span>
-      <span className="ag-account-capacity-max">{max}</span>
+      <span>{current}</span>
+      <span>/</span>
+      <span>{max}</span>
     </span>
   );
 }
-

@@ -1,5 +1,5 @@
 import { createElement, type ComponentType } from 'react';
-import type { PluginFrontendModule } from '@doudou-start/airgate-theme/plugin';
+import type { PluginFrontendModule } from './plugin-types';
 
 function wrapPluginComponent<TProps extends object>(
   Component: ComponentType<TProps>,

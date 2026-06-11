@@ -56,13 +56,13 @@ function CommonTableRoot({
       };
 
   return (
-    <div className={cx('ag-resource-table', className)}>
-      <div className={cx('ag-resource-table-scroll', scrollClassName)} data-slot="wrapper">
+    <div className={cx('overflow-hidden rounded-[var(--radius)] border border-border bg-surface', className)}>
+      <div className={cx('relative overflow-x-auto', scrollClassName)} data-slot="wrapper">
         {scrollOverlay}
         <table
           {...contentProps}
           aria-label={ariaLabel}
-          className={cx('ag-resource-table-content', contentClassName)}
+          className={cx('w-full border-collapse text-sm', contentClassName)}
           data-slot="table"
           style={resolvedContentStyle}
         >
@@ -70,7 +70,7 @@ function CommonTableRoot({
         </table>
       </div>
       {footer ? (
-        <div className="table__footer" data-slot="table-footer">
+        <div className="border-t border-separator bg-surface px-3 py-2" data-slot="table-footer">
           {footer}
         </div>
       ) : null}
@@ -94,7 +94,7 @@ function CommonTableBody({ children, ...props }: HTMLAttributes<HTMLTableSection
   );
 }
 
-function CommonTableColumn({ id, isRowHeader, children, ...props }: CommonTableColumnProps) {
+function CommonTableColumn({ id, isRowHeader, children, className, ...props }: CommonTableColumnProps) {
   const shouldMarkRowHeader =
     isRowHeader ?? (typeof id === 'string' && DEFAULT_ROW_HEADER_COLUMN_IDS.has(id));
 
@@ -105,23 +105,24 @@ function CommonTableColumn({ id, isRowHeader, children, ...props }: CommonTableC
       data-slot="th"
       id={id}
       scope="col"
+      className={cx('border-b border-separator bg-default px-3 py-2 text-xs font-semibold text-muted', className)}
     >
       {children}
     </th>
   );
 }
 
-function CommonTableRow({ id, children, ...props }: CommonTableRowProps) {
+function CommonTableRow({ id, children, className, ...props }: CommonTableRowProps) {
   return (
-    <tr {...props} data-key={id == null ? undefined : String(id)} data-slot="tr">
+    <tr {...props} className={cx('transition-colors hover:bg-default/60', className)} data-key={id == null ? undefined : String(id)} data-slot="tr">
       {children}
     </tr>
   );
 }
 
-function CommonTableCell({ children, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
+function CommonTableCell({ children, className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td {...props} data-slot="td">
+    <td {...props} className={cx('border-b border-separator px-3 py-2 align-middle text-foreground', className)} data-slot="td">
       {children}
     </td>
   );

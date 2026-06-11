@@ -219,12 +219,12 @@ export default function UserKeysPage() {
       value: String(g.id),
       label: g.name,
       suffix: hasOverride ? (
-        <span className="text-text-tertiary">
+        <span className="text-muted">
           <span className="line-through opacity-60">{g.rate_multiplier}x</span>{' '}
-          <span className="text-primary font-medium">{override}x</span>
+          <span className="text-accent font-medium">{override}x</span>
         </span>
       ) : (
-        <span className="text-text-tertiary">{g.rate_multiplier}x {t('user_keys.rate_suffix', '倍率')}</span>
+        <span className="text-muted">{g.rate_multiplier}x {t('user_keys.rate_suffix', '倍率')}</span>
       ),
     };
   }), [groupList, t, userGroupRates]);
@@ -298,7 +298,7 @@ export default function UserKeysPage() {
 
       <CommonTable
         ariaLabel={t('user_keys.title', 'API keys')}
-        className="ag-api-keys-table"
+
         footer={(
           <TablePaginationFooter
             page={page}
@@ -357,11 +357,11 @@ export default function UserKeysPage() {
               return (
                 <CommonTable.Row id={String(row.id)} key={row.id}>
                   <CommonTable.Cell>
-                    <span className="font-medium text-text">{row.name}</span>
+                    <span className="font-medium text-foreground">{row.name}</span>
                   </CommonTable.Cell>
                   <CommonTable.Cell>
-                    <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-sm border border-glass-border bg-surface text-text-secondary font-mono">
-                      <Key className="w-3 h-3 text-text-tertiary" />
+                    <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-sm border border-border bg-surface text-muted font-mono">
+                      <Key className="w-3 h-3 text-muted" />
                       {row.key_prefix}...
                     </span>
                   </CommonTable.Cell>
@@ -369,7 +369,7 @@ export default function UserKeysPage() {
                     <div className="space-y-0.5 text-center">
                       <div className="flex justify-center">
                         <span
-                          className="inline-flex h-6 min-w-0 max-w-full items-center justify-center gap-1 rounded-[var(--radius)] px-1.5 text-[13px] font-medium leading-none text-text-secondary"
+                          className="inline-flex h-6 min-w-0 max-w-full items-center justify-center gap-1 rounded-[var(--radius)] px-1.5 text-[13px] font-medium leading-none text-muted"
                           style={GROUP_CHIP_STYLE}
                           title={groupName}
                         >
@@ -379,7 +379,7 @@ export default function UserKeysPage() {
                       </div>
                       {(group || hasSellRate) && (
                         <MetricChips
-                          className="ag-metric-chips--stack ag-metric-chips--markup"
+
                           items={[
                             ...(group ? [{
                               color: 'default' as const,
@@ -403,7 +403,7 @@ export default function UserKeysPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <MetricChips
-                      className="ag-metric-chips--quota"
+
                       items={[
                         {
                           amount: row.used_quota,
@@ -422,7 +422,7 @@ export default function UserKeysPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <MetricChips
-                      className="ag-metric-chips--stack ag-metric-chips--markup"
+
                       items={[
                         {
                           color: 'default',
@@ -446,7 +446,7 @@ export default function UserKeysPage() {
                   </CommonTable.Cell>
                   <CommonTable.Cell>
                     <MetricChips
-                      className="ag-metric-chips--stack ag-metric-chips--usage"
+
                       items={[
                         {
                           amount: row.today_cost,
@@ -471,7 +471,7 @@ export default function UserKeysPage() {
                       : t('user_keys.never_expire')}
                   </CommonTable.Cell>
                   <CommonTable.Cell>
-                    <div className="ag-table-row-actions flex items-center justify-center gap-0.5">
+                    <div className="flex items-center justify-center gap-0.5">
                       <Button
                         isIconOnly
                         size="sm"
@@ -493,7 +493,7 @@ export default function UserKeysPage() {
                       <Dropdown>
                         <Dropdown.Trigger
                           aria-label={t('common.more')}
-                          className="ag-table-row-more-trigger button button--icon-only button--sm button--secondary"
+                          className="button button--icon-only button--sm button--secondary"
                         >
                           <MoreHorizontal className="w-3.5 h-3.5" />
                         </Dropdown.Trigger>
@@ -522,7 +522,7 @@ export default function UserKeysPage() {
                           >
                             <Dropdown.Item id="import_ccs" textValue={t('user_keys.import_ccs')}>
                               <span className="flex items-center gap-2">
-                                <Upload className="w-3.5 h-3.5" style={{ color: 'var(--ag-text-tertiary)' }} />
+                                <Upload className="w-3.5 h-3.5" style={{ color: 'var(--muted)' }} />
                                 {t('user_keys.import_ccs')}
                               </span>
                             </Dropdown.Item>
@@ -585,7 +585,7 @@ export default function UserKeysPage() {
         <DialogTriggerShim />
         <Modal.Backdrop>
           <Modal.Container placement="center" scroll="inside" size="md">
-            <Modal.Dialog className="ag-elevation-modal">
+            <Modal.Dialog>
               <Modal.Header>
                 <Modal.Heading>{t('api_keys.reveal')}</Modal.Heading>
                 <Modal.CloseTrigger />
@@ -601,7 +601,7 @@ export default function UserKeysPage() {
                     </Alert.Content>
                   </Alert>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 break-all rounded-md border border-glass-border bg-surface px-3 py-2 font-mono text-sm text-text">
+                    <code className="flex-1 break-all rounded-md border border-border bg-surface px-3 py-2 font-mono text-sm text-foreground">
                       {revealedKey || ''}
                     </code>
                     <Button size="sm" variant="secondary" onPress={handleCopyRevealedKey}>
@@ -656,7 +656,7 @@ export default function UserKeysPage() {
         <DialogTriggerShim />
         <AlertDialog.Backdrop>
           <AlertDialog.Container placement="center" size="sm">
-            <AlertDialog.Dialog className="ag-elevation-modal">
+            <AlertDialog.Dialog>
               <AlertDialog.Header>
                 <AlertDialog.Icon status="danger" />
                 <AlertDialog.Heading>{t('user_keys.delete_key')}</AlertDialog.Heading>

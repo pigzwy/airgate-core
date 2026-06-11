@@ -51,7 +51,7 @@ export function CommonModal({
       <DialogTriggerShim />
       <Modal.Backdrop>
         <Modal.Container placement={placement} scroll={scroll} size={size}>
-          <Modal.Dialog className={cx('ag-elevation-modal', className)} style={dialogStyle}>
+          <Modal.Dialog className={className} style={dialogStyle}>
             {showCloseTrigger ? <Modal.CloseTrigger /> : null}
             <Modal.Header>
               {icon ? (

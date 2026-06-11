@@ -97,15 +97,15 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 w-28 shrink-0">
-                <Mail className="w-4 h-4 text-text-tertiary" />
-                <span className="text-xs font-medium text-text-secondary">{t('profile.email')}</span>
+                <Mail className="w-4 h-4 text-muted" />
+                <span className="text-xs font-medium text-muted">{t('profile.email')}</span>
               </div>
-              <span className="text-sm text-text">{user.email}</span>
+              <span className="text-sm text-foreground">{user.email}</span>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 w-28 shrink-0">
-                <Shield className="w-4 h-4 text-text-tertiary" />
-                <span className="text-xs font-medium text-text-secondary">{t('profile.role')}</span>
+                <Shield className="w-4 h-4 text-muted" />
+                <span className="text-xs font-medium text-muted">{t('profile.role')}</span>
               </div>
               <Chip color={user.role === 'admin' ? 'accent' : 'default'} size="sm" variant="soft">
                 {user.role === 'admin' ? t('nav.admin') : t('nav.user')}
@@ -117,20 +117,20 @@ export default function ProfilePage() {
               onClick={() => setBalanceHistoryOpen(true)}
             >
               <div className="flex items-center gap-2 w-28 shrink-0">
-                <Wallet className="w-4 h-4 text-text-tertiary" />
-                <span className="text-xs font-medium text-text-secondary">{t('profile.balance')}</span>
+                <Wallet className="w-4 h-4 text-muted" />
+                <span className="text-xs font-medium text-muted">{t('profile.balance')}</span>
               </div>
-              <span className="text-sm text-text font-mono">
+              <span className="text-sm text-foreground font-mono">
                 ${user.balance.toFixed(4)}
               </span>
-              <ChevronRight className="w-4 h-4 text-text-tertiary ml-auto" />
+              <ChevronRight className="w-4 h-4 text-muted ml-auto" />
             </button>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 w-28 shrink-0">
-                <Layers className="w-4 h-4 text-text-tertiary" />
-                <span className="text-xs font-medium text-text-secondary">{t('profile.concurrency')}</span>
+                <Layers className="w-4 h-4 text-muted" />
+                <span className="text-xs font-medium text-muted">{t('profile.concurrency')}</span>
               </div>
-              <span className="text-sm text-text font-mono">
+              <span className="text-sm text-foreground font-mono">
                 {user.max_concurrency}
               </span>
             </div>
@@ -155,7 +155,7 @@ export default function ProfilePage() {
               <HeroTextField fullWidth>
                 <Label className="sr-only">{t('profile.change_username')}</Label>
                 <div className="relative">
-                  <User className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                  <User className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                   <Input
                     className="pl-9"
                     value={username}
@@ -195,7 +195,7 @@ export default function ProfilePage() {
             <HeroTextField fullWidth isRequired>
               <Label className="sr-only">{t('profile.old_password')}</Label>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                 <Input
                   className="pl-9"
                   name="current-password"
@@ -213,7 +213,7 @@ export default function ProfilePage() {
             <HeroTextField fullWidth isRequired>
               <Label className="sr-only">{t('profile.new_password')}</Label>
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                <KeyRound className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                 <Input
                   className="pl-9"
                   name="new-password"
@@ -231,7 +231,7 @@ export default function ProfilePage() {
             <HeroTextField fullWidth isRequired>
               <Label className="sr-only">{t('profile.confirm_new_password')}</Label>
               <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                <KeyRound className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                 <Input
                   className="pl-9"
                   name="confirm-new-password"
@@ -307,7 +307,7 @@ function MyBalanceHistoryModal({ open, balance, onClose }: { open: boolean; bala
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '900px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -315,8 +315,8 @@ function MyBalanceHistoryModal({ open, balance, onClose }: { open: boolean; bala
               <Modal.CloseTrigger />
             </Modal.Header>
             <Modal.Body>
-              <div className="mb-4 rounded-md border border-glass-border bg-surface px-4 py-3">
-                <p className="text-xs text-text-tertiary">{t('users.current_balance')}</p>
+              <div className="mb-4 rounded-md border border-border bg-surface px-4 py-3">
+                <p className="text-xs text-muted">{t('users.current_balance')}</p>
                 <p className="mt-1 font-mono text-lg font-bold">${balance.toFixed(2)}</p>
               </div>
 
@@ -370,24 +370,24 @@ function MyBalanceHistoryModal({ open, balance, onClose }: { open: boolean; bala
                               </Chip>
                             </CommonTable.Cell>
                             <CommonTable.Cell>
-                              <span className={`font-mono text-xs font-semibold whitespace-nowrap ${row.action === 'add' ? 'text-success' : row.action === 'subtract' ? 'text-danger' : 'text-info'}`}>
+                              <span className={`font-mono text-xs font-semibold whitespace-nowrap ${row.action === 'add' ? 'text-success' : row.action === 'subtract' ? 'text-danger' : 'text-accent'}`}>
                                 {row.action === 'add' ? '+' : row.action === 'subtract' ? '-' : '='}{row.amount.toFixed(2)}
                               </span>
                             </CommonTable.Cell>
                             <CommonTable.Cell>
-                              <span className="font-mono text-xs text-text-secondary whitespace-nowrap">
+                              <span className="font-mono text-xs text-muted whitespace-nowrap">
                                 ${row.before_balance.toFixed(2)}
-                                <span className="text-text-tertiary"> → </span>
+                                <span className="text-muted"> → </span>
                                 ${row.after_balance.toFixed(2)}
                               </span>
                             </CommonTable.Cell>
                             <CommonTable.Cell>
-                              <span className="text-xs text-text-tertiary block max-w-[200px] truncate" title={row.remark || undefined}>
+                              <span className="text-xs text-muted block max-w-[200px] truncate" title={row.remark || undefined}>
                                 {row.remark || '-'}
                               </span>
                             </CommonTable.Cell>
                             <CommonTable.Cell>
-                              <span className="text-xs text-text-secondary">
+                              <span className="text-xs text-muted">
                                 {new Date(row.created_at).toLocaleString('zh-CN', {
                                   day: '2-digit',
                                   hour: '2-digit',
@@ -437,8 +437,8 @@ function BalanceAlertCard({ threshold, balance }: { threshold: number; balance: 
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <div className="text-sm font-medium text-text">{t('profile.balance_alert_enabled')}</div>
-              <p className="mt-0.5 text-xs text-text-tertiary">{t('profile.balance_alert_desc')}</p>
+              <div className="text-sm font-medium text-foreground">{t('profile.balance_alert_enabled')}</div>
+              <p className="mt-0.5 text-xs text-muted">{t('profile.balance_alert_desc')}</p>
             </div>
             <NativeSwitch
               ariaLabel={t('profile.balance_alert_enabled')}
@@ -455,7 +455,7 @@ function BalanceAlertCard({ threshold, balance }: { threshold: number; balance: 
                 <HeroTextField fullWidth>
                   <Label className="sr-only">{t('profile.balance_alert_threshold')}</Label>
                   <div className="relative">
-                    <Bell className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-text-tertiary" />
+                    <Bell className="pointer-events-none absolute left-3 top-1/2 z-10 w-4 h-4 -translate-y-1/2 text-muted" />
                     <Input
                       className="pl-9"
                       value={value}

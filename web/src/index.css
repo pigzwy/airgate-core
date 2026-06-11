@@ -6,11 +6,3 @@
 @import "@heroui/styles";
 @import "@fontsource/geist-sans/latin.css";
 @import "@fontsource/geist-mono/latin.css";
-
-@import "./styles/theme.css";
-@import "./styles/base.css";
-@import "./styles/layout.css";
-@import "./styles/heroui.css";
-@import "./styles/pages.css";
-@import "./styles/tables.css";
-@import "./styles/animations.css";

@@ -146,7 +146,7 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
 
   const renderRateField = (group: GroupResp, enabled: boolean) => (
     <div className="ml-auto w-24 shrink-0">
-      <div className="mb-1 text-[10px] text-text-tertiary">{t('groups.rate_multiplier')}</div>
+      <div className="mb-1 text-[10px] text-muted">{t('groups.rate_multiplier')}</div>
       <HeroTextField fullWidth isDisabled={!enabled}>
         <div className="relative">
           <Input
@@ -160,7 +160,7 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
             placeholder={String(group.rate_multiplier ?? 1)}
             onChange={(e) => setCustomRates((prev) => ({ ...prev, [group.id]: e.target.value }))}
           />
-          <span className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-[10px] text-text-tertiary">×</span>
+          <span className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-[10px] text-muted">×</span>
         </div>
       </HeroTextField>
     </div>
@@ -171,7 +171,7 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
     const prices = customImagePrices[group.id] ?? emptyImagePrices();
     return (
       <div className="ml-2 w-56 shrink-0">
-        <div className="mb-1 flex items-center justify-between text-[10px] text-text-tertiary">
+        <div className="mb-1 flex items-center justify-between text-[10px] text-muted">
           <span>{t('groups.image_pricing_short')}</span>
           <span>{t('groups.image_price_fallback')}</span>
         </div>
@@ -179,7 +179,7 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
           {IMAGE_PRICE_FIELDS.map((field) => (
             <HeroTextField key={field.key} fullWidth isDisabled={!enabled}>
               <div className="relative">
-                <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 text-[10px] text-text-tertiary">
+                <span className="pointer-events-none absolute left-2 top-1/2 z-10 -translate-y-1/2 text-[10px] text-muted">
                   {field.label}
                 </span>
                 <Input
@@ -209,16 +209,16 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
   const renderGroupRow = (group: GroupResp, selected: boolean, locked: boolean) => (
     <div
       key={group.id}
-      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-text-secondary"
+      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted"
     >
       <Checkbox
         isDisabled={locked}
         isSelected={selected}
         onChange={(nextSelected) => toggleExclusiveGroup(group.id, nextSelected)}
       >
-        <span className="text-text">{group.name}</span>
+        <span className="text-foreground">{group.name}</span>
       </Checkbox>
-      <span className="text-[10px] text-text-tertiary">{group.platform}</span>
+      <span className="text-[10px] text-muted">{group.platform}</span>
       {renderRateField(group, !group.is_exclusive || selected)}
       {renderImagePriceFields(group, !group.is_exclusive || selected)}
     </div>
@@ -236,7 +236,7 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
       <Modal.Backdrop>
         <Modal.Container placement="center" scroll="inside" size="md">
           <Modal.Dialog
-            className="ag-elevation-modal"
+
             style={{ maxWidth: '720px', width: 'min(100%, calc(100vw - 2rem))' }}
           >
             <Modal.Header>
@@ -245,17 +245,17 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
             </Modal.Header>
             <Modal.Body>
               {groupsLoading ? (
-                <p className="py-8 text-center text-sm text-text-tertiary">{t('common.loading')}</p>
+                <p className="py-8 text-center text-sm text-muted">{t('common.loading')}</p>
               ) : allGroups.length === 0 ? (
-                <p className="py-8 text-center text-sm text-text-tertiary">{t('common.no_data')}</p>
+                <p className="py-8 text-center text-sm text-muted">{t('common.no_data')}</p>
               ) : (
                 <div className="max-h-[26rem] space-y-4 overflow-y-auto">
-                  <p className="text-[11px] text-text-tertiary">{t('users.group_rate_hint')}</p>
-                  <p className="text-[11px] text-text-tertiary">{t('groups.image_pricing_hint')}</p>
+                  <p className="text-[11px] text-muted">{t('users.group_rate_hint')}</p>
+                  <p className="text-[11px] text-muted">{t('groups.image_pricing_hint')}</p>
 
                   {normalGroups.length > 0 ? (
                     <div>
-                      <p className="mb-2 text-xs font-medium uppercaser text-text-tertiary">
+                      <p className="mb-2 text-xs font-medium uppercaser text-muted">
                         {t('users.normal_groups')}
                       </p>
                       <div className="space-y-0.5">
@@ -266,7 +266,7 @@ export function UserGroupsModal({ open, user, onClose, onSaved }: UserGroupsModa
 
                   {exclusiveGroups.length > 0 ? (
                     <div>
-                      <p className="mb-2 text-xs font-medium uppercaser text-text-tertiary">
+                      <p className="mb-2 text-xs font-medium uppercaser text-muted">
                         {t('users.exclusive_groups')}
                       </p>
                       <div className="space-y-0.5">
