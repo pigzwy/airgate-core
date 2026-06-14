@@ -18,6 +18,12 @@ type BalanceLog func(*sql.Selector)
 // Group is the predicate function for group builders.
 type Group func(*sql.Selector)
 
+// OpsRequestLog is the predicate function for opsrequestlog builders.
+type OpsRequestLog func(*sql.Selector)
+
+// OpsWindowStat is the predicate function for opswindowstat builders.
+type OpsWindowStat func(*sql.Selector)
+
 // Plugin is the predicate function for plugin builders.
 type Plugin func(*sql.Selector)
 

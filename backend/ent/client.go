@@ -19,6 +19,8 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/opsrequestlog"
+	"github.com/DouDOU-start/airgate-core/ent/opswindowstat"
 	"github.com/DouDOU-start/airgate-core/ent/plugin"
 	"github.com/DouDOU-start/airgate-core/ent/pluginsource"
 	"github.com/DouDOU-start/airgate-core/ent/proxy"
@@ -42,6 +44,10 @@ type Client struct {
 	BalanceLog *BalanceLogClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// OpsRequestLog is the client for interacting with the OpsRequestLog builders.
+	OpsRequestLog *OpsRequestLogClient
+	// OpsWindowStat is the client for interacting with the OpsWindowStat builders.
+	OpsWindowStat *OpsWindowStatClient
 	// Plugin is the client for interacting with the Plugin builders.
 	Plugin *PluginClient
 	// PluginSource is the client for interacting with the PluginSource builders.
@@ -73,6 +79,8 @@ func (c *Client) init() {
 	c.Account = NewAccountClient(c.config)
 	c.BalanceLog = NewBalanceLogClient(c.config)
 	c.Group = NewGroupClient(c.config)
+	c.OpsRequestLog = NewOpsRequestLogClient(c.config)
+	c.OpsWindowStat = NewOpsWindowStatClient(c.config)
 	c.Plugin = NewPluginClient(c.config)
 	c.PluginSource = NewPluginSourceClient(c.config)
 	c.Proxy = NewProxyClient(c.config)
@@ -177,6 +185,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Account:          NewAccountClient(cfg),
 		BalanceLog:       NewBalanceLogClient(cfg),
 		Group:            NewGroupClient(cfg),
+		OpsRequestLog:    NewOpsRequestLogClient(cfg),
+		OpsWindowStat:    NewOpsWindowStatClient(cfg),
 		Plugin:           NewPluginClient(cfg),
 		PluginSource:     NewPluginSourceClient(cfg),
 		Proxy:            NewProxyClient(cfg),
@@ -208,6 +218,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Account:          NewAccountClient(cfg),
 		BalanceLog:       NewBalanceLogClient(cfg),
 		Group:            NewGroupClient(cfg),
+		OpsRequestLog:    NewOpsRequestLogClient(cfg),
+		OpsWindowStat:    NewOpsWindowStatClient(cfg),
 		Plugin:           NewPluginClient(cfg),
 		PluginSource:     NewPluginSourceClient(cfg),
 		Proxy:            NewProxyClient(cfg),
@@ -245,8 +257,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.APIKey, c.Account, c.BalanceLog, c.Group, c.Plugin, c.PluginSource, c.Proxy,
-		c.Setting, c.Task, c.UsageLog, c.User, c.UserSubscription,
+		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsRequestLog, c.OpsWindowStat,
+		c.Plugin, c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
+		c.UserSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -256,8 +269,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.APIKey, c.Account, c.BalanceLog, c.Group, c.Plugin, c.PluginSource, c.Proxy,
-		c.Setting, c.Task, c.UsageLog, c.User, c.UserSubscription,
+		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsRequestLog, c.OpsWindowStat,
+		c.Plugin, c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
+		c.UserSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -274,6 +288,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BalanceLog.mutate(ctx, m)
 	case *GroupMutation:
 		return c.Group.mutate(ctx, m)
+	case *OpsRequestLogMutation:
+		return c.OpsRequestLog.mutate(ctx, m)
+	case *OpsWindowStatMutation:
+		return c.OpsWindowStat.mutate(ctx, m)
 	case *PluginMutation:
 		return c.Plugin.mutate(ctx, m)
 	case *PluginSourceMutation:
@@ -1016,6 +1034,272 @@ func (c *GroupClient) mutate(ctx context.Context, m *GroupMutation) (Value, erro
 		return (&GroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Group mutation op: %q", m.Op())
+	}
+}
+
+// OpsRequestLogClient is a client for the OpsRequestLog schema.
+type OpsRequestLogClient struct {
+	config
+}
+
+// NewOpsRequestLogClient returns a client for the OpsRequestLog from the given config.
+func NewOpsRequestLogClient(c config) *OpsRequestLogClient {
+	return &OpsRequestLogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `opsrequestlog.Hooks(f(g(h())))`.
+func (c *OpsRequestLogClient) Use(hooks ...Hook) {
+	c.hooks.OpsRequestLog = append(c.hooks.OpsRequestLog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `opsrequestlog.Intercept(f(g(h())))`.
+func (c *OpsRequestLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OpsRequestLog = append(c.inters.OpsRequestLog, interceptors...)
+}
+
+// Create returns a builder for creating a OpsRequestLog entity.
+func (c *OpsRequestLogClient) Create() *OpsRequestLogCreate {
+	mutation := newOpsRequestLogMutation(c.config, OpCreate)
+	return &OpsRequestLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OpsRequestLog entities.
+func (c *OpsRequestLogClient) CreateBulk(builders ...*OpsRequestLogCreate) *OpsRequestLogCreateBulk {
+	return &OpsRequestLogCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OpsRequestLogClient) MapCreateBulk(slice any, setFunc func(*OpsRequestLogCreate, int)) *OpsRequestLogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OpsRequestLogCreateBulk{err: fmt.Errorf("calling to OpsRequestLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OpsRequestLogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OpsRequestLogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OpsRequestLog.
+func (c *OpsRequestLogClient) Update() *OpsRequestLogUpdate {
+	mutation := newOpsRequestLogMutation(c.config, OpUpdate)
+	return &OpsRequestLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OpsRequestLogClient) UpdateOne(orl *OpsRequestLog) *OpsRequestLogUpdateOne {
+	mutation := newOpsRequestLogMutation(c.config, OpUpdateOne, withOpsRequestLog(orl))
+	return &OpsRequestLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OpsRequestLogClient) UpdateOneID(id int) *OpsRequestLogUpdateOne {
+	mutation := newOpsRequestLogMutation(c.config, OpUpdateOne, withOpsRequestLogID(id))
+	return &OpsRequestLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OpsRequestLog.
+func (c *OpsRequestLogClient) Delete() *OpsRequestLogDelete {
+	mutation := newOpsRequestLogMutation(c.config, OpDelete)
+	return &OpsRequestLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OpsRequestLogClient) DeleteOne(orl *OpsRequestLog) *OpsRequestLogDeleteOne {
+	return c.DeleteOneID(orl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OpsRequestLogClient) DeleteOneID(id int) *OpsRequestLogDeleteOne {
+	builder := c.Delete().Where(opsrequestlog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OpsRequestLogDeleteOne{builder}
+}
+
+// Query returns a query builder for OpsRequestLog.
+func (c *OpsRequestLogClient) Query() *OpsRequestLogQuery {
+	return &OpsRequestLogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOpsRequestLog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OpsRequestLog entity by its id.
+func (c *OpsRequestLogClient) Get(ctx context.Context, id int) (*OpsRequestLog, error) {
+	return c.Query().Where(opsrequestlog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OpsRequestLogClient) GetX(ctx context.Context, id int) *OpsRequestLog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OpsRequestLogClient) Hooks() []Hook {
+	return c.hooks.OpsRequestLog
+}
+
+// Interceptors returns the client interceptors.
+func (c *OpsRequestLogClient) Interceptors() []Interceptor {
+	return c.inters.OpsRequestLog
+}
+
+func (c *OpsRequestLogClient) mutate(ctx context.Context, m *OpsRequestLogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OpsRequestLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OpsRequestLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OpsRequestLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OpsRequestLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OpsRequestLog mutation op: %q", m.Op())
+	}
+}
+
+// OpsWindowStatClient is a client for the OpsWindowStat schema.
+type OpsWindowStatClient struct {
+	config
+}
+
+// NewOpsWindowStatClient returns a client for the OpsWindowStat from the given config.
+func NewOpsWindowStatClient(c config) *OpsWindowStatClient {
+	return &OpsWindowStatClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `opswindowstat.Hooks(f(g(h())))`.
+func (c *OpsWindowStatClient) Use(hooks ...Hook) {
+	c.hooks.OpsWindowStat = append(c.hooks.OpsWindowStat, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `opswindowstat.Intercept(f(g(h())))`.
+func (c *OpsWindowStatClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OpsWindowStat = append(c.inters.OpsWindowStat, interceptors...)
+}
+
+// Create returns a builder for creating a OpsWindowStat entity.
+func (c *OpsWindowStatClient) Create() *OpsWindowStatCreate {
+	mutation := newOpsWindowStatMutation(c.config, OpCreate)
+	return &OpsWindowStatCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OpsWindowStat entities.
+func (c *OpsWindowStatClient) CreateBulk(builders ...*OpsWindowStatCreate) *OpsWindowStatCreateBulk {
+	return &OpsWindowStatCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OpsWindowStatClient) MapCreateBulk(slice any, setFunc func(*OpsWindowStatCreate, int)) *OpsWindowStatCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OpsWindowStatCreateBulk{err: fmt.Errorf("calling to OpsWindowStatClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OpsWindowStatCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OpsWindowStatCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OpsWindowStat.
+func (c *OpsWindowStatClient) Update() *OpsWindowStatUpdate {
+	mutation := newOpsWindowStatMutation(c.config, OpUpdate)
+	return &OpsWindowStatUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OpsWindowStatClient) UpdateOne(ows *OpsWindowStat) *OpsWindowStatUpdateOne {
+	mutation := newOpsWindowStatMutation(c.config, OpUpdateOne, withOpsWindowStat(ows))
+	return &OpsWindowStatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OpsWindowStatClient) UpdateOneID(id int) *OpsWindowStatUpdateOne {
+	mutation := newOpsWindowStatMutation(c.config, OpUpdateOne, withOpsWindowStatID(id))
+	return &OpsWindowStatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OpsWindowStat.
+func (c *OpsWindowStatClient) Delete() *OpsWindowStatDelete {
+	mutation := newOpsWindowStatMutation(c.config, OpDelete)
+	return &OpsWindowStatDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OpsWindowStatClient) DeleteOne(ows *OpsWindowStat) *OpsWindowStatDeleteOne {
+	return c.DeleteOneID(ows.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OpsWindowStatClient) DeleteOneID(id int) *OpsWindowStatDeleteOne {
+	builder := c.Delete().Where(opswindowstat.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OpsWindowStatDeleteOne{builder}
+}
+
+// Query returns a query builder for OpsWindowStat.
+func (c *OpsWindowStatClient) Query() *OpsWindowStatQuery {
+	return &OpsWindowStatQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOpsWindowStat},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OpsWindowStat entity by its id.
+func (c *OpsWindowStatClient) Get(ctx context.Context, id int) (*OpsWindowStat, error) {
+	return c.Query().Where(opswindowstat.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OpsWindowStatClient) GetX(ctx context.Context, id int) *OpsWindowStat {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OpsWindowStatClient) Hooks() []Hook {
+	return c.hooks.OpsWindowStat
+}
+
+// Interceptors returns the client interceptors.
+func (c *OpsWindowStatClient) Interceptors() []Interceptor {
+	return c.inters.OpsWindowStat
+}
+
+func (c *OpsWindowStatClient) mutate(ctx context.Context, m *OpsWindowStatMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OpsWindowStatCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OpsWindowStatUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OpsWindowStatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OpsWindowStatDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OpsWindowStat mutation op: %q", m.Op())
 	}
 }
 
@@ -2278,11 +2562,12 @@ func (c *UserSubscriptionClient) mutate(ctx context.Context, m *UserSubscription
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		APIKey, Account, BalanceLog, Group, Plugin, PluginSource, Proxy, Setting, Task,
-		UsageLog, User, UserSubscription []ent.Hook
+		APIKey, Account, BalanceLog, Group, OpsRequestLog, OpsWindowStat, Plugin,
+		PluginSource, Proxy, Setting, Task, UsageLog, User, UserSubscription []ent.Hook
 	}
 	inters struct {
-		APIKey, Account, BalanceLog, Group, Plugin, PluginSource, Proxy, Setting, Task,
-		UsageLog, User, UserSubscription []ent.Interceptor
+		APIKey, Account, BalanceLog, Group, OpsRequestLog, OpsWindowStat, Plugin,
+		PluginSource, Proxy, Setting, Task, UsageLog, User,
+		UserSubscription []ent.Interceptor
 	}
 )

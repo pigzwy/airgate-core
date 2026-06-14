@@ -57,6 +57,30 @@ func (f GroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupMutation", m)
 }
 
+// The OpsRequestLogFunc type is an adapter to allow the use of ordinary
+// function as OpsRequestLog mutator.
+type OpsRequestLogFunc func(context.Context, *ent.OpsRequestLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OpsRequestLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OpsRequestLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OpsRequestLogMutation", m)
+}
+
+// The OpsWindowStatFunc type is an adapter to allow the use of ordinary
+// function as OpsWindowStat mutator.
+type OpsWindowStatFunc func(context.Context, *ent.OpsWindowStatMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OpsWindowStatFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OpsWindowStatMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OpsWindowStatMutation", m)
+}
+
 // The PluginFunc type is an adapter to allow the use of ordinary
 // function as Plugin mutator.
 type PluginFunc func(context.Context, *ent.PluginMutation) (ent.Value, error)

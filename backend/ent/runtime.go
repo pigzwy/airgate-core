@@ -9,6 +9,8 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/opsrequestlog"
+	"github.com/DouDOU-start/airgate-core/ent/opswindowstat"
 	"github.com/DouDOU-start/airgate-core/ent/plugin"
 	"github.com/DouDOU-start/airgate-core/ent/pluginsource"
 	"github.com/DouDOU-start/airgate-core/ent/proxy"
@@ -206,6 +208,150 @@ func init() {
 	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
 	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	opsrequestlogFields := schema.OpsRequestLog{}.Fields()
+	_ = opsrequestlogFields
+	// opsrequestlogDescRequestID is the schema descriptor for request_id field.
+	opsrequestlogDescRequestID := opsrequestlogFields[0].Descriptor()
+	// opsrequestlog.DefaultRequestID holds the default value on creation for the request_id field.
+	opsrequestlog.DefaultRequestID = opsrequestlogDescRequestID.Default.(string)
+	// opsrequestlogDescPluginID is the schema descriptor for plugin_id field.
+	opsrequestlogDescPluginID := opsrequestlogFields[1].Descriptor()
+	// opsrequestlog.DefaultPluginID holds the default value on creation for the plugin_id field.
+	opsrequestlog.DefaultPluginID = opsrequestlogDescPluginID.Default.(string)
+	// opsrequestlogDescPlatform is the schema descriptor for platform field.
+	opsrequestlogDescPlatform := opsrequestlogFields[2].Descriptor()
+	// opsrequestlog.DefaultPlatform holds the default value on creation for the platform field.
+	opsrequestlog.DefaultPlatform = opsrequestlogDescPlatform.Default.(string)
+	// opsrequestlogDescModel is the schema descriptor for model field.
+	opsrequestlogDescModel := opsrequestlogFields[3].Descriptor()
+	// opsrequestlog.DefaultModel holds the default value on creation for the model field.
+	opsrequestlog.DefaultModel = opsrequestlogDescModel.Default.(string)
+	// opsrequestlogDescEndpoint is the schema descriptor for endpoint field.
+	opsrequestlogDescEndpoint := opsrequestlogFields[4].Descriptor()
+	// opsrequestlog.DefaultEndpoint holds the default value on creation for the endpoint field.
+	opsrequestlog.DefaultEndpoint = opsrequestlogDescEndpoint.Default.(string)
+	// opsrequestlogDescUserIDSnapshot is the schema descriptor for user_id_snapshot field.
+	opsrequestlogDescUserIDSnapshot := opsrequestlogFields[5].Descriptor()
+	// opsrequestlog.DefaultUserIDSnapshot holds the default value on creation for the user_id_snapshot field.
+	opsrequestlog.DefaultUserIDSnapshot = opsrequestlogDescUserIDSnapshot.Default.(int)
+	// opsrequestlogDescAPIKeyIDSnapshot is the schema descriptor for api_key_id_snapshot field.
+	opsrequestlogDescAPIKeyIDSnapshot := opsrequestlogFields[6].Descriptor()
+	// opsrequestlog.DefaultAPIKeyIDSnapshot holds the default value on creation for the api_key_id_snapshot field.
+	opsrequestlog.DefaultAPIKeyIDSnapshot = opsrequestlogDescAPIKeyIDSnapshot.Default.(int)
+	// opsrequestlogDescAccountIDSnapshot is the schema descriptor for account_id_snapshot field.
+	opsrequestlogDescAccountIDSnapshot := opsrequestlogFields[7].Descriptor()
+	// opsrequestlog.DefaultAccountIDSnapshot holds the default value on creation for the account_id_snapshot field.
+	opsrequestlog.DefaultAccountIDSnapshot = opsrequestlogDescAccountIDSnapshot.Default.(int)
+	// opsrequestlogDescGroupIDSnapshot is the schema descriptor for group_id_snapshot field.
+	opsrequestlogDescGroupIDSnapshot := opsrequestlogFields[8].Descriptor()
+	// opsrequestlog.DefaultGroupIDSnapshot holds the default value on creation for the group_id_snapshot field.
+	opsrequestlog.DefaultGroupIDSnapshot = opsrequestlogDescGroupIDSnapshot.Default.(int)
+	// opsrequestlogDescSuccess is the schema descriptor for success field.
+	opsrequestlogDescSuccess := opsrequestlogFields[9].Descriptor()
+	// opsrequestlog.DefaultSuccess holds the default value on creation for the success field.
+	opsrequestlog.DefaultSuccess = opsrequestlogDescSuccess.Default.(bool)
+	// opsrequestlogDescStatusCode is the schema descriptor for status_code field.
+	opsrequestlogDescStatusCode := opsrequestlogFields[10].Descriptor()
+	// opsrequestlog.DefaultStatusCode holds the default value on creation for the status_code field.
+	opsrequestlog.DefaultStatusCode = opsrequestlogDescStatusCode.Default.(int)
+	// opsrequestlogDescUpstreamStatusCode is the schema descriptor for upstream_status_code field.
+	opsrequestlogDescUpstreamStatusCode := opsrequestlogFields[11].Descriptor()
+	// opsrequestlog.DefaultUpstreamStatusCode holds the default value on creation for the upstream_status_code field.
+	opsrequestlog.DefaultUpstreamStatusCode = opsrequestlogDescUpstreamStatusCode.Default.(int)
+	// opsrequestlogDescDurationMs is the schema descriptor for duration_ms field.
+	opsrequestlogDescDurationMs := opsrequestlogFields[12].Descriptor()
+	// opsrequestlog.DefaultDurationMs holds the default value on creation for the duration_ms field.
+	opsrequestlog.DefaultDurationMs = opsrequestlogDescDurationMs.Default.(int64)
+	// opsrequestlogDescFirstTokenMs is the schema descriptor for first_token_ms field.
+	opsrequestlogDescFirstTokenMs := opsrequestlogFields[13].Descriptor()
+	// opsrequestlog.DefaultFirstTokenMs holds the default value on creation for the first_token_ms field.
+	opsrequestlog.DefaultFirstTokenMs = opsrequestlogDescFirstTokenMs.Default.(int64)
+	// opsrequestlogDescStream is the schema descriptor for stream field.
+	opsrequestlogDescStream := opsrequestlogFields[14].Descriptor()
+	// opsrequestlog.DefaultStream holds the default value on creation for the stream field.
+	opsrequestlog.DefaultStream = opsrequestlogDescStream.Default.(bool)
+	// opsrequestlogDescInputTokens is the schema descriptor for input_tokens field.
+	opsrequestlogDescInputTokens := opsrequestlogFields[15].Descriptor()
+	// opsrequestlog.DefaultInputTokens holds the default value on creation for the input_tokens field.
+	opsrequestlog.DefaultInputTokens = opsrequestlogDescInputTokens.Default.(int)
+	// opsrequestlogDescOutputTokens is the schema descriptor for output_tokens field.
+	opsrequestlogDescOutputTokens := opsrequestlogFields[16].Descriptor()
+	// opsrequestlog.DefaultOutputTokens holds the default value on creation for the output_tokens field.
+	opsrequestlog.DefaultOutputTokens = opsrequestlogDescOutputTokens.Default.(int)
+	// opsrequestlogDescErrorKind is the schema descriptor for error_kind field.
+	opsrequestlogDescErrorKind := opsrequestlogFields[17].Descriptor()
+	// opsrequestlog.DefaultErrorKind holds the default value on creation for the error_kind field.
+	opsrequestlog.DefaultErrorKind = opsrequestlogDescErrorKind.Default.(string)
+	// opsrequestlogDescErrorMsg is the schema descriptor for error_msg field.
+	opsrequestlogDescErrorMsg := opsrequestlogFields[18].Descriptor()
+	// opsrequestlog.DefaultErrorMsg holds the default value on creation for the error_msg field.
+	opsrequestlog.DefaultErrorMsg = opsrequestlogDescErrorMsg.Default.(string)
+	// opsrequestlogDescErrorDetail is the schema descriptor for error_detail field.
+	opsrequestlogDescErrorDetail := opsrequestlogFields[19].Descriptor()
+	// opsrequestlog.DefaultErrorDetail holds the default value on creation for the error_detail field.
+	opsrequestlog.DefaultErrorDetail = opsrequestlogDescErrorDetail.Default.(string)
+	// opsrequestlogDescCreatedAt is the schema descriptor for created_at field.
+	opsrequestlogDescCreatedAt := opsrequestlogFields[20].Descriptor()
+	// opsrequestlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	opsrequestlog.DefaultCreatedAt = opsrequestlogDescCreatedAt.Default.(func() time.Time)
+	opswindowstatFields := schema.OpsWindowStat{}.Fields()
+	_ = opswindowstatFields
+	// opswindowstatDescWindowSeconds is the schema descriptor for window_seconds field.
+	opswindowstatDescWindowSeconds := opswindowstatFields[1].Descriptor()
+	// opswindowstat.DefaultWindowSeconds holds the default value on creation for the window_seconds field.
+	opswindowstat.DefaultWindowSeconds = opswindowstatDescWindowSeconds.Default.(int)
+	// opswindowstatDescPlatform is the schema descriptor for platform field.
+	opswindowstatDescPlatform := opswindowstatFields[2].Descriptor()
+	// opswindowstat.DefaultPlatform holds the default value on creation for the platform field.
+	opswindowstat.DefaultPlatform = opswindowstatDescPlatform.Default.(string)
+	// opswindowstatDescTotalRequests is the schema descriptor for total_requests field.
+	opswindowstatDescTotalRequests := opswindowstatFields[3].Descriptor()
+	// opswindowstat.DefaultTotalRequests holds the default value on creation for the total_requests field.
+	opswindowstat.DefaultTotalRequests = opswindowstatDescTotalRequests.Default.(int64)
+	// opswindowstatDescSuccessRequests is the schema descriptor for success_requests field.
+	opswindowstatDescSuccessRequests := opswindowstatFields[4].Descriptor()
+	// opswindowstat.DefaultSuccessRequests holds the default value on creation for the success_requests field.
+	opswindowstat.DefaultSuccessRequests = opswindowstatDescSuccessRequests.Default.(int64)
+	// opswindowstatDescErrorRequests is the schema descriptor for error_requests field.
+	opswindowstatDescErrorRequests := opswindowstatFields[5].Descriptor()
+	// opswindowstat.DefaultErrorRequests holds the default value on creation for the error_requests field.
+	opswindowstat.DefaultErrorRequests = opswindowstatDescErrorRequests.Default.(int64)
+	// opswindowstatDescUpstreamErrorRequests is the schema descriptor for upstream_error_requests field.
+	opswindowstatDescUpstreamErrorRequests := opswindowstatFields[6].Descriptor()
+	// opswindowstat.DefaultUpstreamErrorRequests holds the default value on creation for the upstream_error_requests field.
+	opswindowstat.DefaultUpstreamErrorRequests = opswindowstatDescUpstreamErrorRequests.Default.(int64)
+	// opswindowstatDescRps is the schema descriptor for rps field.
+	opswindowstatDescRps := opswindowstatFields[7].Descriptor()
+	// opswindowstat.DefaultRps holds the default value on creation for the rps field.
+	opswindowstat.DefaultRps = opswindowstatDescRps.Default.(float64)
+	// opswindowstatDescErrorRate is the schema descriptor for error_rate field.
+	opswindowstatDescErrorRate := opswindowstatFields[8].Descriptor()
+	// opswindowstat.DefaultErrorRate holds the default value on creation for the error_rate field.
+	opswindowstat.DefaultErrorRate = opswindowstatDescErrorRate.Default.(float64)
+	// opswindowstatDescP50DurationMs is the schema descriptor for p50_duration_ms field.
+	opswindowstatDescP50DurationMs := opswindowstatFields[9].Descriptor()
+	// opswindowstat.DefaultP50DurationMs holds the default value on creation for the p50_duration_ms field.
+	opswindowstat.DefaultP50DurationMs = opswindowstatDescP50DurationMs.Default.(int64)
+	// opswindowstatDescP95DurationMs is the schema descriptor for p95_duration_ms field.
+	opswindowstatDescP95DurationMs := opswindowstatFields[10].Descriptor()
+	// opswindowstat.DefaultP95DurationMs holds the default value on creation for the p95_duration_ms field.
+	opswindowstat.DefaultP95DurationMs = opswindowstatDescP95DurationMs.Default.(int64)
+	// opswindowstatDescP99DurationMs is the schema descriptor for p99_duration_ms field.
+	opswindowstatDescP99DurationMs := opswindowstatFields[11].Descriptor()
+	// opswindowstat.DefaultP99DurationMs holds the default value on creation for the p99_duration_ms field.
+	opswindowstat.DefaultP99DurationMs = opswindowstatDescP99DurationMs.Default.(int64)
+	// opswindowstatDescTotalInputTokens is the schema descriptor for total_input_tokens field.
+	opswindowstatDescTotalInputTokens := opswindowstatFields[12].Descriptor()
+	// opswindowstat.DefaultTotalInputTokens holds the default value on creation for the total_input_tokens field.
+	opswindowstat.DefaultTotalInputTokens = opswindowstatDescTotalInputTokens.Default.(int64)
+	// opswindowstatDescTotalOutputTokens is the schema descriptor for total_output_tokens field.
+	opswindowstatDescTotalOutputTokens := opswindowstatFields[13].Descriptor()
+	// opswindowstat.DefaultTotalOutputTokens holds the default value on creation for the total_output_tokens field.
+	opswindowstat.DefaultTotalOutputTokens = opswindowstatDescTotalOutputTokens.Default.(int64)
+	// opswindowstatDescCreatedAt is the schema descriptor for created_at field.
+	opswindowstatDescCreatedAt := opswindowstatFields[14].Descriptor()
+	// opswindowstat.DefaultCreatedAt holds the default value on creation for the created_at field.
+	opswindowstat.DefaultCreatedAt = opswindowstatDescCreatedAt.Default.(func() time.Time)
 	pluginFields := schema.Plugin{}.Fields()
 	_ = pluginFields
 	// pluginDescName is the schema descriptor for name field.

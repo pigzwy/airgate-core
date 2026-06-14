@@ -15,6 +15,8 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/opsrequestlog"
+	"github.com/DouDOU-start/airgate-core/ent/opswindowstat"
 	"github.com/DouDOU-start/airgate-core/ent/plugin"
 	"github.com/DouDOU-start/airgate-core/ent/pluginsource"
 	"github.com/DouDOU-start/airgate-core/ent/predicate"
@@ -40,6 +42,8 @@ const (
 	TypeAccount          = "Account"
 	TypeBalanceLog       = "BalanceLog"
 	TypeGroup            = "Group"
+	TypeOpsRequestLog    = "OpsRequestLog"
+	TypeOpsWindowStat    = "OpsWindowStat"
 	TypePlugin           = "Plugin"
 	TypePluginSource     = "PluginSource"
 	TypeProxy            = "Proxy"
@@ -5662,6 +5666,3226 @@ func (m *GroupMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Group edge %s", name)
+}
+
+// OpsRequestLogMutation represents an operation that mutates the OpsRequestLog nodes in the graph.
+type OpsRequestLogMutation struct {
+	config
+	op                      Op
+	typ                     string
+	id                      *int
+	request_id              *string
+	plugin_id               *string
+	platform                *string
+	model                   *string
+	endpoint                *string
+	user_id_snapshot        *int
+	adduser_id_snapshot     *int
+	api_key_id_snapshot     *int
+	addapi_key_id_snapshot  *int
+	account_id_snapshot     *int
+	addaccount_id_snapshot  *int
+	group_id_snapshot       *int
+	addgroup_id_snapshot    *int
+	success                 *bool
+	status_code             *int
+	addstatus_code          *int
+	upstream_status_code    *int
+	addupstream_status_code *int
+	duration_ms             *int64
+	addduration_ms          *int64
+	first_token_ms          *int64
+	addfirst_token_ms       *int64
+	stream                  *bool
+	input_tokens            *int
+	addinput_tokens         *int
+	output_tokens           *int
+	addoutput_tokens        *int
+	error_kind              *string
+	error_msg               *string
+	error_detail            *string
+	created_at              *time.Time
+	clearedFields           map[string]struct{}
+	done                    bool
+	oldValue                func(context.Context) (*OpsRequestLog, error)
+	predicates              []predicate.OpsRequestLog
+}
+
+var _ ent.Mutation = (*OpsRequestLogMutation)(nil)
+
+// opsrequestlogOption allows management of the mutation configuration using functional options.
+type opsrequestlogOption func(*OpsRequestLogMutation)
+
+// newOpsRequestLogMutation creates new mutation for the OpsRequestLog entity.
+func newOpsRequestLogMutation(c config, op Op, opts ...opsrequestlogOption) *OpsRequestLogMutation {
+	m := &OpsRequestLogMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeOpsRequestLog,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withOpsRequestLogID sets the ID field of the mutation.
+func withOpsRequestLogID(id int) opsrequestlogOption {
+	return func(m *OpsRequestLogMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *OpsRequestLog
+		)
+		m.oldValue = func(ctx context.Context) (*OpsRequestLog, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().OpsRequestLog.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withOpsRequestLog sets the old OpsRequestLog of the mutation.
+func withOpsRequestLog(node *OpsRequestLog) opsrequestlogOption {
+	return func(m *OpsRequestLogMutation) {
+		m.oldValue = func(context.Context) (*OpsRequestLog, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m OpsRequestLogMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m OpsRequestLogMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *OpsRequestLogMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *OpsRequestLogMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().OpsRequestLog.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetRequestID sets the "request_id" field.
+func (m *OpsRequestLogMutation) SetRequestID(s string) {
+	m.request_id = &s
+}
+
+// RequestID returns the value of the "request_id" field in the mutation.
+func (m *OpsRequestLogMutation) RequestID() (r string, exists bool) {
+	v := m.request_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRequestID returns the old "request_id" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldRequestID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRequestID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRequestID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRequestID: %w", err)
+	}
+	return oldValue.RequestID, nil
+}
+
+// ResetRequestID resets all changes to the "request_id" field.
+func (m *OpsRequestLogMutation) ResetRequestID() {
+	m.request_id = nil
+}
+
+// SetPluginID sets the "plugin_id" field.
+func (m *OpsRequestLogMutation) SetPluginID(s string) {
+	m.plugin_id = &s
+}
+
+// PluginID returns the value of the "plugin_id" field in the mutation.
+func (m *OpsRequestLogMutation) PluginID() (r string, exists bool) {
+	v := m.plugin_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPluginID returns the old "plugin_id" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldPluginID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPluginID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPluginID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPluginID: %w", err)
+	}
+	return oldValue.PluginID, nil
+}
+
+// ResetPluginID resets all changes to the "plugin_id" field.
+func (m *OpsRequestLogMutation) ResetPluginID() {
+	m.plugin_id = nil
+}
+
+// SetPlatform sets the "platform" field.
+func (m *OpsRequestLogMutation) SetPlatform(s string) {
+	m.platform = &s
+}
+
+// Platform returns the value of the "platform" field in the mutation.
+func (m *OpsRequestLogMutation) Platform() (r string, exists bool) {
+	v := m.platform
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlatform returns the old "platform" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldPlatform(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlatform is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlatform requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlatform: %w", err)
+	}
+	return oldValue.Platform, nil
+}
+
+// ResetPlatform resets all changes to the "platform" field.
+func (m *OpsRequestLogMutation) ResetPlatform() {
+	m.platform = nil
+}
+
+// SetModel sets the "model" field.
+func (m *OpsRequestLogMutation) SetModel(s string) {
+	m.model = &s
+}
+
+// Model returns the value of the "model" field in the mutation.
+func (m *OpsRequestLogMutation) Model() (r string, exists bool) {
+	v := m.model
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldModel returns the old "model" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldModel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldModel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldModel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldModel: %w", err)
+	}
+	return oldValue.Model, nil
+}
+
+// ResetModel resets all changes to the "model" field.
+func (m *OpsRequestLogMutation) ResetModel() {
+	m.model = nil
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *OpsRequestLogMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *OpsRequestLogMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *OpsRequestLogMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetUserIDSnapshot sets the "user_id_snapshot" field.
+func (m *OpsRequestLogMutation) SetUserIDSnapshot(i int) {
+	m.user_id_snapshot = &i
+	m.adduser_id_snapshot = nil
+}
+
+// UserIDSnapshot returns the value of the "user_id_snapshot" field in the mutation.
+func (m *OpsRequestLogMutation) UserIDSnapshot() (r int, exists bool) {
+	v := m.user_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserIDSnapshot returns the old "user_id_snapshot" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldUserIDSnapshot(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserIDSnapshot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserIDSnapshot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserIDSnapshot: %w", err)
+	}
+	return oldValue.UserIDSnapshot, nil
+}
+
+// AddUserIDSnapshot adds i to the "user_id_snapshot" field.
+func (m *OpsRequestLogMutation) AddUserIDSnapshot(i int) {
+	if m.adduser_id_snapshot != nil {
+		*m.adduser_id_snapshot += i
+	} else {
+		m.adduser_id_snapshot = &i
+	}
+}
+
+// AddedUserIDSnapshot returns the value that was added to the "user_id_snapshot" field in this mutation.
+func (m *OpsRequestLogMutation) AddedUserIDSnapshot() (r int, exists bool) {
+	v := m.adduser_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserIDSnapshot resets all changes to the "user_id_snapshot" field.
+func (m *OpsRequestLogMutation) ResetUserIDSnapshot() {
+	m.user_id_snapshot = nil
+	m.adduser_id_snapshot = nil
+}
+
+// SetAPIKeyIDSnapshot sets the "api_key_id_snapshot" field.
+func (m *OpsRequestLogMutation) SetAPIKeyIDSnapshot(i int) {
+	m.api_key_id_snapshot = &i
+	m.addapi_key_id_snapshot = nil
+}
+
+// APIKeyIDSnapshot returns the value of the "api_key_id_snapshot" field in the mutation.
+func (m *OpsRequestLogMutation) APIKeyIDSnapshot() (r int, exists bool) {
+	v := m.api_key_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAPIKeyIDSnapshot returns the old "api_key_id_snapshot" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldAPIKeyIDSnapshot(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAPIKeyIDSnapshot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAPIKeyIDSnapshot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAPIKeyIDSnapshot: %w", err)
+	}
+	return oldValue.APIKeyIDSnapshot, nil
+}
+
+// AddAPIKeyIDSnapshot adds i to the "api_key_id_snapshot" field.
+func (m *OpsRequestLogMutation) AddAPIKeyIDSnapshot(i int) {
+	if m.addapi_key_id_snapshot != nil {
+		*m.addapi_key_id_snapshot += i
+	} else {
+		m.addapi_key_id_snapshot = &i
+	}
+}
+
+// AddedAPIKeyIDSnapshot returns the value that was added to the "api_key_id_snapshot" field in this mutation.
+func (m *OpsRequestLogMutation) AddedAPIKeyIDSnapshot() (r int, exists bool) {
+	v := m.addapi_key_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAPIKeyIDSnapshot resets all changes to the "api_key_id_snapshot" field.
+func (m *OpsRequestLogMutation) ResetAPIKeyIDSnapshot() {
+	m.api_key_id_snapshot = nil
+	m.addapi_key_id_snapshot = nil
+}
+
+// SetAccountIDSnapshot sets the "account_id_snapshot" field.
+func (m *OpsRequestLogMutation) SetAccountIDSnapshot(i int) {
+	m.account_id_snapshot = &i
+	m.addaccount_id_snapshot = nil
+}
+
+// AccountIDSnapshot returns the value of the "account_id_snapshot" field in the mutation.
+func (m *OpsRequestLogMutation) AccountIDSnapshot() (r int, exists bool) {
+	v := m.account_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountIDSnapshot returns the old "account_id_snapshot" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldAccountIDSnapshot(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountIDSnapshot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountIDSnapshot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountIDSnapshot: %w", err)
+	}
+	return oldValue.AccountIDSnapshot, nil
+}
+
+// AddAccountIDSnapshot adds i to the "account_id_snapshot" field.
+func (m *OpsRequestLogMutation) AddAccountIDSnapshot(i int) {
+	if m.addaccount_id_snapshot != nil {
+		*m.addaccount_id_snapshot += i
+	} else {
+		m.addaccount_id_snapshot = &i
+	}
+}
+
+// AddedAccountIDSnapshot returns the value that was added to the "account_id_snapshot" field in this mutation.
+func (m *OpsRequestLogMutation) AddedAccountIDSnapshot() (r int, exists bool) {
+	v := m.addaccount_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAccountIDSnapshot resets all changes to the "account_id_snapshot" field.
+func (m *OpsRequestLogMutation) ResetAccountIDSnapshot() {
+	m.account_id_snapshot = nil
+	m.addaccount_id_snapshot = nil
+}
+
+// SetGroupIDSnapshot sets the "group_id_snapshot" field.
+func (m *OpsRequestLogMutation) SetGroupIDSnapshot(i int) {
+	m.group_id_snapshot = &i
+	m.addgroup_id_snapshot = nil
+}
+
+// GroupIDSnapshot returns the value of the "group_id_snapshot" field in the mutation.
+func (m *OpsRequestLogMutation) GroupIDSnapshot() (r int, exists bool) {
+	v := m.group_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGroupIDSnapshot returns the old "group_id_snapshot" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldGroupIDSnapshot(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGroupIDSnapshot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGroupIDSnapshot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGroupIDSnapshot: %w", err)
+	}
+	return oldValue.GroupIDSnapshot, nil
+}
+
+// AddGroupIDSnapshot adds i to the "group_id_snapshot" field.
+func (m *OpsRequestLogMutation) AddGroupIDSnapshot(i int) {
+	if m.addgroup_id_snapshot != nil {
+		*m.addgroup_id_snapshot += i
+	} else {
+		m.addgroup_id_snapshot = &i
+	}
+}
+
+// AddedGroupIDSnapshot returns the value that was added to the "group_id_snapshot" field in this mutation.
+func (m *OpsRequestLogMutation) AddedGroupIDSnapshot() (r int, exists bool) {
+	v := m.addgroup_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGroupIDSnapshot resets all changes to the "group_id_snapshot" field.
+func (m *OpsRequestLogMutation) ResetGroupIDSnapshot() {
+	m.group_id_snapshot = nil
+	m.addgroup_id_snapshot = nil
+}
+
+// SetSuccess sets the "success" field.
+func (m *OpsRequestLogMutation) SetSuccess(b bool) {
+	m.success = &b
+}
+
+// Success returns the value of the "success" field in the mutation.
+func (m *OpsRequestLogMutation) Success() (r bool, exists bool) {
+	v := m.success
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSuccess returns the old "success" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldSuccess(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSuccess is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSuccess requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSuccess: %w", err)
+	}
+	return oldValue.Success, nil
+}
+
+// ResetSuccess resets all changes to the "success" field.
+func (m *OpsRequestLogMutation) ResetSuccess() {
+	m.success = nil
+}
+
+// SetStatusCode sets the "status_code" field.
+func (m *OpsRequestLogMutation) SetStatusCode(i int) {
+	m.status_code = &i
+	m.addstatus_code = nil
+}
+
+// StatusCode returns the value of the "status_code" field in the mutation.
+func (m *OpsRequestLogMutation) StatusCode() (r int, exists bool) {
+	v := m.status_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatusCode returns the old "status_code" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldStatusCode(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatusCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatusCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatusCode: %w", err)
+	}
+	return oldValue.StatusCode, nil
+}
+
+// AddStatusCode adds i to the "status_code" field.
+func (m *OpsRequestLogMutation) AddStatusCode(i int) {
+	if m.addstatus_code != nil {
+		*m.addstatus_code += i
+	} else {
+		m.addstatus_code = &i
+	}
+}
+
+// AddedStatusCode returns the value that was added to the "status_code" field in this mutation.
+func (m *OpsRequestLogMutation) AddedStatusCode() (r int, exists bool) {
+	v := m.addstatus_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatusCode resets all changes to the "status_code" field.
+func (m *OpsRequestLogMutation) ResetStatusCode() {
+	m.status_code = nil
+	m.addstatus_code = nil
+}
+
+// SetUpstreamStatusCode sets the "upstream_status_code" field.
+func (m *OpsRequestLogMutation) SetUpstreamStatusCode(i int) {
+	m.upstream_status_code = &i
+	m.addupstream_status_code = nil
+}
+
+// UpstreamStatusCode returns the value of the "upstream_status_code" field in the mutation.
+func (m *OpsRequestLogMutation) UpstreamStatusCode() (r int, exists bool) {
+	v := m.upstream_status_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpstreamStatusCode returns the old "upstream_status_code" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldUpstreamStatusCode(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpstreamStatusCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpstreamStatusCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpstreamStatusCode: %w", err)
+	}
+	return oldValue.UpstreamStatusCode, nil
+}
+
+// AddUpstreamStatusCode adds i to the "upstream_status_code" field.
+func (m *OpsRequestLogMutation) AddUpstreamStatusCode(i int) {
+	if m.addupstream_status_code != nil {
+		*m.addupstream_status_code += i
+	} else {
+		m.addupstream_status_code = &i
+	}
+}
+
+// AddedUpstreamStatusCode returns the value that was added to the "upstream_status_code" field in this mutation.
+func (m *OpsRequestLogMutation) AddedUpstreamStatusCode() (r int, exists bool) {
+	v := m.addupstream_status_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpstreamStatusCode resets all changes to the "upstream_status_code" field.
+func (m *OpsRequestLogMutation) ResetUpstreamStatusCode() {
+	m.upstream_status_code = nil
+	m.addupstream_status_code = nil
+}
+
+// SetDurationMs sets the "duration_ms" field.
+func (m *OpsRequestLogMutation) SetDurationMs(i int64) {
+	m.duration_ms = &i
+	m.addduration_ms = nil
+}
+
+// DurationMs returns the value of the "duration_ms" field in the mutation.
+func (m *OpsRequestLogMutation) DurationMs() (r int64, exists bool) {
+	v := m.duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDurationMs returns the old "duration_ms" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldDurationMs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDurationMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDurationMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDurationMs: %w", err)
+	}
+	return oldValue.DurationMs, nil
+}
+
+// AddDurationMs adds i to the "duration_ms" field.
+func (m *OpsRequestLogMutation) AddDurationMs(i int64) {
+	if m.addduration_ms != nil {
+		*m.addduration_ms += i
+	} else {
+		m.addduration_ms = &i
+	}
+}
+
+// AddedDurationMs returns the value that was added to the "duration_ms" field in this mutation.
+func (m *OpsRequestLogMutation) AddedDurationMs() (r int64, exists bool) {
+	v := m.addduration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDurationMs resets all changes to the "duration_ms" field.
+func (m *OpsRequestLogMutation) ResetDurationMs() {
+	m.duration_ms = nil
+	m.addduration_ms = nil
+}
+
+// SetFirstTokenMs sets the "first_token_ms" field.
+func (m *OpsRequestLogMutation) SetFirstTokenMs(i int64) {
+	m.first_token_ms = &i
+	m.addfirst_token_ms = nil
+}
+
+// FirstTokenMs returns the value of the "first_token_ms" field in the mutation.
+func (m *OpsRequestLogMutation) FirstTokenMs() (r int64, exists bool) {
+	v := m.first_token_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFirstTokenMs returns the old "first_token_ms" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldFirstTokenMs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFirstTokenMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFirstTokenMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFirstTokenMs: %w", err)
+	}
+	return oldValue.FirstTokenMs, nil
+}
+
+// AddFirstTokenMs adds i to the "first_token_ms" field.
+func (m *OpsRequestLogMutation) AddFirstTokenMs(i int64) {
+	if m.addfirst_token_ms != nil {
+		*m.addfirst_token_ms += i
+	} else {
+		m.addfirst_token_ms = &i
+	}
+}
+
+// AddedFirstTokenMs returns the value that was added to the "first_token_ms" field in this mutation.
+func (m *OpsRequestLogMutation) AddedFirstTokenMs() (r int64, exists bool) {
+	v := m.addfirst_token_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetFirstTokenMs resets all changes to the "first_token_ms" field.
+func (m *OpsRequestLogMutation) ResetFirstTokenMs() {
+	m.first_token_ms = nil
+	m.addfirst_token_ms = nil
+}
+
+// SetStream sets the "stream" field.
+func (m *OpsRequestLogMutation) SetStream(b bool) {
+	m.stream = &b
+}
+
+// Stream returns the value of the "stream" field in the mutation.
+func (m *OpsRequestLogMutation) Stream() (r bool, exists bool) {
+	v := m.stream
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStream returns the old "stream" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldStream(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStream is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStream requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStream: %w", err)
+	}
+	return oldValue.Stream, nil
+}
+
+// ResetStream resets all changes to the "stream" field.
+func (m *OpsRequestLogMutation) ResetStream() {
+	m.stream = nil
+}
+
+// SetInputTokens sets the "input_tokens" field.
+func (m *OpsRequestLogMutation) SetInputTokens(i int) {
+	m.input_tokens = &i
+	m.addinput_tokens = nil
+}
+
+// InputTokens returns the value of the "input_tokens" field in the mutation.
+func (m *OpsRequestLogMutation) InputTokens() (r int, exists bool) {
+	v := m.input_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInputTokens returns the old "input_tokens" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldInputTokens(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInputTokens is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInputTokens requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInputTokens: %w", err)
+	}
+	return oldValue.InputTokens, nil
+}
+
+// AddInputTokens adds i to the "input_tokens" field.
+func (m *OpsRequestLogMutation) AddInputTokens(i int) {
+	if m.addinput_tokens != nil {
+		*m.addinput_tokens += i
+	} else {
+		m.addinput_tokens = &i
+	}
+}
+
+// AddedInputTokens returns the value that was added to the "input_tokens" field in this mutation.
+func (m *OpsRequestLogMutation) AddedInputTokens() (r int, exists bool) {
+	v := m.addinput_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetInputTokens resets all changes to the "input_tokens" field.
+func (m *OpsRequestLogMutation) ResetInputTokens() {
+	m.input_tokens = nil
+	m.addinput_tokens = nil
+}
+
+// SetOutputTokens sets the "output_tokens" field.
+func (m *OpsRequestLogMutation) SetOutputTokens(i int) {
+	m.output_tokens = &i
+	m.addoutput_tokens = nil
+}
+
+// OutputTokens returns the value of the "output_tokens" field in the mutation.
+func (m *OpsRequestLogMutation) OutputTokens() (r int, exists bool) {
+	v := m.output_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOutputTokens returns the old "output_tokens" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldOutputTokens(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOutputTokens is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOutputTokens requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOutputTokens: %w", err)
+	}
+	return oldValue.OutputTokens, nil
+}
+
+// AddOutputTokens adds i to the "output_tokens" field.
+func (m *OpsRequestLogMutation) AddOutputTokens(i int) {
+	if m.addoutput_tokens != nil {
+		*m.addoutput_tokens += i
+	} else {
+		m.addoutput_tokens = &i
+	}
+}
+
+// AddedOutputTokens returns the value that was added to the "output_tokens" field in this mutation.
+func (m *OpsRequestLogMutation) AddedOutputTokens() (r int, exists bool) {
+	v := m.addoutput_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOutputTokens resets all changes to the "output_tokens" field.
+func (m *OpsRequestLogMutation) ResetOutputTokens() {
+	m.output_tokens = nil
+	m.addoutput_tokens = nil
+}
+
+// SetErrorKind sets the "error_kind" field.
+func (m *OpsRequestLogMutation) SetErrorKind(s string) {
+	m.error_kind = &s
+}
+
+// ErrorKind returns the value of the "error_kind" field in the mutation.
+func (m *OpsRequestLogMutation) ErrorKind() (r string, exists bool) {
+	v := m.error_kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldErrorKind returns the old "error_kind" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldErrorKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldErrorKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldErrorKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldErrorKind: %w", err)
+	}
+	return oldValue.ErrorKind, nil
+}
+
+// ResetErrorKind resets all changes to the "error_kind" field.
+func (m *OpsRequestLogMutation) ResetErrorKind() {
+	m.error_kind = nil
+}
+
+// SetErrorMsg sets the "error_msg" field.
+func (m *OpsRequestLogMutation) SetErrorMsg(s string) {
+	m.error_msg = &s
+}
+
+// ErrorMsg returns the value of the "error_msg" field in the mutation.
+func (m *OpsRequestLogMutation) ErrorMsg() (r string, exists bool) {
+	v := m.error_msg
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldErrorMsg returns the old "error_msg" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldErrorMsg(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldErrorMsg is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldErrorMsg requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldErrorMsg: %w", err)
+	}
+	return oldValue.ErrorMsg, nil
+}
+
+// ResetErrorMsg resets all changes to the "error_msg" field.
+func (m *OpsRequestLogMutation) ResetErrorMsg() {
+	m.error_msg = nil
+}
+
+// SetErrorDetail sets the "error_detail" field.
+func (m *OpsRequestLogMutation) SetErrorDetail(s string) {
+	m.error_detail = &s
+}
+
+// ErrorDetail returns the value of the "error_detail" field in the mutation.
+func (m *OpsRequestLogMutation) ErrorDetail() (r string, exists bool) {
+	v := m.error_detail
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldErrorDetail returns the old "error_detail" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldErrorDetail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldErrorDetail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldErrorDetail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldErrorDetail: %w", err)
+	}
+	return oldValue.ErrorDetail, nil
+}
+
+// ResetErrorDetail resets all changes to the "error_detail" field.
+func (m *OpsRequestLogMutation) ResetErrorDetail() {
+	m.error_detail = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *OpsRequestLogMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *OpsRequestLogMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the OpsRequestLog entity.
+// If the OpsRequestLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsRequestLogMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *OpsRequestLogMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// Where appends a list predicates to the OpsRequestLogMutation builder.
+func (m *OpsRequestLogMutation) Where(ps ...predicate.OpsRequestLog) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the OpsRequestLogMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *OpsRequestLogMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.OpsRequestLog, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *OpsRequestLogMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *OpsRequestLogMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (OpsRequestLog).
+func (m *OpsRequestLogMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *OpsRequestLogMutation) Fields() []string {
+	fields := make([]string, 0, 21)
+	if m.request_id != nil {
+		fields = append(fields, opsrequestlog.FieldRequestID)
+	}
+	if m.plugin_id != nil {
+		fields = append(fields, opsrequestlog.FieldPluginID)
+	}
+	if m.platform != nil {
+		fields = append(fields, opsrequestlog.FieldPlatform)
+	}
+	if m.model != nil {
+		fields = append(fields, opsrequestlog.FieldModel)
+	}
+	if m.endpoint != nil {
+		fields = append(fields, opsrequestlog.FieldEndpoint)
+	}
+	if m.user_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldUserIDSnapshot)
+	}
+	if m.api_key_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldAPIKeyIDSnapshot)
+	}
+	if m.account_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldAccountIDSnapshot)
+	}
+	if m.group_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldGroupIDSnapshot)
+	}
+	if m.success != nil {
+		fields = append(fields, opsrequestlog.FieldSuccess)
+	}
+	if m.status_code != nil {
+		fields = append(fields, opsrequestlog.FieldStatusCode)
+	}
+	if m.upstream_status_code != nil {
+		fields = append(fields, opsrequestlog.FieldUpstreamStatusCode)
+	}
+	if m.duration_ms != nil {
+		fields = append(fields, opsrequestlog.FieldDurationMs)
+	}
+	if m.first_token_ms != nil {
+		fields = append(fields, opsrequestlog.FieldFirstTokenMs)
+	}
+	if m.stream != nil {
+		fields = append(fields, opsrequestlog.FieldStream)
+	}
+	if m.input_tokens != nil {
+		fields = append(fields, opsrequestlog.FieldInputTokens)
+	}
+	if m.output_tokens != nil {
+		fields = append(fields, opsrequestlog.FieldOutputTokens)
+	}
+	if m.error_kind != nil {
+		fields = append(fields, opsrequestlog.FieldErrorKind)
+	}
+	if m.error_msg != nil {
+		fields = append(fields, opsrequestlog.FieldErrorMsg)
+	}
+	if m.error_detail != nil {
+		fields = append(fields, opsrequestlog.FieldErrorDetail)
+	}
+	if m.created_at != nil {
+		fields = append(fields, opsrequestlog.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *OpsRequestLogMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case opsrequestlog.FieldRequestID:
+		return m.RequestID()
+	case opsrequestlog.FieldPluginID:
+		return m.PluginID()
+	case opsrequestlog.FieldPlatform:
+		return m.Platform()
+	case opsrequestlog.FieldModel:
+		return m.Model()
+	case opsrequestlog.FieldEndpoint:
+		return m.Endpoint()
+	case opsrequestlog.FieldUserIDSnapshot:
+		return m.UserIDSnapshot()
+	case opsrequestlog.FieldAPIKeyIDSnapshot:
+		return m.APIKeyIDSnapshot()
+	case opsrequestlog.FieldAccountIDSnapshot:
+		return m.AccountIDSnapshot()
+	case opsrequestlog.FieldGroupIDSnapshot:
+		return m.GroupIDSnapshot()
+	case opsrequestlog.FieldSuccess:
+		return m.Success()
+	case opsrequestlog.FieldStatusCode:
+		return m.StatusCode()
+	case opsrequestlog.FieldUpstreamStatusCode:
+		return m.UpstreamStatusCode()
+	case opsrequestlog.FieldDurationMs:
+		return m.DurationMs()
+	case opsrequestlog.FieldFirstTokenMs:
+		return m.FirstTokenMs()
+	case opsrequestlog.FieldStream:
+		return m.Stream()
+	case opsrequestlog.FieldInputTokens:
+		return m.InputTokens()
+	case opsrequestlog.FieldOutputTokens:
+		return m.OutputTokens()
+	case opsrequestlog.FieldErrorKind:
+		return m.ErrorKind()
+	case opsrequestlog.FieldErrorMsg:
+		return m.ErrorMsg()
+	case opsrequestlog.FieldErrorDetail:
+		return m.ErrorDetail()
+	case opsrequestlog.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *OpsRequestLogMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case opsrequestlog.FieldRequestID:
+		return m.OldRequestID(ctx)
+	case opsrequestlog.FieldPluginID:
+		return m.OldPluginID(ctx)
+	case opsrequestlog.FieldPlatform:
+		return m.OldPlatform(ctx)
+	case opsrequestlog.FieldModel:
+		return m.OldModel(ctx)
+	case opsrequestlog.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	case opsrequestlog.FieldUserIDSnapshot:
+		return m.OldUserIDSnapshot(ctx)
+	case opsrequestlog.FieldAPIKeyIDSnapshot:
+		return m.OldAPIKeyIDSnapshot(ctx)
+	case opsrequestlog.FieldAccountIDSnapshot:
+		return m.OldAccountIDSnapshot(ctx)
+	case opsrequestlog.FieldGroupIDSnapshot:
+		return m.OldGroupIDSnapshot(ctx)
+	case opsrequestlog.FieldSuccess:
+		return m.OldSuccess(ctx)
+	case opsrequestlog.FieldStatusCode:
+		return m.OldStatusCode(ctx)
+	case opsrequestlog.FieldUpstreamStatusCode:
+		return m.OldUpstreamStatusCode(ctx)
+	case opsrequestlog.FieldDurationMs:
+		return m.OldDurationMs(ctx)
+	case opsrequestlog.FieldFirstTokenMs:
+		return m.OldFirstTokenMs(ctx)
+	case opsrequestlog.FieldStream:
+		return m.OldStream(ctx)
+	case opsrequestlog.FieldInputTokens:
+		return m.OldInputTokens(ctx)
+	case opsrequestlog.FieldOutputTokens:
+		return m.OldOutputTokens(ctx)
+	case opsrequestlog.FieldErrorKind:
+		return m.OldErrorKind(ctx)
+	case opsrequestlog.FieldErrorMsg:
+		return m.OldErrorMsg(ctx)
+	case opsrequestlog.FieldErrorDetail:
+		return m.OldErrorDetail(ctx)
+	case opsrequestlog.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown OpsRequestLog field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OpsRequestLogMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case opsrequestlog.FieldRequestID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRequestID(v)
+		return nil
+	case opsrequestlog.FieldPluginID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPluginID(v)
+		return nil
+	case opsrequestlog.FieldPlatform:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlatform(v)
+		return nil
+	case opsrequestlog.FieldModel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetModel(v)
+		return nil
+	case opsrequestlog.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	case opsrequestlog.FieldUserIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldAPIKeyIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAPIKeyIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldAccountIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldGroupIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGroupIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldSuccess:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSuccess(v)
+		return nil
+	case opsrequestlog.FieldStatusCode:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatusCode(v)
+		return nil
+	case opsrequestlog.FieldUpstreamStatusCode:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpstreamStatusCode(v)
+		return nil
+	case opsrequestlog.FieldDurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDurationMs(v)
+		return nil
+	case opsrequestlog.FieldFirstTokenMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFirstTokenMs(v)
+		return nil
+	case opsrequestlog.FieldStream:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStream(v)
+		return nil
+	case opsrequestlog.FieldInputTokens:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInputTokens(v)
+		return nil
+	case opsrequestlog.FieldOutputTokens:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOutputTokens(v)
+		return nil
+	case opsrequestlog.FieldErrorKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetErrorKind(v)
+		return nil
+	case opsrequestlog.FieldErrorMsg:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetErrorMsg(v)
+		return nil
+	case opsrequestlog.FieldErrorDetail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetErrorDetail(v)
+		return nil
+	case opsrequestlog.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown OpsRequestLog field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *OpsRequestLogMutation) AddedFields() []string {
+	var fields []string
+	if m.adduser_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldUserIDSnapshot)
+	}
+	if m.addapi_key_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldAPIKeyIDSnapshot)
+	}
+	if m.addaccount_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldAccountIDSnapshot)
+	}
+	if m.addgroup_id_snapshot != nil {
+		fields = append(fields, opsrequestlog.FieldGroupIDSnapshot)
+	}
+	if m.addstatus_code != nil {
+		fields = append(fields, opsrequestlog.FieldStatusCode)
+	}
+	if m.addupstream_status_code != nil {
+		fields = append(fields, opsrequestlog.FieldUpstreamStatusCode)
+	}
+	if m.addduration_ms != nil {
+		fields = append(fields, opsrequestlog.FieldDurationMs)
+	}
+	if m.addfirst_token_ms != nil {
+		fields = append(fields, opsrequestlog.FieldFirstTokenMs)
+	}
+	if m.addinput_tokens != nil {
+		fields = append(fields, opsrequestlog.FieldInputTokens)
+	}
+	if m.addoutput_tokens != nil {
+		fields = append(fields, opsrequestlog.FieldOutputTokens)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *OpsRequestLogMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case opsrequestlog.FieldUserIDSnapshot:
+		return m.AddedUserIDSnapshot()
+	case opsrequestlog.FieldAPIKeyIDSnapshot:
+		return m.AddedAPIKeyIDSnapshot()
+	case opsrequestlog.FieldAccountIDSnapshot:
+		return m.AddedAccountIDSnapshot()
+	case opsrequestlog.FieldGroupIDSnapshot:
+		return m.AddedGroupIDSnapshot()
+	case opsrequestlog.FieldStatusCode:
+		return m.AddedStatusCode()
+	case opsrequestlog.FieldUpstreamStatusCode:
+		return m.AddedUpstreamStatusCode()
+	case opsrequestlog.FieldDurationMs:
+		return m.AddedDurationMs()
+	case opsrequestlog.FieldFirstTokenMs:
+		return m.AddedFirstTokenMs()
+	case opsrequestlog.FieldInputTokens:
+		return m.AddedInputTokens()
+	case opsrequestlog.FieldOutputTokens:
+		return m.AddedOutputTokens()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OpsRequestLogMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case opsrequestlog.FieldUserIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldAPIKeyIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAPIKeyIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldAccountIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAccountIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldGroupIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGroupIDSnapshot(v)
+		return nil
+	case opsrequestlog.FieldStatusCode:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatusCode(v)
+		return nil
+	case opsrequestlog.FieldUpstreamStatusCode:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpstreamStatusCode(v)
+		return nil
+	case opsrequestlog.FieldDurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDurationMs(v)
+		return nil
+	case opsrequestlog.FieldFirstTokenMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFirstTokenMs(v)
+		return nil
+	case opsrequestlog.FieldInputTokens:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddInputTokens(v)
+		return nil
+	case opsrequestlog.FieldOutputTokens:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOutputTokens(v)
+		return nil
+	}
+	return fmt.Errorf("unknown OpsRequestLog numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *OpsRequestLogMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *OpsRequestLogMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *OpsRequestLogMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown OpsRequestLog nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *OpsRequestLogMutation) ResetField(name string) error {
+	switch name {
+	case opsrequestlog.FieldRequestID:
+		m.ResetRequestID()
+		return nil
+	case opsrequestlog.FieldPluginID:
+		m.ResetPluginID()
+		return nil
+	case opsrequestlog.FieldPlatform:
+		m.ResetPlatform()
+		return nil
+	case opsrequestlog.FieldModel:
+		m.ResetModel()
+		return nil
+	case opsrequestlog.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	case opsrequestlog.FieldUserIDSnapshot:
+		m.ResetUserIDSnapshot()
+		return nil
+	case opsrequestlog.FieldAPIKeyIDSnapshot:
+		m.ResetAPIKeyIDSnapshot()
+		return nil
+	case opsrequestlog.FieldAccountIDSnapshot:
+		m.ResetAccountIDSnapshot()
+		return nil
+	case opsrequestlog.FieldGroupIDSnapshot:
+		m.ResetGroupIDSnapshot()
+		return nil
+	case opsrequestlog.FieldSuccess:
+		m.ResetSuccess()
+		return nil
+	case opsrequestlog.FieldStatusCode:
+		m.ResetStatusCode()
+		return nil
+	case opsrequestlog.FieldUpstreamStatusCode:
+		m.ResetUpstreamStatusCode()
+		return nil
+	case opsrequestlog.FieldDurationMs:
+		m.ResetDurationMs()
+		return nil
+	case opsrequestlog.FieldFirstTokenMs:
+		m.ResetFirstTokenMs()
+		return nil
+	case opsrequestlog.FieldStream:
+		m.ResetStream()
+		return nil
+	case opsrequestlog.FieldInputTokens:
+		m.ResetInputTokens()
+		return nil
+	case opsrequestlog.FieldOutputTokens:
+		m.ResetOutputTokens()
+		return nil
+	case opsrequestlog.FieldErrorKind:
+		m.ResetErrorKind()
+		return nil
+	case opsrequestlog.FieldErrorMsg:
+		m.ResetErrorMsg()
+		return nil
+	case opsrequestlog.FieldErrorDetail:
+		m.ResetErrorDetail()
+		return nil
+	case opsrequestlog.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown OpsRequestLog field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *OpsRequestLogMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *OpsRequestLogMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *OpsRequestLogMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *OpsRequestLogMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *OpsRequestLogMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *OpsRequestLogMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *OpsRequestLogMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown OpsRequestLog unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *OpsRequestLogMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown OpsRequestLog edge %s", name)
+}
+
+// OpsWindowStatMutation represents an operation that mutates the OpsWindowStat nodes in the graph.
+type OpsWindowStatMutation struct {
+	config
+	op                         Op
+	typ                        string
+	id                         *int
+	window_start               *time.Time
+	window_seconds             *int
+	addwindow_seconds          *int
+	platform                   *string
+	total_requests             *int64
+	addtotal_requests          *int64
+	success_requests           *int64
+	addsuccess_requests        *int64
+	error_requests             *int64
+	adderror_requests          *int64
+	upstream_error_requests    *int64
+	addupstream_error_requests *int64
+	rps                        *float64
+	addrps                     *float64
+	error_rate                 *float64
+	adderror_rate              *float64
+	p50_duration_ms            *int64
+	addp50_duration_ms         *int64
+	p95_duration_ms            *int64
+	addp95_duration_ms         *int64
+	p99_duration_ms            *int64
+	addp99_duration_ms         *int64
+	total_input_tokens         *int64
+	addtotal_input_tokens      *int64
+	total_output_tokens        *int64
+	addtotal_output_tokens     *int64
+	created_at                 *time.Time
+	clearedFields              map[string]struct{}
+	done                       bool
+	oldValue                   func(context.Context) (*OpsWindowStat, error)
+	predicates                 []predicate.OpsWindowStat
+}
+
+var _ ent.Mutation = (*OpsWindowStatMutation)(nil)
+
+// opswindowstatOption allows management of the mutation configuration using functional options.
+type opswindowstatOption func(*OpsWindowStatMutation)
+
+// newOpsWindowStatMutation creates new mutation for the OpsWindowStat entity.
+func newOpsWindowStatMutation(c config, op Op, opts ...opswindowstatOption) *OpsWindowStatMutation {
+	m := &OpsWindowStatMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeOpsWindowStat,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withOpsWindowStatID sets the ID field of the mutation.
+func withOpsWindowStatID(id int) opswindowstatOption {
+	return func(m *OpsWindowStatMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *OpsWindowStat
+		)
+		m.oldValue = func(ctx context.Context) (*OpsWindowStat, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().OpsWindowStat.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withOpsWindowStat sets the old OpsWindowStat of the mutation.
+func withOpsWindowStat(node *OpsWindowStat) opswindowstatOption {
+	return func(m *OpsWindowStatMutation) {
+		m.oldValue = func(context.Context) (*OpsWindowStat, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m OpsWindowStatMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m OpsWindowStatMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *OpsWindowStatMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *OpsWindowStatMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().OpsWindowStat.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetWindowStart sets the "window_start" field.
+func (m *OpsWindowStatMutation) SetWindowStart(t time.Time) {
+	m.window_start = &t
+}
+
+// WindowStart returns the value of the "window_start" field in the mutation.
+func (m *OpsWindowStatMutation) WindowStart() (r time.Time, exists bool) {
+	v := m.window_start
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWindowStart returns the old "window_start" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldWindowStart(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWindowStart is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWindowStart requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWindowStart: %w", err)
+	}
+	return oldValue.WindowStart, nil
+}
+
+// ResetWindowStart resets all changes to the "window_start" field.
+func (m *OpsWindowStatMutation) ResetWindowStart() {
+	m.window_start = nil
+}
+
+// SetWindowSeconds sets the "window_seconds" field.
+func (m *OpsWindowStatMutation) SetWindowSeconds(i int) {
+	m.window_seconds = &i
+	m.addwindow_seconds = nil
+}
+
+// WindowSeconds returns the value of the "window_seconds" field in the mutation.
+func (m *OpsWindowStatMutation) WindowSeconds() (r int, exists bool) {
+	v := m.window_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWindowSeconds returns the old "window_seconds" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldWindowSeconds(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWindowSeconds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWindowSeconds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWindowSeconds: %w", err)
+	}
+	return oldValue.WindowSeconds, nil
+}
+
+// AddWindowSeconds adds i to the "window_seconds" field.
+func (m *OpsWindowStatMutation) AddWindowSeconds(i int) {
+	if m.addwindow_seconds != nil {
+		*m.addwindow_seconds += i
+	} else {
+		m.addwindow_seconds = &i
+	}
+}
+
+// AddedWindowSeconds returns the value that was added to the "window_seconds" field in this mutation.
+func (m *OpsWindowStatMutation) AddedWindowSeconds() (r int, exists bool) {
+	v := m.addwindow_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWindowSeconds resets all changes to the "window_seconds" field.
+func (m *OpsWindowStatMutation) ResetWindowSeconds() {
+	m.window_seconds = nil
+	m.addwindow_seconds = nil
+}
+
+// SetPlatform sets the "platform" field.
+func (m *OpsWindowStatMutation) SetPlatform(s string) {
+	m.platform = &s
+}
+
+// Platform returns the value of the "platform" field in the mutation.
+func (m *OpsWindowStatMutation) Platform() (r string, exists bool) {
+	v := m.platform
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlatform returns the old "platform" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldPlatform(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlatform is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlatform requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlatform: %w", err)
+	}
+	return oldValue.Platform, nil
+}
+
+// ResetPlatform resets all changes to the "platform" field.
+func (m *OpsWindowStatMutation) ResetPlatform() {
+	m.platform = nil
+}
+
+// SetTotalRequests sets the "total_requests" field.
+func (m *OpsWindowStatMutation) SetTotalRequests(i int64) {
+	m.total_requests = &i
+	m.addtotal_requests = nil
+}
+
+// TotalRequests returns the value of the "total_requests" field in the mutation.
+func (m *OpsWindowStatMutation) TotalRequests() (r int64, exists bool) {
+	v := m.total_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalRequests returns the old "total_requests" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldTotalRequests(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalRequests is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalRequests requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalRequests: %w", err)
+	}
+	return oldValue.TotalRequests, nil
+}
+
+// AddTotalRequests adds i to the "total_requests" field.
+func (m *OpsWindowStatMutation) AddTotalRequests(i int64) {
+	if m.addtotal_requests != nil {
+		*m.addtotal_requests += i
+	} else {
+		m.addtotal_requests = &i
+	}
+}
+
+// AddedTotalRequests returns the value that was added to the "total_requests" field in this mutation.
+func (m *OpsWindowStatMutation) AddedTotalRequests() (r int64, exists bool) {
+	v := m.addtotal_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalRequests resets all changes to the "total_requests" field.
+func (m *OpsWindowStatMutation) ResetTotalRequests() {
+	m.total_requests = nil
+	m.addtotal_requests = nil
+}
+
+// SetSuccessRequests sets the "success_requests" field.
+func (m *OpsWindowStatMutation) SetSuccessRequests(i int64) {
+	m.success_requests = &i
+	m.addsuccess_requests = nil
+}
+
+// SuccessRequests returns the value of the "success_requests" field in the mutation.
+func (m *OpsWindowStatMutation) SuccessRequests() (r int64, exists bool) {
+	v := m.success_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSuccessRequests returns the old "success_requests" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldSuccessRequests(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSuccessRequests is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSuccessRequests requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSuccessRequests: %w", err)
+	}
+	return oldValue.SuccessRequests, nil
+}
+
+// AddSuccessRequests adds i to the "success_requests" field.
+func (m *OpsWindowStatMutation) AddSuccessRequests(i int64) {
+	if m.addsuccess_requests != nil {
+		*m.addsuccess_requests += i
+	} else {
+		m.addsuccess_requests = &i
+	}
+}
+
+// AddedSuccessRequests returns the value that was added to the "success_requests" field in this mutation.
+func (m *OpsWindowStatMutation) AddedSuccessRequests() (r int64, exists bool) {
+	v := m.addsuccess_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSuccessRequests resets all changes to the "success_requests" field.
+func (m *OpsWindowStatMutation) ResetSuccessRequests() {
+	m.success_requests = nil
+	m.addsuccess_requests = nil
+}
+
+// SetErrorRequests sets the "error_requests" field.
+func (m *OpsWindowStatMutation) SetErrorRequests(i int64) {
+	m.error_requests = &i
+	m.adderror_requests = nil
+}
+
+// ErrorRequests returns the value of the "error_requests" field in the mutation.
+func (m *OpsWindowStatMutation) ErrorRequests() (r int64, exists bool) {
+	v := m.error_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldErrorRequests returns the old "error_requests" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldErrorRequests(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldErrorRequests is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldErrorRequests requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldErrorRequests: %w", err)
+	}
+	return oldValue.ErrorRequests, nil
+}
+
+// AddErrorRequests adds i to the "error_requests" field.
+func (m *OpsWindowStatMutation) AddErrorRequests(i int64) {
+	if m.adderror_requests != nil {
+		*m.adderror_requests += i
+	} else {
+		m.adderror_requests = &i
+	}
+}
+
+// AddedErrorRequests returns the value that was added to the "error_requests" field in this mutation.
+func (m *OpsWindowStatMutation) AddedErrorRequests() (r int64, exists bool) {
+	v := m.adderror_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetErrorRequests resets all changes to the "error_requests" field.
+func (m *OpsWindowStatMutation) ResetErrorRequests() {
+	m.error_requests = nil
+	m.adderror_requests = nil
+}
+
+// SetUpstreamErrorRequests sets the "upstream_error_requests" field.
+func (m *OpsWindowStatMutation) SetUpstreamErrorRequests(i int64) {
+	m.upstream_error_requests = &i
+	m.addupstream_error_requests = nil
+}
+
+// UpstreamErrorRequests returns the value of the "upstream_error_requests" field in the mutation.
+func (m *OpsWindowStatMutation) UpstreamErrorRequests() (r int64, exists bool) {
+	v := m.upstream_error_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpstreamErrorRequests returns the old "upstream_error_requests" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldUpstreamErrorRequests(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpstreamErrorRequests is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpstreamErrorRequests requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpstreamErrorRequests: %w", err)
+	}
+	return oldValue.UpstreamErrorRequests, nil
+}
+
+// AddUpstreamErrorRequests adds i to the "upstream_error_requests" field.
+func (m *OpsWindowStatMutation) AddUpstreamErrorRequests(i int64) {
+	if m.addupstream_error_requests != nil {
+		*m.addupstream_error_requests += i
+	} else {
+		m.addupstream_error_requests = &i
+	}
+}
+
+// AddedUpstreamErrorRequests returns the value that was added to the "upstream_error_requests" field in this mutation.
+func (m *OpsWindowStatMutation) AddedUpstreamErrorRequests() (r int64, exists bool) {
+	v := m.addupstream_error_requests
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpstreamErrorRequests resets all changes to the "upstream_error_requests" field.
+func (m *OpsWindowStatMutation) ResetUpstreamErrorRequests() {
+	m.upstream_error_requests = nil
+	m.addupstream_error_requests = nil
+}
+
+// SetRps sets the "rps" field.
+func (m *OpsWindowStatMutation) SetRps(f float64) {
+	m.rps = &f
+	m.addrps = nil
+}
+
+// Rps returns the value of the "rps" field in the mutation.
+func (m *OpsWindowStatMutation) Rps() (r float64, exists bool) {
+	v := m.rps
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRps returns the old "rps" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldRps(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRps is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRps requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRps: %w", err)
+	}
+	return oldValue.Rps, nil
+}
+
+// AddRps adds f to the "rps" field.
+func (m *OpsWindowStatMutation) AddRps(f float64) {
+	if m.addrps != nil {
+		*m.addrps += f
+	} else {
+		m.addrps = &f
+	}
+}
+
+// AddedRps returns the value that was added to the "rps" field in this mutation.
+func (m *OpsWindowStatMutation) AddedRps() (r float64, exists bool) {
+	v := m.addrps
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRps resets all changes to the "rps" field.
+func (m *OpsWindowStatMutation) ResetRps() {
+	m.rps = nil
+	m.addrps = nil
+}
+
+// SetErrorRate sets the "error_rate" field.
+func (m *OpsWindowStatMutation) SetErrorRate(f float64) {
+	m.error_rate = &f
+	m.adderror_rate = nil
+}
+
+// ErrorRate returns the value of the "error_rate" field in the mutation.
+func (m *OpsWindowStatMutation) ErrorRate() (r float64, exists bool) {
+	v := m.error_rate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldErrorRate returns the old "error_rate" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldErrorRate(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldErrorRate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldErrorRate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldErrorRate: %w", err)
+	}
+	return oldValue.ErrorRate, nil
+}
+
+// AddErrorRate adds f to the "error_rate" field.
+func (m *OpsWindowStatMutation) AddErrorRate(f float64) {
+	if m.adderror_rate != nil {
+		*m.adderror_rate += f
+	} else {
+		m.adderror_rate = &f
+	}
+}
+
+// AddedErrorRate returns the value that was added to the "error_rate" field in this mutation.
+func (m *OpsWindowStatMutation) AddedErrorRate() (r float64, exists bool) {
+	v := m.adderror_rate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetErrorRate resets all changes to the "error_rate" field.
+func (m *OpsWindowStatMutation) ResetErrorRate() {
+	m.error_rate = nil
+	m.adderror_rate = nil
+}
+
+// SetP50DurationMs sets the "p50_duration_ms" field.
+func (m *OpsWindowStatMutation) SetP50DurationMs(i int64) {
+	m.p50_duration_ms = &i
+	m.addp50_duration_ms = nil
+}
+
+// P50DurationMs returns the value of the "p50_duration_ms" field in the mutation.
+func (m *OpsWindowStatMutation) P50DurationMs() (r int64, exists bool) {
+	v := m.p50_duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldP50DurationMs returns the old "p50_duration_ms" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldP50DurationMs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldP50DurationMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldP50DurationMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldP50DurationMs: %w", err)
+	}
+	return oldValue.P50DurationMs, nil
+}
+
+// AddP50DurationMs adds i to the "p50_duration_ms" field.
+func (m *OpsWindowStatMutation) AddP50DurationMs(i int64) {
+	if m.addp50_duration_ms != nil {
+		*m.addp50_duration_ms += i
+	} else {
+		m.addp50_duration_ms = &i
+	}
+}
+
+// AddedP50DurationMs returns the value that was added to the "p50_duration_ms" field in this mutation.
+func (m *OpsWindowStatMutation) AddedP50DurationMs() (r int64, exists bool) {
+	v := m.addp50_duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetP50DurationMs resets all changes to the "p50_duration_ms" field.
+func (m *OpsWindowStatMutation) ResetP50DurationMs() {
+	m.p50_duration_ms = nil
+	m.addp50_duration_ms = nil
+}
+
+// SetP95DurationMs sets the "p95_duration_ms" field.
+func (m *OpsWindowStatMutation) SetP95DurationMs(i int64) {
+	m.p95_duration_ms = &i
+	m.addp95_duration_ms = nil
+}
+
+// P95DurationMs returns the value of the "p95_duration_ms" field in the mutation.
+func (m *OpsWindowStatMutation) P95DurationMs() (r int64, exists bool) {
+	v := m.p95_duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldP95DurationMs returns the old "p95_duration_ms" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldP95DurationMs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldP95DurationMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldP95DurationMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldP95DurationMs: %w", err)
+	}
+	return oldValue.P95DurationMs, nil
+}
+
+// AddP95DurationMs adds i to the "p95_duration_ms" field.
+func (m *OpsWindowStatMutation) AddP95DurationMs(i int64) {
+	if m.addp95_duration_ms != nil {
+		*m.addp95_duration_ms += i
+	} else {
+		m.addp95_duration_ms = &i
+	}
+}
+
+// AddedP95DurationMs returns the value that was added to the "p95_duration_ms" field in this mutation.
+func (m *OpsWindowStatMutation) AddedP95DurationMs() (r int64, exists bool) {
+	v := m.addp95_duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetP95DurationMs resets all changes to the "p95_duration_ms" field.
+func (m *OpsWindowStatMutation) ResetP95DurationMs() {
+	m.p95_duration_ms = nil
+	m.addp95_duration_ms = nil
+}
+
+// SetP99DurationMs sets the "p99_duration_ms" field.
+func (m *OpsWindowStatMutation) SetP99DurationMs(i int64) {
+	m.p99_duration_ms = &i
+	m.addp99_duration_ms = nil
+}
+
+// P99DurationMs returns the value of the "p99_duration_ms" field in the mutation.
+func (m *OpsWindowStatMutation) P99DurationMs() (r int64, exists bool) {
+	v := m.p99_duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldP99DurationMs returns the old "p99_duration_ms" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldP99DurationMs(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldP99DurationMs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldP99DurationMs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldP99DurationMs: %w", err)
+	}
+	return oldValue.P99DurationMs, nil
+}
+
+// AddP99DurationMs adds i to the "p99_duration_ms" field.
+func (m *OpsWindowStatMutation) AddP99DurationMs(i int64) {
+	if m.addp99_duration_ms != nil {
+		*m.addp99_duration_ms += i
+	} else {
+		m.addp99_duration_ms = &i
+	}
+}
+
+// AddedP99DurationMs returns the value that was added to the "p99_duration_ms" field in this mutation.
+func (m *OpsWindowStatMutation) AddedP99DurationMs() (r int64, exists bool) {
+	v := m.addp99_duration_ms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetP99DurationMs resets all changes to the "p99_duration_ms" field.
+func (m *OpsWindowStatMutation) ResetP99DurationMs() {
+	m.p99_duration_ms = nil
+	m.addp99_duration_ms = nil
+}
+
+// SetTotalInputTokens sets the "total_input_tokens" field.
+func (m *OpsWindowStatMutation) SetTotalInputTokens(i int64) {
+	m.total_input_tokens = &i
+	m.addtotal_input_tokens = nil
+}
+
+// TotalInputTokens returns the value of the "total_input_tokens" field in the mutation.
+func (m *OpsWindowStatMutation) TotalInputTokens() (r int64, exists bool) {
+	v := m.total_input_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalInputTokens returns the old "total_input_tokens" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldTotalInputTokens(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalInputTokens is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalInputTokens requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalInputTokens: %w", err)
+	}
+	return oldValue.TotalInputTokens, nil
+}
+
+// AddTotalInputTokens adds i to the "total_input_tokens" field.
+func (m *OpsWindowStatMutation) AddTotalInputTokens(i int64) {
+	if m.addtotal_input_tokens != nil {
+		*m.addtotal_input_tokens += i
+	} else {
+		m.addtotal_input_tokens = &i
+	}
+}
+
+// AddedTotalInputTokens returns the value that was added to the "total_input_tokens" field in this mutation.
+func (m *OpsWindowStatMutation) AddedTotalInputTokens() (r int64, exists bool) {
+	v := m.addtotal_input_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalInputTokens resets all changes to the "total_input_tokens" field.
+func (m *OpsWindowStatMutation) ResetTotalInputTokens() {
+	m.total_input_tokens = nil
+	m.addtotal_input_tokens = nil
+}
+
+// SetTotalOutputTokens sets the "total_output_tokens" field.
+func (m *OpsWindowStatMutation) SetTotalOutputTokens(i int64) {
+	m.total_output_tokens = &i
+	m.addtotal_output_tokens = nil
+}
+
+// TotalOutputTokens returns the value of the "total_output_tokens" field in the mutation.
+func (m *OpsWindowStatMutation) TotalOutputTokens() (r int64, exists bool) {
+	v := m.total_output_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalOutputTokens returns the old "total_output_tokens" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldTotalOutputTokens(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalOutputTokens is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalOutputTokens requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalOutputTokens: %w", err)
+	}
+	return oldValue.TotalOutputTokens, nil
+}
+
+// AddTotalOutputTokens adds i to the "total_output_tokens" field.
+func (m *OpsWindowStatMutation) AddTotalOutputTokens(i int64) {
+	if m.addtotal_output_tokens != nil {
+		*m.addtotal_output_tokens += i
+	} else {
+		m.addtotal_output_tokens = &i
+	}
+}
+
+// AddedTotalOutputTokens returns the value that was added to the "total_output_tokens" field in this mutation.
+func (m *OpsWindowStatMutation) AddedTotalOutputTokens() (r int64, exists bool) {
+	v := m.addtotal_output_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalOutputTokens resets all changes to the "total_output_tokens" field.
+func (m *OpsWindowStatMutation) ResetTotalOutputTokens() {
+	m.total_output_tokens = nil
+	m.addtotal_output_tokens = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *OpsWindowStatMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *OpsWindowStatMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the OpsWindowStat entity.
+// If the OpsWindowStat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OpsWindowStatMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *OpsWindowStatMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// Where appends a list predicates to the OpsWindowStatMutation builder.
+func (m *OpsWindowStatMutation) Where(ps ...predicate.OpsWindowStat) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the OpsWindowStatMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *OpsWindowStatMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.OpsWindowStat, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *OpsWindowStatMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *OpsWindowStatMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (OpsWindowStat).
+func (m *OpsWindowStatMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *OpsWindowStatMutation) Fields() []string {
+	fields := make([]string, 0, 15)
+	if m.window_start != nil {
+		fields = append(fields, opswindowstat.FieldWindowStart)
+	}
+	if m.window_seconds != nil {
+		fields = append(fields, opswindowstat.FieldWindowSeconds)
+	}
+	if m.platform != nil {
+		fields = append(fields, opswindowstat.FieldPlatform)
+	}
+	if m.total_requests != nil {
+		fields = append(fields, opswindowstat.FieldTotalRequests)
+	}
+	if m.success_requests != nil {
+		fields = append(fields, opswindowstat.FieldSuccessRequests)
+	}
+	if m.error_requests != nil {
+		fields = append(fields, opswindowstat.FieldErrorRequests)
+	}
+	if m.upstream_error_requests != nil {
+		fields = append(fields, opswindowstat.FieldUpstreamErrorRequests)
+	}
+	if m.rps != nil {
+		fields = append(fields, opswindowstat.FieldRps)
+	}
+	if m.error_rate != nil {
+		fields = append(fields, opswindowstat.FieldErrorRate)
+	}
+	if m.p50_duration_ms != nil {
+		fields = append(fields, opswindowstat.FieldP50DurationMs)
+	}
+	if m.p95_duration_ms != nil {
+		fields = append(fields, opswindowstat.FieldP95DurationMs)
+	}
+	if m.p99_duration_ms != nil {
+		fields = append(fields, opswindowstat.FieldP99DurationMs)
+	}
+	if m.total_input_tokens != nil {
+		fields = append(fields, opswindowstat.FieldTotalInputTokens)
+	}
+	if m.total_output_tokens != nil {
+		fields = append(fields, opswindowstat.FieldTotalOutputTokens)
+	}
+	if m.created_at != nil {
+		fields = append(fields, opswindowstat.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *OpsWindowStatMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case opswindowstat.FieldWindowStart:
+		return m.WindowStart()
+	case opswindowstat.FieldWindowSeconds:
+		return m.WindowSeconds()
+	case opswindowstat.FieldPlatform:
+		return m.Platform()
+	case opswindowstat.FieldTotalRequests:
+		return m.TotalRequests()
+	case opswindowstat.FieldSuccessRequests:
+		return m.SuccessRequests()
+	case opswindowstat.FieldErrorRequests:
+		return m.ErrorRequests()
+	case opswindowstat.FieldUpstreamErrorRequests:
+		return m.UpstreamErrorRequests()
+	case opswindowstat.FieldRps:
+		return m.Rps()
+	case opswindowstat.FieldErrorRate:
+		return m.ErrorRate()
+	case opswindowstat.FieldP50DurationMs:
+		return m.P50DurationMs()
+	case opswindowstat.FieldP95DurationMs:
+		return m.P95DurationMs()
+	case opswindowstat.FieldP99DurationMs:
+		return m.P99DurationMs()
+	case opswindowstat.FieldTotalInputTokens:
+		return m.TotalInputTokens()
+	case opswindowstat.FieldTotalOutputTokens:
+		return m.TotalOutputTokens()
+	case opswindowstat.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *OpsWindowStatMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case opswindowstat.FieldWindowStart:
+		return m.OldWindowStart(ctx)
+	case opswindowstat.FieldWindowSeconds:
+		return m.OldWindowSeconds(ctx)
+	case opswindowstat.FieldPlatform:
+		return m.OldPlatform(ctx)
+	case opswindowstat.FieldTotalRequests:
+		return m.OldTotalRequests(ctx)
+	case opswindowstat.FieldSuccessRequests:
+		return m.OldSuccessRequests(ctx)
+	case opswindowstat.FieldErrorRequests:
+		return m.OldErrorRequests(ctx)
+	case opswindowstat.FieldUpstreamErrorRequests:
+		return m.OldUpstreamErrorRequests(ctx)
+	case opswindowstat.FieldRps:
+		return m.OldRps(ctx)
+	case opswindowstat.FieldErrorRate:
+		return m.OldErrorRate(ctx)
+	case opswindowstat.FieldP50DurationMs:
+		return m.OldP50DurationMs(ctx)
+	case opswindowstat.FieldP95DurationMs:
+		return m.OldP95DurationMs(ctx)
+	case opswindowstat.FieldP99DurationMs:
+		return m.OldP99DurationMs(ctx)
+	case opswindowstat.FieldTotalInputTokens:
+		return m.OldTotalInputTokens(ctx)
+	case opswindowstat.FieldTotalOutputTokens:
+		return m.OldTotalOutputTokens(ctx)
+	case opswindowstat.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown OpsWindowStat field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OpsWindowStatMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case opswindowstat.FieldWindowStart:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWindowStart(v)
+		return nil
+	case opswindowstat.FieldWindowSeconds:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWindowSeconds(v)
+		return nil
+	case opswindowstat.FieldPlatform:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlatform(v)
+		return nil
+	case opswindowstat.FieldTotalRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalRequests(v)
+		return nil
+	case opswindowstat.FieldSuccessRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSuccessRequests(v)
+		return nil
+	case opswindowstat.FieldErrorRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetErrorRequests(v)
+		return nil
+	case opswindowstat.FieldUpstreamErrorRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpstreamErrorRequests(v)
+		return nil
+	case opswindowstat.FieldRps:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRps(v)
+		return nil
+	case opswindowstat.FieldErrorRate:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetErrorRate(v)
+		return nil
+	case opswindowstat.FieldP50DurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetP50DurationMs(v)
+		return nil
+	case opswindowstat.FieldP95DurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetP95DurationMs(v)
+		return nil
+	case opswindowstat.FieldP99DurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetP99DurationMs(v)
+		return nil
+	case opswindowstat.FieldTotalInputTokens:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalInputTokens(v)
+		return nil
+	case opswindowstat.FieldTotalOutputTokens:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalOutputTokens(v)
+		return nil
+	case opswindowstat.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown OpsWindowStat field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *OpsWindowStatMutation) AddedFields() []string {
+	var fields []string
+	if m.addwindow_seconds != nil {
+		fields = append(fields, opswindowstat.FieldWindowSeconds)
+	}
+	if m.addtotal_requests != nil {
+		fields = append(fields, opswindowstat.FieldTotalRequests)
+	}
+	if m.addsuccess_requests != nil {
+		fields = append(fields, opswindowstat.FieldSuccessRequests)
+	}
+	if m.adderror_requests != nil {
+		fields = append(fields, opswindowstat.FieldErrorRequests)
+	}
+	if m.addupstream_error_requests != nil {
+		fields = append(fields, opswindowstat.FieldUpstreamErrorRequests)
+	}
+	if m.addrps != nil {
+		fields = append(fields, opswindowstat.FieldRps)
+	}
+	if m.adderror_rate != nil {
+		fields = append(fields, opswindowstat.FieldErrorRate)
+	}
+	if m.addp50_duration_ms != nil {
+		fields = append(fields, opswindowstat.FieldP50DurationMs)
+	}
+	if m.addp95_duration_ms != nil {
+		fields = append(fields, opswindowstat.FieldP95DurationMs)
+	}
+	if m.addp99_duration_ms != nil {
+		fields = append(fields, opswindowstat.FieldP99DurationMs)
+	}
+	if m.addtotal_input_tokens != nil {
+		fields = append(fields, opswindowstat.FieldTotalInputTokens)
+	}
+	if m.addtotal_output_tokens != nil {
+		fields = append(fields, opswindowstat.FieldTotalOutputTokens)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *OpsWindowStatMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case opswindowstat.FieldWindowSeconds:
+		return m.AddedWindowSeconds()
+	case opswindowstat.FieldTotalRequests:
+		return m.AddedTotalRequests()
+	case opswindowstat.FieldSuccessRequests:
+		return m.AddedSuccessRequests()
+	case opswindowstat.FieldErrorRequests:
+		return m.AddedErrorRequests()
+	case opswindowstat.FieldUpstreamErrorRequests:
+		return m.AddedUpstreamErrorRequests()
+	case opswindowstat.FieldRps:
+		return m.AddedRps()
+	case opswindowstat.FieldErrorRate:
+		return m.AddedErrorRate()
+	case opswindowstat.FieldP50DurationMs:
+		return m.AddedP50DurationMs()
+	case opswindowstat.FieldP95DurationMs:
+		return m.AddedP95DurationMs()
+	case opswindowstat.FieldP99DurationMs:
+		return m.AddedP99DurationMs()
+	case opswindowstat.FieldTotalInputTokens:
+		return m.AddedTotalInputTokens()
+	case opswindowstat.FieldTotalOutputTokens:
+		return m.AddedTotalOutputTokens()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OpsWindowStatMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case opswindowstat.FieldWindowSeconds:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWindowSeconds(v)
+		return nil
+	case opswindowstat.FieldTotalRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalRequests(v)
+		return nil
+	case opswindowstat.FieldSuccessRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSuccessRequests(v)
+		return nil
+	case opswindowstat.FieldErrorRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddErrorRequests(v)
+		return nil
+	case opswindowstat.FieldUpstreamErrorRequests:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpstreamErrorRequests(v)
+		return nil
+	case opswindowstat.FieldRps:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRps(v)
+		return nil
+	case opswindowstat.FieldErrorRate:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddErrorRate(v)
+		return nil
+	case opswindowstat.FieldP50DurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddP50DurationMs(v)
+		return nil
+	case opswindowstat.FieldP95DurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddP95DurationMs(v)
+		return nil
+	case opswindowstat.FieldP99DurationMs:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddP99DurationMs(v)
+		return nil
+	case opswindowstat.FieldTotalInputTokens:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalInputTokens(v)
+		return nil
+	case opswindowstat.FieldTotalOutputTokens:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalOutputTokens(v)
+		return nil
+	}
+	return fmt.Errorf("unknown OpsWindowStat numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *OpsWindowStatMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *OpsWindowStatMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *OpsWindowStatMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown OpsWindowStat nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *OpsWindowStatMutation) ResetField(name string) error {
+	switch name {
+	case opswindowstat.FieldWindowStart:
+		m.ResetWindowStart()
+		return nil
+	case opswindowstat.FieldWindowSeconds:
+		m.ResetWindowSeconds()
+		return nil
+	case opswindowstat.FieldPlatform:
+		m.ResetPlatform()
+		return nil
+	case opswindowstat.FieldTotalRequests:
+		m.ResetTotalRequests()
+		return nil
+	case opswindowstat.FieldSuccessRequests:
+		m.ResetSuccessRequests()
+		return nil
+	case opswindowstat.FieldErrorRequests:
+		m.ResetErrorRequests()
+		return nil
+	case opswindowstat.FieldUpstreamErrorRequests:
+		m.ResetUpstreamErrorRequests()
+		return nil
+	case opswindowstat.FieldRps:
+		m.ResetRps()
+		return nil
+	case opswindowstat.FieldErrorRate:
+		m.ResetErrorRate()
+		return nil
+	case opswindowstat.FieldP50DurationMs:
+		m.ResetP50DurationMs()
+		return nil
+	case opswindowstat.FieldP95DurationMs:
+		m.ResetP95DurationMs()
+		return nil
+	case opswindowstat.FieldP99DurationMs:
+		m.ResetP99DurationMs()
+		return nil
+	case opswindowstat.FieldTotalInputTokens:
+		m.ResetTotalInputTokens()
+		return nil
+	case opswindowstat.FieldTotalOutputTokens:
+		m.ResetTotalOutputTokens()
+		return nil
+	case opswindowstat.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown OpsWindowStat field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *OpsWindowStatMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *OpsWindowStatMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *OpsWindowStatMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *OpsWindowStatMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *OpsWindowStatMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *OpsWindowStatMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *OpsWindowStatMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown OpsWindowStat unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *OpsWindowStatMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown OpsWindowStat edge %s", name)
 }
 
 // PluginMutation represents an operation that mutates the Plugin nodes in the graph.

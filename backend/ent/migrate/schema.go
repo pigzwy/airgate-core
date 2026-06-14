@@ -135,6 +135,96 @@ var (
 		Columns:    GroupsColumns,
 		PrimaryKey: []*schema.Column{GroupsColumns[0]},
 	}
+	// OpsRequestLogsColumns holds the columns for the "ops_request_logs" table.
+	OpsRequestLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "request_id", Type: field.TypeString, Default: ""},
+		{Name: "plugin_id", Type: field.TypeString, Default: ""},
+		{Name: "platform", Type: field.TypeString, Default: ""},
+		{Name: "model", Type: field.TypeString, Default: ""},
+		{Name: "endpoint", Type: field.TypeString, Default: ""},
+		{Name: "user_id_snapshot", Type: field.TypeInt, Default: 0},
+		{Name: "api_key_id_snapshot", Type: field.TypeInt, Default: 0},
+		{Name: "account_id_snapshot", Type: field.TypeInt, Default: 0},
+		{Name: "group_id_snapshot", Type: field.TypeInt, Default: 0},
+		{Name: "success", Type: field.TypeBool, Default: false},
+		{Name: "status_code", Type: field.TypeInt, Default: 0},
+		{Name: "upstream_status_code", Type: field.TypeInt, Default: 0},
+		{Name: "duration_ms", Type: field.TypeInt64, Default: 0},
+		{Name: "first_token_ms", Type: field.TypeInt64, Default: 0},
+		{Name: "stream", Type: field.TypeBool, Default: false},
+		{Name: "input_tokens", Type: field.TypeInt, Default: 0},
+		{Name: "output_tokens", Type: field.TypeInt, Default: 0},
+		{Name: "error_kind", Type: field.TypeString, Default: ""},
+		{Name: "error_msg", Type: field.TypeString, Size: 2147483647, Default: ""},
+		{Name: "error_detail", Type: field.TypeString, Size: 2147483647, Default: ""},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// OpsRequestLogsTable holds the schema information for the "ops_request_logs" table.
+	OpsRequestLogsTable = &schema.Table{
+		Name:       "ops_request_logs",
+		Columns:    OpsRequestLogsColumns,
+		PrimaryKey: []*schema.Column{OpsRequestLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "ops_request_log_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsRequestLogsColumns[21]},
+			},
+			{
+				Name:    "ops_request_log_success_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsRequestLogsColumns[10], OpsRequestLogsColumns[21]},
+			},
+			{
+				Name:    "ops_request_log_platform_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsRequestLogsColumns[3], OpsRequestLogsColumns[21]},
+			},
+			{
+				Name:    "ops_request_log_error_kind_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsRequestLogsColumns[18], OpsRequestLogsColumns[21]},
+			},
+			{
+				Name:    "ops_request_log_request_id",
+				Unique:  false,
+				Columns: []*schema.Column{OpsRequestLogsColumns[1]},
+			},
+		},
+	}
+	// OpsWindowStatsColumns holds the columns for the "ops_window_stats" table.
+	OpsWindowStatsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "window_start", Type: field.TypeTime},
+		{Name: "window_seconds", Type: field.TypeInt, Default: 60},
+		{Name: "platform", Type: field.TypeString, Default: ""},
+		{Name: "total_requests", Type: field.TypeInt64, Default: 0},
+		{Name: "success_requests", Type: field.TypeInt64, Default: 0},
+		{Name: "error_requests", Type: field.TypeInt64, Default: 0},
+		{Name: "upstream_error_requests", Type: field.TypeInt64, Default: 0},
+		{Name: "rps", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"postgres": "decimal(12,4)"}},
+		{Name: "error_rate", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"postgres": "decimal(8,6)"}},
+		{Name: "p50_duration_ms", Type: field.TypeInt64, Default: 0},
+		{Name: "p95_duration_ms", Type: field.TypeInt64, Default: 0},
+		{Name: "p99_duration_ms", Type: field.TypeInt64, Default: 0},
+		{Name: "total_input_tokens", Type: field.TypeInt64, Default: 0},
+		{Name: "total_output_tokens", Type: field.TypeInt64, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// OpsWindowStatsTable holds the schema information for the "ops_window_stats" table.
+	OpsWindowStatsTable = &schema.Table{
+		Name:       "ops_window_stats",
+		Columns:    OpsWindowStatsColumns,
+		PrimaryKey: []*schema.Column{OpsWindowStatsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "ops_window_stat_window_platform",
+				Unique:  true,
+				Columns: []*schema.Column{OpsWindowStatsColumns[1], OpsWindowStatsColumns[3]},
+			},
+		},
+	}
 	// PluginsColumns holds the columns for the "plugins" table.
 	PluginsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -497,6 +587,8 @@ var (
 		AccountsTable,
 		BalanceLogsTable,
 		GroupsTable,
+		OpsRequestLogsTable,
+		OpsWindowStatsTable,
 		PluginsTable,
 		PluginSourcesTable,
 		ProxiesTable,
