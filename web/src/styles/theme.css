@@ -1,0 +1,346 @@
+/* ==========================================================================
+   AirGate 品牌主题（遵循 pigcoder 设计语言：navy 结构 + 金色单一强调 + 绿色语义）
+   架构：--ag-* 品牌 token（设计源） → HeroUI 语义变量（实现层） → @theme 桥接（Tailwind）
+   说明：原先由外部 SDK 运行时注入，现改为静态定义，零外部依赖。
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. 品牌 token 源（亮色）
+   -------------------------------------------------------------------------- */
+:root,
+.light,
+.default,
+[data-theme="light"],
+[data-theme="default"] {
+  --ag-font-sans: "Geist Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ag-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* 品牌色 */
+  --ag-navy: #18345f;
+  --ag-navy-deep: #0d1b2a;
+  --ag-gold: #c89410;  /* 原 #e8a825 加深，确保白色文字对比度达到 WCAG AA 4.5:1 */
+
+  /* 底 / 文字 */
+  --ag-bg: #f7f9fc;
+  --ag-text: #0f172a;
+  --ag-muted: #586273;
+
+  /* surface 层级 */
+  --ag-surface: #ffffff;
+  --ag-surface-foreground: #0f172a;
+  --ag-surface-secondary: #f7f9fc;
+  --ag-surface-secondary-foreground: #0f172a;
+  --ag-surface-tertiary: #eef3f8;
+  --ag-surface-tertiary-foreground: #0f172a;
+  --ag-overlay: #ffffff;
+  --ag-overlay-foreground: #0f172a;
+
+  /* 主色（亮色 = navy 结构色） */
+  --ag-primary: #18345f;
+  --ag-primary-foreground: #ffffff;
+  --ag-primary-hover: #142a4d;
+  --ag-primary-subtle: rgba(24, 52, 95, 0.08);
+  --ag-primary-glow: transparent;
+
+  /* 语义色 */
+  --ag-success: #4f9462;
+  --ag-success-foreground: #ffffff;
+  --ag-success-subtle: rgba(79, 148, 98, 0.12);
+  --ag-warning: #c2790b;
+  --ag-warning-foreground: #ffffff;
+  --ag-warning-subtle: rgba(232, 168, 37, 0.14);
+  --ag-danger: #ba1a1a;
+  --ag-danger-foreground: #ffffff;
+  --ag-danger-subtle: rgba(186, 26, 26, 0.1);
+  --ag-info: #18345f;
+  --ag-info-subtle: rgba(24, 52, 95, 0.08);
+
+  /* 中性按钮 / 字段 / 边框 */
+  --ag-default-bg: #eef2f6;
+  --ag-default-foreground: #344054;
+  --ag-field-background: #ffffff;
+  --ag-field-foreground: #0f172a;
+  --ag-field-placeholder: #94a3b8;
+  --ag-border: #e4e7ec;
+  --ag-border-subtle: #eef1f4;
+  --ag-scrollbar: #cbd5e1;
+  --ag-segment: #eef3f8;
+  --ag-segment-foreground: #344054;
+
+  /* 玻璃 / 发光（克制：默认关闭发光） */
+  --ag-glass: rgba(255, 255, 255, 0.72);
+  --ag-glass-border: rgba(255, 255, 255, 0.45);
+  --ag-shadow-glow: none;
+}
+
+/* --------------------------------------------------------------------------
+   02. 品牌 token 源（暗色：近黑底，主色翻金保证对比度）
+   -------------------------------------------------------------------------- */
+.dark,
+[data-theme="dark"] {
+  --ag-bg: #0d1b2a;
+  --ag-text: #f8fafc;
+  --ag-muted: #94a3b8;
+
+  --ag-surface: #111c2d;
+  --ag-surface-foreground: #f8fafc;
+  --ag-surface-secondary: #13233a;
+  --ag-surface-secondary-foreground: #f8fafc;
+  --ag-surface-tertiary: #16304d;
+  --ag-surface-tertiary-foreground: #f8fafc;
+  --ag-overlay: #111c2d;
+  --ag-overlay-foreground: #f8fafc;
+
+  /* 暗色主色 = 金（navy 在近黑上对比不足） */
+  --ag-primary: #d4a017;  /* 暗色下稍微调亮，确保在深色背景上对比度足够 */
+  --ag-primary-foreground: #0d1b2a;
+  --ag-primary-hover: #e0b030;
+  --ag-primary-subtle: rgba(212, 160, 23, 0.14);
+  --ag-primary-glow: transparent;
+
+  --ag-success: #5fb87a;
+  --ag-success-foreground: #0d1b2a;
+  --ag-success-subtle: rgba(79, 148, 98, 0.18);
+  --ag-warning: #e0a93a;
+  --ag-warning-foreground: #0d1b2a;
+  --ag-warning-subtle: rgba(232, 168, 37, 0.16);
+  --ag-danger: #f87171;
+  --ag-danger-foreground: #0d1b2a;
+  --ag-danger-subtle: rgba(248, 113, 113, 0.14);
+  --ag-info: #89a5dd;
+  --ag-info-subtle: rgba(137, 165, 221, 0.14);
+
+  --ag-default-bg: rgba(255, 255, 255, 0.06);
+  --ag-default-foreground: #cbd5e1;
+  --ag-field-background: rgba(255, 255, 255, 0.04);
+  --ag-field-foreground: #f8fafc;
+  --ag-field-placeholder: #64748b;
+  --ag-border: rgba(255, 255, 255, 0.1);
+  --ag-border-subtle: rgba(255, 255, 255, 0.06);
+  --ag-scrollbar: #334155;
+  --ag-segment: rgba(255, 255, 255, 0.05);
+  --ag-segment-foreground: #cbd5e1;
+
+  --ag-glass: rgba(17, 28, 45, 0.6);
+  --ag-glass-border: rgba(255, 255, 255, 0.1);
+  --ag-shadow-glow: none;
+}
+
+/* --------------------------------------------------------------------------
+   02b. 插件兼容别名（旧 SDK airgate-theme 命名 → 现有 token）
+   插件（airgate-openai 等）的组件仍按旧 SDK 变量名取色；这里补别名指向重建后的
+   token，让插件嵌入主应用 admin 界面时样式正常、风格一致。别名指向的变量已按
+   主题级联，所以只需在共享块定义一次。新增插件请优先使用 --ag-surface / --ag-muted
+   等现命名，这些别名仅为向后兼容保留。
+   -------------------------------------------------------------------------- */
+:root,
+.light,
+.default,
+.dark,
+[data-theme="light"],
+[data-theme="default"],
+[data-theme="dark"] {
+  --ag-bg-surface: var(--ag-surface);
+  --ag-text-secondary: var(--ag-muted);
+  --ag-text-tertiary: var(--ag-muted);
+  --ag-text-inverse: var(--ag-primary-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   03. HeroUI 语义变量 ← 品牌 token（实现层，勿在页面直接用 --ag-*）
+   -------------------------------------------------------------------------- */
+:root,
+.light,
+.default,
+.dark,
+[data-theme="light"],
+[data-theme="default"],
+[data-theme="dark"] {
+  --white: oklch(100% 0 0);
+  --black: oklch(0% 0 0);
+  --snow: oklch(0.9911 0 0);
+  --eclipse: oklch(0.2103 0.0059 285.89);
+  --spacing: 0.25rem;
+  --border-width: 1px;
+  --field-border-width: 1px;
+  --disabled-opacity: 0.5;
+  --ring-offset-width: 2px;
+  --cursor-interactive: pointer;
+  --cursor-disabled: not-allowed;
+  --skeleton-animation: shimmer;
+
+  --radius: 0.5rem;
+  --field-radius: 0.5rem;
+  --font-geist: var(--ag-font-sans);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--ag-font-mono);
+
+  --background: var(--ag-bg);
+  --foreground: var(--ag-text);
+
+  --surface: var(--ag-surface);
+  --surface-foreground: var(--ag-surface-foreground);
+  --surface-secondary: var(--ag-surface-secondary);
+  --surface-secondary-foreground: var(--ag-surface-secondary-foreground);
+  --surface-tertiary: var(--ag-surface-tertiary);
+  --surface-tertiary-foreground: var(--ag-surface-tertiary-foreground);
+
+  --overlay: var(--ag-overlay);
+  --overlay-foreground: var(--ag-overlay-foreground);
+  --popover: var(--overlay);
+  --popover-foreground: var(--overlay-foreground);
+
+  --accent: var(--ag-primary);
+  --accent-foreground: var(--ag-primary-foreground);
+  --accent-hover: var(--ag-primary-hover);
+  --accent-soft: var(--ag-primary-subtle);
+  --accent-soft-foreground: var(--ag-primary);
+
+  --success: var(--ag-success);
+  --success-foreground: var(--ag-success-foreground);
+  --warning: var(--ag-warning);
+  --warning-foreground: var(--ag-warning-foreground);
+  --danger: var(--ag-danger);
+  --danger-foreground: var(--ag-danger-foreground);
+
+  --default: var(--ag-default-bg);
+  --default-foreground: var(--ag-default-foreground);
+  --muted: var(--ag-muted);
+
+  --field-background: var(--ag-field-background);
+  --field-foreground: var(--ag-field-foreground);
+  --field-placeholder: var(--ag-field-placeholder);
+  --field-border: color-mix(in oklab, var(--border) 88%, transparent);
+
+  --border: var(--ag-border);
+  --separator: var(--ag-border-subtle);
+  --focus: var(--ag-gold); /* 全局金色 focus 环（品牌识别） */
+  --link: var(--foreground);
+  --scrollbar: var(--ag-scrollbar);
+  --segment: var(--ag-segment);
+  --segment-foreground: var(--ag-segment-foreground);
+
+  --backdrop: rgba(0, 0, 0, 0.5);
+  --surface-shadow:
+    0 2px 4px 0 rgba(15, 23, 42, 0.04), 0 1px 2px 0 rgba(15, 23, 42, 0.06),
+    0 0 1px 0 rgba(15, 23, 42, 0.06);
+  --overlay-shadow: 0 4px 16px 0 rgba(24, 52, 95, 0.1), 0 8px 24px 0 rgba(24, 52, 95, 0.1);
+  --field-shadow:
+    0 2px 4px 0 rgba(15, 23, 42, 0.04), 0 1px 2px 0 rgba(15, 23, 42, 0.06),
+    0 0 1px 0 rgba(15, 23, 42, 0.06);
+}
+
+:root:not([data-theme="dark"]),
+.light,
+.default,
+[data-theme="light"],
+[data-theme="default"] {
+  color-scheme: light;
+}
+
+.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --backdrop: rgba(0, 0, 0, 0.6);
+  --surface-shadow: 0 0 0 0 transparent inset;
+  --overlay-shadow: 0 8px 28px 0 rgba(0, 0, 0, 0.45);
+  --field-shadow: 0 0 0 0 transparent inset;
+}
+
+/* --------------------------------------------------------------------------
+   04. Tailwind v4 @theme 桥接（--color-* → 上面的语义变量）
+   -------------------------------------------------------------------------- */
+@theme inline {
+  --color-white: var(--white);
+  --color-black: var(--black);
+  --color-snow: var(--snow);
+  --color-eclipse: var(--eclipse);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-secondary-foreground: var(--surface-secondary-foreground);
+  --color-surface-tertiary: var(--surface-tertiary);
+  --color-surface-tertiary-foreground: var(--surface-tertiary-foreground);
+  --color-overlay: var(--overlay);
+  --color-overlay-foreground: var(--overlay-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-foreground: var(--accent-soft-foreground);
+
+  /* 金色：单一装饰强调色，供关键 CTA / 激活态 / 焦点点缀 */
+  --color-gold: var(--ag-gold);
+  --color-gold-foreground: var(--ag-navy-deep);
+  --color-gold-subtle: var(--ag-primary-subtle);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--ag-success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--ag-warning-subtle);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-subtle: var(--ag-danger-subtle);
+
+  --color-default: var(--default);
+  --color-default-foreground: var(--default-foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-separator: var(--separator);
+  --color-focus: var(--focus);
+  --color-link: var(--link);
+  --color-backdrop: var(--backdrop);
+  --color-scrollbar: var(--scrollbar);
+
+  --color-field-background: var(--field-background);
+  --color-field-foreground: var(--field-foreground);
+  --color-field-placeholder: var(--field-placeholder);
+  --color-field-border: var(--field-border);
+
+  --color-segment: var(--segment);
+  --color-segment-foreground: var(--segment-foreground);
+
+  /* ── 兼容别名（沿用页面里可能用到的 Tailwind 工具类） ── */
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-subtle: var(--accent-soft);
+  --color-primary-glow: var(--ag-primary-glow);
+  --color-info: var(--ag-info);
+  --color-info-subtle: var(--ag-info-subtle);
+
+  --color-bg: var(--background);
+  --color-bg-deep: var(--background);
+  --color-bg-elevated: var(--overlay);
+  --color-bg-surface: var(--surface);
+  --color-bg-hover: color-mix(in oklab, var(--default) 82%, var(--background) 18%);
+  --color-bg-active: color-mix(in oklab, var(--default) 72%, var(--foreground) 8%);
+
+  --color-border-subtle: var(--separator);
+  --color-border-focus: var(--focus);
+
+  --color-text: var(--foreground);
+  --color-text-secondary: color-mix(in oklab, var(--foreground) 74%, var(--muted) 26%);
+  --color-text-tertiary: var(--muted);
+  --color-text-inverse: var(--accent-foreground);
+
+  --color-glass: var(--ag-glass);
+  --color-glass-border: var(--ag-glass-border);
+
+  /* 字体 */
+  --font-sans: var(--font-geist);
+  --font-mono: var(--ag-font-mono);
+
+  /* 阴影 */
+  --shadow-sm: var(--surface-shadow);
+  --shadow-md: var(--surface-shadow);
+  --shadow-lg: var(--overlay-shadow);
+  --shadow-glow: var(--ag-shadow-glow);
+}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { settingsApi } from '../../shared/api/settings';
-import defaultLogoUrl from '../../assets/logo.svg';
+import defaultLogoUrl from '../../assets/logo.jpg';
 
 export { defaultLogoUrl };
 

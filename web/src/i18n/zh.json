@@ -23,7 +23,10 @@
     "feature_keys": "密钥管理",
     "feature_keys_desc": "多密钥分组管理，按需设置配额与过期时间，精细化权限控制。",
     "feature_multi_platform": "多平台支持",
-    "feature_multi_platform_desc": "内置 OpenAI、Anthropic 等主流平台支持，开箱即用。"
+    "feature_multi_platform_desc": "内置 OpenAI、Anthropic 等主流平台支持，开箱即用。",
+    "endpoints_title": "端点地址",
+    "endpoints_hint": "一个 Key，多种协议",
+    "quick_start": "快速接入"
   },
 
   "datepicker": {

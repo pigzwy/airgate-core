@@ -326,7 +326,7 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex flex-col gap-6 min-h-screen">
+    <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex flex-col gap-6 min-h-[100dvh]">
       <div className="mx-auto w-full max-w-full overflow-x-auto hide-scrollbar pb-1">
         <Tabs
           className="whitespace-nowrap"
@@ -337,7 +337,7 @@ export default function SettingsPage() {
             {TABS.map((tab, index) => {
               const Icon = tab.icon;
               return (
-                <Tabs.Tab key={tab.key} id={tab.key}>
+                <Tabs.Tab key={tab.key} id={tab.key} className="whitespace-nowrap">
                   {index > 0 ? <Tabs.Separator /> : null}
                   <Tabs.Indicator />
                   <Icon className="w-4 h-4" />
@@ -521,11 +521,11 @@ export default function SettingsPage() {
                       onSelectionChange={(key) => setEmailTplType(key as 'verify' | 'balance_alert')}
                     >
                       <Tabs.List>
-                        <Tabs.Tab id="verify">
+                        <Tabs.Tab id="verify" className="whitespace-nowrap">
                           <Tabs.Indicator />
                           <span>{t('settings.email_template')}</span>
                         </Tabs.Tab>
-                        <Tabs.Tab id="balance_alert">
+                        <Tabs.Tab id="balance_alert" className="whitespace-nowrap">
                           <Tabs.Separator />
                           <Tabs.Indicator />
                           <span>{t('settings.balance_alert_email_template')}</span>

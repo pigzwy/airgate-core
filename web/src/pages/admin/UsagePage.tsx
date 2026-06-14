@@ -147,11 +147,11 @@ function DistributionCard({
   const metricTabs = (
     <Tabs selectedKey={metric} onSelectionChange={(key) => setMetric(key as PieMetric)}>
       <Tabs.List>
-        <Tabs.Tab id="token">
+        <Tabs.Tab id="token" className="whitespace-nowrap">
           <Tabs.Indicator />
           <span>{t('usage.by_token')}</span>
         </Tabs.Tab>
-        <Tabs.Tab id="cost">
+        <Tabs.Tab id="cost" className="whitespace-nowrap">
           <Tabs.Separator />
           <Tabs.Indicator />
           <span>{t('usage.by_actual_cost')}</span>
@@ -262,7 +262,7 @@ function GroupStatsCard({
         >
           <Tabs.List>
             {Object.entries(groupByKeys).map(([key, i18nKey], index) => (
-              <Tabs.Tab id={key} key={key}>
+              <Tabs.Tab id={key} key={key} className="whitespace-nowrap">
                 {index > 0 ? <Tabs.Separator /> : null}
                 <Tabs.Indicator />
                 <span>{t(i18nKey)}</span>
@@ -353,7 +353,7 @@ function TokenTrendCard({
     <Tabs selectedKey={granularity} onSelectionChange={(key) => onGranularityChange(String(key))}>
       <Tabs.List>
         {(['hour', 'day'] as const).map((g, index) => (
-          <Tabs.Tab id={g} key={g}>
+          <Tabs.Tab id={g} key={g} className="whitespace-nowrap">
             {index > 0 ? <Tabs.Separator /> : null}
             <Tabs.Indicator />
             <span>{t(`usage.granularity_${g}`)}</span>

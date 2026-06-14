@@ -1,0 +1,75 @@
+/* ==========================================================================
+   全局基础层（body / 滚动条 / 选区 / focus）
+   颜色全部取自 theme.css 暴露的语义变量。
+   ========================================================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--scrollbar) 76%, var(--foreground) 24%);
+}
+
+html {
+  font-size: 16px;
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--foreground);
+  background: var(--background);
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+/* 选区：金色微底（品牌点缀） */
+::selection {
+  background: color-mix(in oklab, var(--ag-gold) 26%, transparent);
+  color: var(--foreground);
+}
+
+/* 全局 focus：金色环（品牌识别） */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: var(--ring-offset-width);
+}
+
+/* HeroUI 字段组件自带 focus 态，避免双环 */
+:where(.input,
+  .textarea,
+  .date-input-group,
+  .select__trigger,
+  .combo-box__trigger,
+  .search-field__input):focus-visible {
+  outline: none;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}

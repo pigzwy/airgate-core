@@ -85,11 +85,13 @@ const SIDEBAR_COLLAPSED_WIDTH = 72;
 const TOPBAR_CLASS_NAME = 'border-b border-border bg-background';
 const SIDEBAR_COLLAPSE_BUTTON_CLASS = 'h-10 w-10 min-w-10 text-muted [&_svg]:stroke-[2.5]';
 const SIDEBAR_NAV_ITEM_CLASS = [
-  'group relative flex min-h-9 items-center gap-3 rounded-[var(--radius)]',
+  'group relative flex min-h-9 items-center gap-3 rounded-[var(--radius)] px-2',
   'text-[0.9375rem] font-normal leading-5 text-foreground transition-colors duration-150',
-  'hover:bg-default hover:text-foreground data-[active=true]:bg-default data-[active=true]:font-medium',
+  'hover:bg-default hover:text-foreground',
+  // 激活态：仅文字和图标变金色（移除左边框装饰）
+  'data-[active=true]:text-gold data-[active=true]:font-medium',
   '[&_svg]:h-5 [&_svg]:w-5 [&_svg]:text-muted [&_svg]:stroke-[2.1]',
-  'data-[active=true]:[&_svg]:text-foreground',
+  'data-[active=true]:[&_svg]:text-gold',
 ].join(' ');
 
 /**

@@ -128,7 +128,7 @@ export default function PluginsPage() {
               {tabs.map((tab, index) => {
                 const Icon = tab.icon;
                 return (
-                  <Tabs.Tab key={tab.key} id={tab.key}>
+                  <Tabs.Tab key={tab.key} id={tab.key} className="whitespace-nowrap">
                     {index > 0 ? <Tabs.Separator /> : null}
                     <Tabs.Indicator />
                     <Icon className="w-4 h-4" />
@@ -189,7 +189,7 @@ export default function PluginsPage() {
               <CommonTable.Row id="empty">
                 <CommonTable.Cell colSpan={3}>
                   <EmptyState>
-                    <div className="text-sm text-default-500">{t('common.no_data')}</div>
+                    <div className="text-sm text-muted">{t('common.no_data')}</div>
                   </EmptyState>
                 </CommonTable.Cell>
               </CommonTable.Row>
@@ -646,7 +646,7 @@ function InstallPluginModal({
                 <Tabs.ListContainer className="mb-5">
                   <Tabs.List>
                     {installTabs.map((tab, index) => (
-                      <Tabs.Tab key={tab.key} id={tab.key}>
+                      <Tabs.Tab key={tab.key} id={tab.key} className="whitespace-nowrap">
                         {index > 0 ? <Tabs.Separator /> : null}
                         <Tabs.Indicator />
                         {tab.icon}

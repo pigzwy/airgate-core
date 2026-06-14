@@ -108,7 +108,7 @@ export function BalanceHistoryModal({ open, user, onClose }: BalanceHistoryModal
                 <CommonTable.Row id="empty">
                   <CommonTable.Cell colSpan={5}>
                     <EmptyState>
-                      <div className="text-sm text-default-500">{t('common.no_data')}</div>
+                      <div className="text-sm text-muted">{t('common.no_data')}</div>
                     </EmptyState>
                   </CommonTable.Cell>
                 </CommonTable.Row>

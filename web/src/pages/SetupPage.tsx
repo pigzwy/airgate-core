@@ -164,7 +164,7 @@ export default function SetupPage() {
   const currentStepKey = visibleSteps[step] ?? 'finish';
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-[100dvh] flex items-center justify-center p-4 relative overflow-hidden">
       {/* 背景 */}
       <div className="absolute inset-0 pointer-events-none">
         <div

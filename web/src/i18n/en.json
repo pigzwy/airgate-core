@@ -23,7 +23,10 @@
     "feature_keys": "Key Management",
     "feature_keys_desc": "Multi-key group management with customizable quotas, expiration, and fine-grained access control.",
     "feature_multi_platform": "Multi-Platform",
-    "feature_multi_platform_desc": "Built-in support for OpenAI, Anthropic, and other major platforms, ready to use out of the box."
+    "feature_multi_platform_desc": "Built-in support for OpenAI, Anthropic, and other major platforms, ready to use out of the box.",
+    "endpoints_title": "Endpoints",
+    "endpoints_hint": "One key, multiple protocols",
+    "quick_start": "Quick start"
   },
 
   "datepicker": {

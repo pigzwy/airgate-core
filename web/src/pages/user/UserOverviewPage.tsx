@@ -257,7 +257,7 @@ export default function UserOverviewPage() {
         >
           <Tabs.List>
             {RANGE_PRESETS.map((r, index) => (
-              <Tabs.Tab key={r} id={r}>
+              <Tabs.Tab key={r} id={r} className="whitespace-nowrap">
                 {index > 0 ? <Tabs.Separator /> : null}
                 <Tabs.Indicator />
                 <span>{t(`dashboard.range_${r}`)}</span>

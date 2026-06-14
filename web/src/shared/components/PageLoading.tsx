@@ -29,7 +29,7 @@ export function PageLoading() {
 
 export function FullPageLoading() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-[100dvh] bg-background text-foreground">
       <TopLoadingLine />
     </div>
   );

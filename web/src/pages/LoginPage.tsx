@@ -468,7 +468,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden bg-background text-foreground">
+    <div className="min-h-[100dvh] flex relative overflow-hidden bg-background text-foreground">
       {/* ===== 左侧装饰面板（桌面端） ===== */}
       <div
         className="hidden lg:flex lg:w-[45%] xl:w-[50%] relative items-center justify-center overflow-hidden"
@@ -503,11 +503,7 @@ export default function LoginPage() {
             {[t('auth.feature_1'), t('auth.feature_2'), t('auth.feature_3')].map((f) => (
               <span
                 key={f}
-                className="text-[11px] px-3 py-1.5 rounded-[var(--radius)] font-medium border"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  borderColor: 'rgba(255,255,255,0.10)',
-                }}
+                className="text-[11px] px-3 py-1.5 rounded-[var(--radius)] font-medium border border-white/10 bg-white/[0.08]"
               >
                 {f}
               </span>
@@ -549,11 +545,11 @@ export default function LoginPage() {
             variant="secondary"
           >
             <Tabs.List className="w-full">
-              <Tabs.Tab id="login">{t('common.login')}</Tabs.Tab>
+              <Tabs.Tab id="login" className="whitespace-nowrap">{t('common.login')}</Tabs.Tab>
               {site.registration_enabled ? (
-                <Tabs.Tab id="register">{t('common.register')}</Tabs.Tab>
+                <Tabs.Tab id="register" className="whitespace-nowrap">{t('common.register')}</Tabs.Tab>
               ) : null}
-              <Tabs.Tab id="apikey">API Key</Tabs.Tab>
+              <Tabs.Tab id="apikey" className="whitespace-nowrap">API Key</Tabs.Tab>
             </Tabs.List>
           </Tabs>
 

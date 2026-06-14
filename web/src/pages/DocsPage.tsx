@@ -97,43 +97,46 @@ export default function DocsPage() {
 
   // ===== Scroll-spy =====
   //
-  // 在 scroll 事件里直接遍历 h2RefsRef，找"最后一个 top 已经越过 HEADER_OFFSET+30
-  // 这条线"的 H2，作为当前 active。这是 docs 站常用的"过线即激活"语义：
+  // 语义：「过线即激活」——找"最后一个 top 已经越过 HEADER_OFFSET+24 这条线"的 H2。
   //   - 短小节也能激活（不需要 H2 落在窄带里）
   //   - 用户读正文中间时，最后越线的 H2 仍然 active，不会卡死
-  // RAF throttle 防止 scroll 事件密集触发引起多余 setState。
+  //
+  // 实现：用 IntersectionObserver 替代 window scroll 监听（避免每帧回调、jank）。
+  // IO 只负责"何时重算"（任一 H2 跨越激活线时触发回调），重算逻辑仍复用「过线」
+  // 判定遍历一遍 ref（只在边界触发时 O(n)，不是每帧）。rootMargin 顶部内缩到
+  // 激活线位置，让 H2 进入顶栏下方时触发。
   useEffect(() => {
     if (toc.length === 0) return;
 
     const SPY_OFFSET = HEADER_OFFSET + 24; // 越过顶栏再多 24px 才算激活
-    let raf = 0;
 
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const refs = h2RefsRef.current;
-        let next = -1;
-        for (let i = 0; i < refs.length; i++) {
-          const el = refs[i];
-          if (!el) continue;
-          if (el.getBoundingClientRect().top - SPY_OFFSET <= 0) {
-            next = i; // 继续往后找，最终会落在"最后一个越线的"
-          } else {
-            break; // H2 都是按文档顺序排的，遇到第一个未越线就可以停
-          }
+    const recompute = () => {
+      const refs = h2RefsRef.current;
+      let next = -1;
+      for (let i = 0; i < refs.length; i++) {
+        const el = refs[i];
+        if (!el) continue;
+        if (el.getBoundingClientRect().top - SPY_OFFSET <= 0) {
+          next = i; // 继续往后找，最终会落在"最后一个越线的"
+        } else {
+          break; // H2 都是按文档顺序排的，遇到第一个未越线就可以停
         }
-        // 函数式 setState 防止 stale 比较；React 自带相同值跳过 re-render
-        setActiveIndex((prev) => (prev === next ? prev : next));
-      });
+      }
+      // 函数式 setState 防止 stale 比较；React 自带相同值跳过 re-render
+      setActiveIndex((prev) => (prev === next ? prev : next));
     };
 
-    onScroll(); // 首次同步一下，处理刷新后已经在中段的情况
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
+    const observer = new IntersectionObserver(recompute, {
+      // 顶部内缩到激活线，底部留 -40% 让"过线"判定更贴近阅读位置
+      rootMargin: `-${SPY_OFFSET}px 0px -40% 0px`,
+      threshold: 0,
+    });
+
+    const observed = h2RefsRef.current.filter((el): el is HTMLHeadingElement => el != null);
+    observed.forEach((el) => observer.observe(el));
+
+    recompute(); // 首次同步一下，处理刷新后已经在中段的情况
+    return () => observer.disconnect();
   }, [toc.length]);
 
   // ===== mount 时如果 URL 已经带 #section-N，主动滚一次 =====
@@ -159,7 +162,7 @@ export default function DocsPage() {
   }, [toc.length]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-[100dvh] bg-background text-foreground">
       {/* 顶栏：拉到 7xl，和正文同宽，避免顶栏窄、正文宽的撕裂感 */}
       <nav className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border/50">
         <div className="flex items-center justify-between px-6 md:px-12 py-4 max-w-7xl mx-auto">

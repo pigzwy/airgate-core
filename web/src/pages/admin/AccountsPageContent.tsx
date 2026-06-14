@@ -855,7 +855,7 @@ export default function AccountsPageContent() {
                 <tr data-slot="tr" data-key="empty">
                   <td data-slot="td" colSpan={columns.length + 1} className="px-3 py-8">
                     <EmptyState>
-                      <div className="text-sm text-default-500">{t('common.no_data')}</div>
+                      <div className="text-sm text-muted">{t('common.no_data')}</div>
                     </EmptyState>
                   </td>
                 </tr>
