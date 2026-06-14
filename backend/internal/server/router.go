@@ -195,6 +195,11 @@ func (s *Server) registerRoutes() {
 		adminGroup.GET("/dashboard/stats", handlers.Dashboard.Stats)
 		adminGroup.GET("/dashboard/trend", handlers.Dashboard.Trend)
 
+		// 运维监控（管理员）：实时大盘 + 错误日志钻取
+		adminGroup.GET("/ops/overview", handlers.Ops.Overview)
+		adminGroup.GET("/ops/error-logs", handlers.Ops.ErrorLogs)
+		adminGroup.GET("/ops/error-logs/:id", handlers.Ops.ErrorDetail)
+
 		// core 版本信息（仅管理员可见，避免对外暴露版本指纹）
 		adminGroup.GET("/version", handlers.Version.GetVersion)
 

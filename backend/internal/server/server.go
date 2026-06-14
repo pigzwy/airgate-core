@@ -11,10 +11,12 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/DouDOU-start/airgate-core/ent"
+	appops "github.com/DouDOU-start/airgate-core/internal/app/ops"
 	"github.com/DouDOU-start/airgate-core/internal/auth"
 	"github.com/DouDOU-start/airgate-core/internal/billing"
 	"github.com/DouDOU-start/airgate-core/internal/bootstrap"
 	"github.com/DouDOU-start/airgate-core/internal/config"
+	"github.com/DouDOU-start/airgate-core/internal/infra/store"
 	"github.com/DouDOU-start/airgate-core/internal/plugin"
 	"github.com/DouDOU-start/airgate-core/internal/scheduler"
 )
@@ -40,9 +42,42 @@ type Server struct {
 	concurrency *scheduler.ConcurrencyManager
 	calculator  *billing.Calculator
 	recorder    *billing.Recorder
+	opsService  *appops.Service
 	handlers    *bootstrap.HTTPHandlers
 
 	pluginStartCancel context.CancelFunc
+}
+
+// opsReporterAdapter 把 appops.Service 适配成 plugin.OpsReporter，
+// 完成 plugin.OpsReportInput → appops.ReportInput 的字段转换，
+// 让 plugin 包无需依赖 app/ops 的具体类型。
+type opsReporterAdapter struct {
+	svc *appops.Service
+}
+
+func (a opsReporterAdapter) Report(ctx context.Context, in plugin.OpsReportInput) error {
+	return a.svc.Report(ctx, appops.ReportInput{
+		RequestID:          in.RequestID,
+		PluginID:           in.PluginID,
+		Platform:           in.Platform,
+		Model:              in.Model,
+		Endpoint:           in.Endpoint,
+		UserID:             in.UserID,
+		APIKeyID:           in.APIKeyID,
+		AccountID:          in.AccountID,
+		GroupID:            in.GroupID,
+		Success:            in.Success,
+		StatusCode:         in.StatusCode,
+		UpstreamStatusCode: in.UpstreamStatusCode,
+		DurationMs:         in.DurationMs,
+		FirstTokenMs:       in.FirstTokenMs,
+		Stream:             in.Stream,
+		InputTokens:        in.InputTokens,
+		OutputTokens:       in.OutputTokens,
+		ErrorKind:          in.ErrorKind,
+		ErrorMsg:           in.ErrorMsg,
+		ErrorDetail:        in.ErrorDetail,
+	})
 }
 
 // NewServer 创建 HTTP 服务器
@@ -65,9 +100,14 @@ func NewServer(cfg *config.Config, db *ent.Client, rdb *redis.Client) *Server {
 		pluginDir = "data/plugins"
 	}
 	pluginMgr := plugin.NewManager(pluginDir, cfg.Log.Level, cfg.Database.DSN(), db)
+	// Ops 运维域：请求级日志采集 + 聚合。插件经 Host.Invoke("ops.report_request") 上报，
+	// 落库 ops_request_log，后台聚合成 ops_window_stat 供大盘查询。
+	opsService := appops.NewService(store.NewOpsStore(db), nil)
 	// HostService 通过 hashicorp/go-plugin GRPCBroker 暴露给所有插件子进程，
 	// 替代旧的 admin HTTP API + admin_api_key 模式。必须在加载任何插件之前注入。
-	pluginMgr.SetHostService(plugin.NewHostService(db, pluginMgr, sched, concurrency, calculator, recorder))
+	hostService := plugin.NewHostService(db, pluginMgr, sched, concurrency, calculator, recorder)
+	hostService.SetOpsReporter(opsReporterAdapter{svc: opsService})
+	pluginMgr.SetHostService(hostService)
 	forwarder := plugin.NewForwarder(db, pluginMgr, sched, concurrency, calculator, recorder)
 
 	marketOpts := []plugin.MarketplaceOption{
@@ -97,6 +137,7 @@ func NewServer(cfg *config.Config, db *ent.Client, rdb *redis.Client) *Server {
 		concurrency:    concurrency,
 		calculator:     calculator,
 		recorder:       recorder,
+		opsService:     opsService,
 	}
 
 	s.handlers = bootstrap.NewHTTPHandlers(bootstrap.HTTPDependencies{
@@ -108,6 +149,7 @@ func NewServer(cfg *config.Config, db *ent.Client, rdb *redis.Client) *Server {
 		Marketplace: marketplace,
 		Concurrency: concurrency,
 		Scheduler:   sched,
+		OpsService:  opsService,
 	})
 
 	// 注册路由
@@ -159,6 +201,9 @@ func (s *Server) StartPlugins(ctx context.Context) {
 
 	go plugin.StartAssetMigrationLoop(pluginCtx, s.db)
 	go plugin.StartAssetCleanupLoop(pluginCtx, s.db)
+
+	// 启动 Ops 后台聚合 + 清理循环（请求日志 → 1min 窗口聚合 → 过期清理）
+	s.opsService.StartAggregationLoop(pluginCtx)
 
 	go func() {
 		// 加载已编译的插件。后台执行，避免坏插件阻塞 core 监听端口。

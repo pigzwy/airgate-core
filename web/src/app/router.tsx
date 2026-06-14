@@ -21,6 +21,7 @@ import {
   GroupsPage,
   lazyWithPreload,
   LoginPage,
+  OpsPage,
   PluginPage,
   PluginsPage,
   preloadRoutePage,
@@ -224,6 +225,7 @@ const adminGroupsRoute = createRoute({ getParentRoute: () => adminLayout, path: 
 const adminSubscriptionsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/subscriptions', component: renderPage(SubscriptionsPage) });
 const adminProxiesRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/proxies', component: renderPage(ProxiesPage) });
 const adminUsageRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/usage', component: renderPage(UsagePage) });
+const adminOpsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/ops', component: renderPage(OpsPage) });
 const adminPluginsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/plugins', component: renderPage(PluginsPage) });
 const adminSettingsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/settings', component: renderPage(SettingsPage) });
 
@@ -312,6 +314,7 @@ const routeTree = rootRoute.addChildren([
       adminSubscriptionsRoute,
       adminProxiesRoute,
       adminUsageRoute,
+      adminOpsRoute,
       adminPluginsRoute,
       adminSettingsRoute,
     ]),

@@ -43,6 +43,44 @@ type HostService struct {
 	concurrency *scheduler.ConcurrencyManager
 	calculator  *billing.Calculator
 	recorder    *billing.Recorder
+	// opsReporter 运维上报（可选）。nil 时 ops.report_request 静默丢弃，不影响插件转发。
+	opsReporter OpsReporter
+}
+
+// OpsReporter 是 ops 域上报能力的最小接口，由 app/ops.Service 实现。
+// 在 plugin 包定义以避免 plugin 直接依赖 app/ops 的具体类型。
+type OpsReporter interface {
+	Report(ctx context.Context, in OpsReportInput) error
+}
+
+// OpsReportInput 是插件上报的运维请求级指标（plugin 包内的传输结构，
+// 与 app/ops.ReportInput 字段一致，由接线层做转换）。
+type OpsReportInput struct {
+	RequestID          string
+	PluginID           string
+	Platform           string
+	Model              string
+	Endpoint           string
+	UserID             int
+	APIKeyID           int
+	AccountID          int
+	GroupID            int
+	Success            bool
+	StatusCode         int
+	UpstreamStatusCode int
+	DurationMs         int64
+	FirstTokenMs       int64
+	Stream             bool
+	InputTokens        int
+	OutputTokens       int
+	ErrorKind          string
+	ErrorMsg           string
+	ErrorDetail        string
+}
+
+// SetOpsReporter 注入运维上报实现。由 bootstrap 在构造 ops service 后调用。
+func (h *HostService) SetOpsReporter(r OpsReporter) {
+	h.opsReporter = r
 }
 
 // NewHostService 构造 HostService 工厂。
@@ -185,6 +223,7 @@ const (
 	hostMethodTasksGet               = "tasks.get"
 	hostMethodTasksList              = "tasks.list"
 	hostMethodTasksDelete            = "tasks.delete"
+	hostMethodOpsReport              = "ops.report_request"
 )
 
 func (h *HostService) invoke(
@@ -299,6 +338,12 @@ func (h *HostService) invoke(
 			return nil, err
 		}
 		return h.deleteTask(ctx, pluginID, req)
+	case hostMethodOpsReport:
+		var req hostOpsReportRequest
+		if err := decodeHostPayload(payload, &req); err != nil {
+			return nil, err
+		}
+		return h.opsReport(ctx, pluginID, req)
 	default:
 		return nil, status.Errorf(codes.Unimplemented, "unknown host method: %s", method)
 	}
@@ -345,6 +390,29 @@ type hostReportAccountResultRequest struct {
 	AccountID int64  `json:"account_id"`
 	Success   bool   `json:"success"`
 	ErrorMsg  string `json:"error_msg"`
+}
+
+// hostOpsReportRequest 插件经 ops.report_request 上报的请求级运维指标。
+type hostOpsReportRequest struct {
+	RequestID          string `json:"request_id"`
+	Platform           string `json:"platform"`
+	Model              string `json:"model"`
+	Endpoint           string `json:"endpoint"`
+	UserID             int    `json:"user_id"`
+	APIKeyID           int    `json:"api_key_id"`
+	AccountID          int    `json:"account_id"`
+	GroupID            int    `json:"group_id"`
+	Success            bool   `json:"success"`
+	StatusCode         int    `json:"status_code"`
+	UpstreamStatusCode int    `json:"upstream_status_code"`
+	DurationMs         int64  `json:"duration_ms"`
+	FirstTokenMs       int64  `json:"first_token_ms"`
+	Stream             bool   `json:"stream"`
+	InputTokens        int    `json:"input_tokens"`
+	OutputTokens       int    `json:"output_tokens"`
+	ErrorKind          string `json:"error_kind"`
+	ErrorMsg           string `json:"error_msg"`
+	ErrorDetail        string `json:"error_detail"`
 }
 
 type hostProbeForwardRequest struct {
@@ -686,6 +754,44 @@ func (h *HostService) reportAccountResult(ctx context.Context, req hostReportAcc
 		Kind:   kind,
 		Reason: req.ErrorMsg,
 	})
+	return map[string]interface{}{"ok": true}, nil
+}
+
+// opsReport 接收插件上报的请求级运维指标并落库。
+//
+// 失败语义：上报失败不返回 gRPC error（避免插件因运维上报失败而误判转发失败）。
+// opsReporter 未注入（nil）时静默丢弃。
+func (h *HostService) opsReport(ctx context.Context, pluginID string, req hostOpsReportRequest) (map[string]interface{}, error) {
+	if h.opsReporter == nil {
+		return map[string]interface{}{"ok": false, "reason": "ops_reporter_unset"}, nil
+	}
+	in := OpsReportInput{
+		RequestID:          req.RequestID,
+		PluginID:           pluginID,
+		Platform:           req.Platform,
+		Model:              req.Model,
+		Endpoint:           req.Endpoint,
+		UserID:             req.UserID,
+		APIKeyID:           req.APIKeyID,
+		AccountID:          req.AccountID,
+		GroupID:            req.GroupID,
+		Success:            req.Success,
+		StatusCode:         req.StatusCode,
+		UpstreamStatusCode: req.UpstreamStatusCode,
+		DurationMs:         req.DurationMs,
+		FirstTokenMs:       req.FirstTokenMs,
+		Stream:             req.Stream,
+		InputTokens:        req.InputTokens,
+		OutputTokens:       req.OutputTokens,
+		ErrorKind:          req.ErrorKind,
+		ErrorMsg:           req.ErrorMsg,
+		ErrorDetail:        req.ErrorDetail,
+	}
+	if err := h.opsReporter.Report(ctx, in); err != nil {
+		// 落库失败只记日志，不阻断插件
+		slog.Warn("ops_report_failed", sdk.LogFieldPluginID, pluginID, "error", err)
+		return map[string]interface{}{"ok": false}, nil
+	}
 	return map[string]interface{}{"ok": true}, nil
 }
 

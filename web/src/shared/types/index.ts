@@ -905,3 +905,63 @@ export interface ModelInfo {
   id: string;
   name: string;
 }
+
+// ===== 运维监控 (Ops) =====
+
+export interface OpsWindowStat {
+  window_start: string;
+  window_seconds: number;
+  platform: string;
+  total_requests: number;
+  success_requests: number;
+  error_requests: number;
+  upstream_error_requests: number;
+  rps: number;
+  error_rate: number;
+  p50_duration_ms: number;
+  p95_duration_ms: number;
+  p99_duration_ms: number;
+  total_input_tokens: number;
+  total_output_tokens: number;
+}
+
+export interface OpsOverviewResp {
+  latest: OpsWindowStat;
+  trend: OpsWindowStat[];
+}
+
+export interface OpsRequestLogResp {
+  id: number;
+  request_id: string;
+  plugin_id: string;
+  platform: string;
+  model: string;
+  endpoint: string;
+  user_id: number;
+  api_key_id: number;
+  account_id: number;
+  group_id: number;
+  success: boolean;
+  status_code: number;
+  upstream_status_code: number;
+  duration_ms: number;
+  first_token_ms: number;
+  stream: boolean;
+  input_tokens: number;
+  output_tokens: number;
+  error_kind: string;
+  error_msg: string;
+  error_detail: string;
+  created_at: string;
+}
+
+export interface OpsErrorLogQuery {
+  page?: number;
+  page_size?: number;
+  platform?: string;
+  model?: string;
+  error_kind?: string;
+  only_errors?: number;
+  start?: string;
+  end?: string;
+}

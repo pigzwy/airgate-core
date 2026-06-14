@@ -24,4 +24,6 @@ export const queryKeys = {
   adminApiKey: () => ['admin-api-key'] as const,
   userMe: () => ['user-me'] as const,
   userUsageStats: (...args: unknown[]) => ['user-usage-stats', ...args] as const,
+  opsOverview: (...args: unknown[]) => ['ops-overview', ...args] as const,
+  opsErrorLogs: (...args: unknown[]) => ['ops-error-logs', ...args] as const,
 } as const;

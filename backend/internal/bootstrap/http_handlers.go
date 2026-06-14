@@ -18,6 +18,7 @@ import (
 	appdashboard "github.com/DouDOU-start/airgate-core/internal/app/dashboard"
 	appgroup "github.com/DouDOU-start/airgate-core/internal/app/group"
 	appopenclaw "github.com/DouDOU-start/airgate-core/internal/app/openclaw"
+	appops "github.com/DouDOU-start/airgate-core/internal/app/ops"
 	apppluginadmin "github.com/DouDOU-start/airgate-core/internal/app/pluginadmin"
 	appproxy "github.com/DouDOU-start/airgate-core/internal/app/proxy"
 	appsettings "github.com/DouDOU-start/airgate-core/internal/app/settings"
@@ -44,6 +45,7 @@ type HTTPDependencies struct {
 	Marketplace *plugin.Marketplace
 	Concurrency *scheduler.ConcurrencyManager
 	Scheduler   *scheduler.Scheduler
+	OpsService  *appops.Service
 }
 
 // HTTPHandlers 聚合所有 HTTP 处理器。
@@ -62,6 +64,7 @@ type HTTPHandlers struct {
 	OpenClaw     *handler.OpenClawHandler
 	Version      *handler.VersionHandler
 	Upgrade      *handler.UpgradeHandler
+	Ops          *handler.OpsHandler
 
 	AccountService *appaccount.Service
 }
@@ -116,6 +119,7 @@ func NewHTTPHandlers(dep HTTPDependencies) *HTTPHandlers {
 		OpenClaw:       handler.NewOpenClawHandler(openclawService),
 		Version:        handler.NewVersionHandler(),
 		Upgrade:        handler.NewUpgradeHandler(upgradeService),
+		Ops:            handler.NewOpsHandler(dep.OpsService),
 		AccountService: accountService,
 	}
 }
