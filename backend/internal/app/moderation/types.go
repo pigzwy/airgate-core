@@ -105,12 +105,47 @@ type LogInput struct {
 	CreatedAt time.Time
 }
 
+// LogRecord 审核日志读模型（管理后台查询）。
+type LogRecord struct {
+	ID        int
+	RequestID string
+	UserID    int
+	Platform  string
+	Endpoint  string
+	Mode      string
+	Flagged   bool
+	Source    string
+	Category  string
+	Score     float64
+	Excerpt   string
+	CreatedAt time.Time
+}
+
+// LogFilter 审核日志查询条件。
+type LogFilter struct {
+	Page     int
+	PageSize int
+	UserID   int // >0 时按用户过滤
+	Platform string
+	Flagged  *bool // 非 nil 时按命中过滤
+}
+
+// LogResult 审核日志分页结果。
+type LogResult struct {
+	List     []LogRecord
+	Total    int64
+	Page     int
+	PageSize int
+}
+
 // Repository 审核域持久化接口（第二批 ent 实现）。
 type Repository interface {
 	// InsertLog 落一条审核日志。
 	InsertLog(ctx context.Context, in LogInput) error
 	// CountViolationsSince 统计某用户 since 之后的命中次数（封禁判定用）。
 	CountViolationsSince(ctx context.Context, userID int, since time.Time) (int, error)
+	// ListLogs 分页查询审核日志（管理后台）。
+	ListLogs(ctx context.Context, f LogFilter) (LogResult, error)
 }
 
 // APIModerator 抽象 OpenAI Moderation API 能力，便于测试注入假实现。

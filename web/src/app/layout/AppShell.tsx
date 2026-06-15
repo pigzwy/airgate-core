@@ -28,6 +28,7 @@ import {
   ReceiptText,
   Puzzle,
   Settings,
+  ShieldAlert,
   UserRoundCog,
   LogOut,
   Languages,
@@ -64,6 +65,7 @@ const adminMenuItems: MenuItem[] = [
   { path: '/admin/proxies', labelKey: 'nav.proxies', icon: <Globe className="h-5 w-5" /> },
   { path: '/admin/usage', labelKey: 'nav.usage', icon: <ChartNoAxesCombined className="h-5 w-5" /> },
   { path: '/admin/ops', labelKey: 'nav.ops', icon: <Activity className="h-5 w-5" />, sectionKey: 'nav.system' },
+  { path: '/admin/moderation', labelKey: 'nav.moderation', icon: <ShieldAlert className="h-5 w-5" /> },
   { path: '/admin/plugins', labelKey: 'nav.plugins', icon: <Puzzle className="h-5 w-5" /> },
   { path: '/admin/settings', labelKey: 'nav.settings', icon: <Settings className="h-5 w-5" /> },
 ];

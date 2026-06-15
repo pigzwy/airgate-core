@@ -18,6 +18,7 @@ import (
 	appcompliance "github.com/DouDOU-start/airgate-core/internal/app/compliance"
 	appdashboard "github.com/DouDOU-start/airgate-core/internal/app/dashboard"
 	appgroup "github.com/DouDOU-start/airgate-core/internal/app/group"
+	appmoderation "github.com/DouDOU-start/airgate-core/internal/app/moderation"
 	appopenclaw "github.com/DouDOU-start/airgate-core/internal/app/openclaw"
 	appops "github.com/DouDOU-start/airgate-core/internal/app/ops"
 	apppluginadmin "github.com/DouDOU-start/airgate-core/internal/app/pluginadmin"
@@ -67,6 +68,7 @@ type HTTPHandlers struct {
 	Upgrade      *handler.UpgradeHandler
 	Ops          *handler.OpsHandler
 	Compliance   *handler.ComplianceHandler
+	Moderation   *handler.ModerationHandler
 
 	AccountService *appaccount.Service
 	// ComplianceService 暴露给 router，用于装配合规门中间件。
@@ -96,6 +98,11 @@ func NewHTTPHandlers(dep HTTPDependencies) *HTTPHandlers {
 	settingsStore := store.NewSettingsStore(dep.DB)
 	settingsService := appsettings.NewService(settingsStore)
 	complianceService := appcompliance.NewService(settingsService)
+	moderationAdmin := appmoderation.NewAdminService(
+		settingsService,
+		store.NewModerationStore(dep.DB),
+		moderationCrypto{secret: dep.Config.APIKeySecret()},
+	)
 	openclawService := appopenclaw.NewService(settingsService)
 	userStore := store.NewUserStore(dep.DB)
 	userService := appuser.NewService(userStore)
@@ -133,9 +140,24 @@ func NewHTTPHandlers(dep HTTPDependencies) *HTTPHandlers {
 		Upgrade:           handler.NewUpgradeHandler(upgradeService),
 		Ops:               handler.NewOpsHandler(dep.OpsService),
 		Compliance:        handler.NewComplianceHandler(complianceService),
+		Moderation:        handler.NewModerationHandler(moderationAdmin),
 		AccountService:    accountService,
 		ComplianceService: complianceService,
 	}
+}
+
+// moderationCrypto 用 auth 包 + secret 适配 app/moderation.Encryptor，
+// 供审核配置里的 OpenAI API key 加解密。
+type moderationCrypto struct {
+	secret string
+}
+
+func (m moderationCrypto) Encrypt(plain string) (string, error) {
+	return auth.EncryptAPIKey(plain, m.secret)
+}
+
+func (m moderationCrypto) Decrypt(enc string) (string, error) {
+	return auth.DecryptAPIKey(enc, m.secret)
 }
 
 // defaultBalanceAlertBody 余额预警邮件默认正文模板。

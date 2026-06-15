@@ -21,6 +21,7 @@ import {
   GroupsPage,
   lazyWithPreload,
   LoginPage,
+  ModerationPage,
   OpsPage,
   PluginPage,
   PluginsPage,
@@ -236,6 +237,7 @@ const adminOpsRoute = createRoute({
     mode: typeof search.mode === 'string' ? search.mode : undefined,
   }),
 });
+const adminModerationRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/moderation', component: renderPage(ModerationPage) });
 const adminPluginsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/plugins', component: renderPage(PluginsPage) });
 const adminSettingsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/settings', component: renderPage(SettingsPage) });
 
@@ -325,6 +327,7 @@ const routeTree = rootRoute.addChildren([
       adminProxiesRoute,
       adminUsageRoute,
       adminOpsRoute,
+      adminModerationRoute,
       adminPluginsRoute,
       adminSettingsRoute,
     ]),

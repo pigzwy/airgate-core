@@ -54,3 +54,50 @@ func (s *ModerationStore) CountViolationsSince(ctx context.Context, userID int, 
 		).
 		Count(ctx)
 }
+
+// ListLogs 分页查询审核日志。
+func (s *ModerationStore) ListLogs(ctx context.Context, f appmoderation.LogFilter) (appmoderation.LogResult, error) {
+	q := s.db.ModerationLog.Query()
+	if f.UserID > 0 {
+		q = q.Where(entmodlog.UserIDSnapshotEQ(f.UserID))
+	}
+	if f.Platform != "" {
+		q = q.Where(entmodlog.PlatformEQ(f.Platform))
+	}
+	if f.Flagged != nil {
+		q = q.Where(entmodlog.FlaggedEQ(*f.Flagged))
+	}
+
+	total, err := q.Clone().Count(ctx)
+	if err != nil {
+		return appmoderation.LogResult{}, err
+	}
+
+	rows, err := q.
+		Order(ent.Desc(entmodlog.FieldCreatedAt)).
+		Offset((f.Page - 1) * f.PageSize).
+		Limit(f.PageSize).
+		All(ctx)
+	if err != nil {
+		return appmoderation.LogResult{}, err
+	}
+
+	list := make([]appmoderation.LogRecord, 0, len(rows))
+	for _, r := range rows {
+		list = append(list, appmoderation.LogRecord{
+			ID:        r.ID,
+			RequestID: r.RequestID,
+			UserID:    r.UserIDSnapshot,
+			Platform:  r.Platform,
+			Endpoint:  r.Endpoint,
+			Mode:      r.Mode,
+			Flagged:   r.Flagged,
+			Source:    r.Source,
+			Category:  r.Category,
+			Score:     r.Score,
+			Excerpt:   r.Excerpt,
+			CreatedAt: r.CreatedAt,
+		})
+	}
+	return appmoderation.LogResult{List: list, Total: int64(total), Page: f.Page, PageSize: f.PageSize}, nil
+}

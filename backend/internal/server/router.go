@@ -106,6 +106,11 @@ func (s *Server) registerRoutes() {
 		adminGroup.POST("/compliance/accept", handlers.Compliance.Accept)
 		adminGroup.PUT("/compliance/enable", handlers.Compliance.SetEnabled)
 
+		// 内容审核（风控）：配置读写 + 审核日志查询
+		adminGroup.GET("/moderation/config", handlers.Moderation.GetConfig)
+		adminGroup.PUT("/moderation/config", handlers.Moderation.UpdateConfig)
+		adminGroup.GET("/moderation/logs", handlers.Moderation.ListLogs)
+
 		// 用户管理
 		adminGroup.GET("/users", handlers.User.ListUsers)
 		adminGroup.POST("/users", handlers.User.CreateUser)

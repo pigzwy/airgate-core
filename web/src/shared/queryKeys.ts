@@ -39,4 +39,6 @@ export const queryKeys = {
   opsErrorLogs: (...args: unknown[]) => ['ops-error-logs', ...args] as const,
   opsTrace: (...args: unknown[]) => ['ops-trace', ...args] as const,
   compliance: () => ['compliance'] as const,
+  moderationConfig: () => ['moderation-config'] as const,
+  moderationLogs: (...args: unknown[]) => ['moderation-logs', ...args] as const,
 } as const;

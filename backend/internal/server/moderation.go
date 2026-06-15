@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"log/slog"
 
 	"github.com/DouDOU-start/airgate-core/ent"
@@ -12,11 +11,7 @@ import (
 	"github.com/DouDOU-start/airgate-core/internal/infra/store"
 )
 
-// moderationConfigKey 审核配置在 settings 表的 key（group="moderation"）。
-const moderationConfigKey = "moderation_config"
-const moderationConfigGroup = "moderation"
-
-// newModerationService 构造内容审核服务并接好依赖：
+// newModerationService 构造内容审核检测服务并接好依赖：
 //   - OpenAI Moderation API 客户端
 //   - ent 仓储（命中落库）
 //   - settings 配置来源（解密 API key）
@@ -33,6 +28,7 @@ func newModerationService(db *ent.Client, secret string) *appmoderation.Service 
 }
 
 // moderationConfigProvider 从 settings(group=moderation) 读取并解密审核配置。
+// 复用 app/moderation.ConfigWire 作为存储 JSON 形态（与管理端写入单一来源）。
 type moderationConfigProvider struct {
 	settings appsettings.Repository
 	secret   string
@@ -40,48 +36,25 @@ type moderationConfigProvider struct {
 
 var _ appmoderation.ConfigProvider = (*moderationConfigProvider)(nil)
 
-// moderationConfigJSON settings 中存储的审核配置 JSON 形态。
-type moderationConfigJSON struct {
-	Enabled              bool               `json:"enabled"`
-	Mode                 string             `json:"mode"`
-	KeywordMode          string             `json:"keyword_mode"`
-	BlockedKeywords      []string           `json:"blocked_keywords"`
-	APIBaseURL           string             `json:"api_base_url"`
-	APIModel             string             `json:"api_model"`
-	APIKeys              []string           `json:"api_keys"` // 加密存储
-	TimeoutMs            int                `json:"timeout_ms"`
-	RetryCount           int                `json:"retry_count"`
-	Thresholds           map[string]float64 `json:"thresholds"`
-	BlockStatus          int                `json:"block_status"`
-	BlockMessage         string             `json:"block_message"`
-	AutoBanEnabled       bool               `json:"auto_ban_enabled"`
-	BanThreshold         int                `json:"ban_threshold"`
-	ViolationWindowHours int                `json:"violation_window_hours"`
-}
-
 func (p *moderationConfigProvider) Load(ctx context.Context) (appmoderation.Config, error) {
-	items, err := p.settings.List(ctx, moderationConfigGroup)
+	items, err := p.settings.List(ctx, appmoderation.SettingGroup)
 	if err != nil {
 		return appmoderation.Config{}, err
 	}
 	var raw string
 	for _, it := range items {
-		if it.Key == moderationConfigKey {
+		if it.Key == appmoderation.SettingKeyConfig {
 			raw = it.Value
 		}
 	}
-	if raw == "" {
-		return appmoderation.Config{}, nil // 未配置 = 禁用
-	}
-
-	var j moderationConfigJSON
-	if err := json.Unmarshal([]byte(raw), &j); err != nil {
+	w, err := appmoderation.ParseConfigWire(raw)
+	if err != nil {
 		return appmoderation.Config{}, err
 	}
 
-	// 解密 API key（明文绝不落库；解密失败的单个 key 跳过，不阻断其余）
-	keys := make([]string, 0, len(j.APIKeys))
-	for _, enc := range j.APIKeys {
+	// 解密 API key（明文绝不落库；单个解密失败跳过，不阻断其余）
+	keys := make([]string, 0, len(w.APIKeysEnc))
+	for _, enc := range w.APIKeysEnc {
 		if enc == "" {
 			continue
 		}
@@ -94,20 +67,20 @@ func (p *moderationConfigProvider) Load(ctx context.Context) (appmoderation.Conf
 	}
 
 	return appmoderation.Config{
-		Enabled:              j.Enabled,
-		Mode:                 appmoderation.Mode(j.Mode),
-		KeywordMode:          appmoderation.KeywordMode(j.KeywordMode),
-		BlockedKeywords:      j.BlockedKeywords,
-		APIBaseURL:           j.APIBaseURL,
-		APIModel:             j.APIModel,
+		Enabled:              w.Enabled,
+		Mode:                 appmoderation.Mode(w.Mode),
+		KeywordMode:          appmoderation.KeywordMode(w.KeywordMode),
+		BlockedKeywords:      w.BlockedKeywords,
+		APIBaseURL:           w.APIBaseURL,
+		APIModel:             w.APIModel,
 		APIKeys:              keys,
-		TimeoutMs:            j.TimeoutMs,
-		RetryCount:           j.RetryCount,
-		Thresholds:           j.Thresholds,
-		BlockStatus:          j.BlockStatus,
-		BlockMessage:         j.BlockMessage,
-		AutoBanEnabled:       j.AutoBanEnabled,
-		BanThreshold:         j.BanThreshold,
-		ViolationWindowHours: j.ViolationWindowHours,
+		TimeoutMs:            w.TimeoutMs,
+		RetryCount:           w.RetryCount,
+		Thresholds:           w.Thresholds,
+		BlockStatus:          w.BlockStatus,
+		BlockMessage:         w.BlockMessage,
+		AutoBanEnabled:       w.AutoBanEnabled,
+		BanThreshold:         w.BanThreshold,
+		ViolationWindowHours: w.ViolationWindowHours,
 	}, nil
 }
