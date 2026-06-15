@@ -12,7 +12,20 @@ import (
 const (
 	// stickyTTL 粘性会话默认过期时间
 	stickyTTL = 30 * time.Minute
+	// switchCounterTTL 切换率统计计数器保留时长（覆盖 24h 趋势查询）。
+	switchCounterTTL = 25 * time.Hour
 )
+
+// StickySetKey 返回某一分钟桶内「粘性绑定次数」计数器 Redis Key。
+// minute 为 unix 秒 / 60。运维侧（app/ops）按此格式读取以算切换率。
+func StickySetKey(minute int64) string {
+	return fmt.Sprintf("ops:sticky:set:%d", minute)
+}
+
+// StickySwitchKey 返回某一分钟桶内「账号切换次数」计数器 Redis Key。
+func StickySwitchKey(minute int64) string {
+	return fmt.Sprintf("ops:sticky:switch:%d", minute)
+}
 
 // StickySession 粘性会话管理
 // 通过 Redis 缓存 session → account 映射，实现对话上下文连续性
@@ -61,5 +74,19 @@ func (s *StickySession) Set(ctx context.Context, userID int, platform, sessionID
 	}
 
 	key := stickyKey(userID, platform, sessionID)
+
+	// 切换率统计（M13）：按分钟桶记录绑定次数与「账号变化」次数。
+	// 绑定到与上次不同的账号即视为一次切换（粘性会话被打破/重路由）。
+	minute := time.Now().Unix() / 60
+	old, err := s.rdb.Get(ctx, key).Result()
+	setKey := StickySetKey(minute)
+	s.rdb.Incr(ctx, setKey)
+	s.rdb.Expire(ctx, setKey, switchCounterTTL)
+	if err == nil && old != "" && old != strconv.Itoa(accountID) {
+		swKey := StickySwitchKey(minute)
+		s.rdb.Incr(ctx, swKey)
+		s.rdb.Expire(ctx, swKey, switchCounterTTL)
+	}
+
 	s.rdb.Set(ctx, key, strconv.Itoa(accountID), s.ttl)
 }

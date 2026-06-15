@@ -57,9 +57,11 @@ type OpsReporter interface {
 // 与 app/ops.ReportInput 字段一致，由接线层做转换）。
 type OpsReportInput struct {
 	RequestID          string
+	ClientRequestID    string
 	PluginID           string
 	Platform           string
 	Model              string
+	UpstreamModel      string
 	Endpoint           string
 	UserID             int
 	APIKeyID           int
@@ -395,8 +397,10 @@ type hostReportAccountResultRequest struct {
 // hostOpsReportRequest 插件经 ops.report_request 上报的请求级运维指标。
 type hostOpsReportRequest struct {
 	RequestID          string `json:"request_id"`
+	ClientRequestID    string `json:"client_request_id"`
 	Platform           string `json:"platform"`
 	Model              string `json:"model"`
+	UpstreamModel      string `json:"upstream_model"`
 	Endpoint           string `json:"endpoint"`
 	UserID             int    `json:"user_id"`
 	APIKeyID           int    `json:"api_key_id"`
@@ -767,9 +771,11 @@ func (h *HostService) opsReport(ctx context.Context, pluginID string, req hostOp
 	}
 	in := OpsReportInput{
 		RequestID:          req.RequestID,
+		ClientRequestID:    req.ClientRequestID,
 		PluginID:           pluginID,
 		Platform:           req.Platform,
 		Model:              req.Model,
+		UpstreamModel:      req.UpstreamModel,
 		Endpoint:           req.Endpoint,
 		UserID:             req.UserID,
 		APIKeyID:           req.APIKeyID,

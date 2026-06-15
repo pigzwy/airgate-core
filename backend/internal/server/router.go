@@ -101,6 +101,7 @@ func (s *Server) registerRoutes() {
 	adminGroup := v1.Group("/admin")
 	adminGroup.Use(middleware.JWTAuth(s.jwtMgr, s.db), middleware.AdminOnly())
 	{
+
 		// 用户管理
 		adminGroup.GET("/users", handlers.User.ListUsers)
 		adminGroup.POST("/users", handlers.User.CreateUser)
@@ -195,10 +196,35 @@ func (s *Server) registerRoutes() {
 		adminGroup.GET("/dashboard/stats", handlers.Dashboard.Stats)
 		adminGroup.GET("/dashboard/trend", handlers.Dashboard.Trend)
 
-		// 运维监控（管理员）：实时大盘 + 错误日志钻取
+		// 运维监控（管理员）：实时大盘 + 系统资源 + 分析 + 请求/错误日志钻取
 		adminGroup.GET("/ops/overview", handlers.Ops.Overview)
+		adminGroup.GET("/ops/health", handlers.Ops.Health)
+		adminGroup.GET("/ops/stream", handlers.Ops.Stream)
+		adminGroup.GET("/ops/system-metrics", handlers.Ops.SystemMetrics)
+		adminGroup.GET("/ops/analytics", handlers.Ops.Analytics)
+		adminGroup.GET("/ops/concurrency", handlers.Ops.Concurrency)
+		adminGroup.GET("/ops/switch-rate", handlers.Ops.SwitchRate)
+		adminGroup.GET("/ops/system-logs", handlers.Ops.SystemLogs)
+		adminGroup.GET("/ops/log-level", handlers.Ops.GetLogLevel)
+		adminGroup.PUT("/ops/log-level", handlers.Ops.SetLogLevel)
+		adminGroup.POST("/ops/log-level/reset", handlers.Ops.ResetLogLevel)
+
+		// 告警闭环（M3）：规则 CRUD + 事件 + 静音
+		adminGroup.GET("/ops/alert-rules", handlers.Ops.ListAlertRules)
+		adminGroup.POST("/ops/alert-rules", handlers.Ops.CreateAlertRule)
+		adminGroup.PUT("/ops/alert-rules/:id", handlers.Ops.UpdateAlertRule)
+		adminGroup.DELETE("/ops/alert-rules/:id", handlers.Ops.DeleteAlertRule)
+		adminGroup.GET("/ops/alert-events", handlers.Ops.ListAlertEvents)
+		adminGroup.POST("/ops/alert-events/:id/resolve", handlers.Ops.ResolveAlertEvent)
+		adminGroup.GET("/ops/alert-silences", handlers.Ops.ListSilences)
+		adminGroup.POST("/ops/alert-silences", handlers.Ops.CreateSilence)
+		adminGroup.DELETE("/ops/alert-silences/:id", handlers.Ops.DeleteSilence)
 		adminGroup.GET("/ops/error-logs", handlers.Ops.ErrorLogs)
 		adminGroup.GET("/ops/error-logs/:id", handlers.Ops.ErrorDetail)
+		// request-logs 为 error-logs 的别名（M6：成功/全部请求钻取，复用同一 handler）
+		adminGroup.GET("/ops/request-logs", handlers.Ops.ErrorLogs)
+		adminGroup.GET("/ops/request-logs/:id", handlers.Ops.ErrorDetail)
+		adminGroup.GET("/ops/trace", handlers.Ops.Trace)
 
 		// core 版本信息（仅管理员可见，避免对外暴露版本指纹）
 		adminGroup.GET("/version", handlers.Version.GetVersion)

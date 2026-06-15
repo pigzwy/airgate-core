@@ -26,6 +26,10 @@ func (h *OpsHandler) handleError(logMessage string, err error) (int, string) {
 		return http.StatusNotFound, "请求日志不存在"
 	case errors.Is(err, appops.ErrInvalidTimeRange):
 		return http.StatusBadRequest, "时间范围无效"
+	case errors.Is(err, appops.ErrAlertRuleNotFound):
+		return http.StatusNotFound, "告警规则不存在"
+	case errors.Is(err, appops.ErrInvalidAlertRule):
+		return http.StatusBadRequest, "告警规则参数无效"
 	default:
 		return http.StatusInternalServerError, "查询失败"
 	}

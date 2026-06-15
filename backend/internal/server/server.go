@@ -3,6 +3,7 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -58,9 +59,11 @@ type opsReporterAdapter struct {
 func (a opsReporterAdapter) Report(ctx context.Context, in plugin.OpsReportInput) error {
 	return a.svc.Report(ctx, appops.ReportInput{
 		RequestID:          in.RequestID,
+		ClientRequestID:    in.ClientRequestID,
 		PluginID:           in.PluginID,
 		Platform:           in.Platform,
 		Model:              in.Model,
+		UpstreamModel:      in.UpstreamModel,
 		Endpoint:           in.Endpoint,
 		UserID:             in.UserID,
 		APIKeyID:           in.APIKeyID,
@@ -103,6 +106,12 @@ func NewServer(cfg *config.Config, db *ent.Client, rdb *redis.Client) *Server {
 	// Ops 运维域：请求级日志采集 + 聚合。插件经 Host.Invoke("ops.report_request") 上报，
 	// 落库 ops_request_log，后台聚合成 ops_window_stat 供大盘查询。
 	opsService := appops.NewService(store.NewOpsStore(db), nil)
+	// 注入 Redis client 与后台任务注册表，供系统资源大盘（/ops/system-metrics）采集。
+	opsService.SetRedis(rdb)
+	opsJobs := appops.NewJobRegistry()
+	opsService.SetJobRegistry(opsJobs)
+	// 注入并发计数器，供并发统计（/ops/concurrency）读取实时并发。
+	opsService.SetConcurrencyCounter(concurrency)
 	// HostService 通过 hashicorp/go-plugin GRPCBroker 暴露给所有插件子进程，
 	// 替代旧的 admin HTTP API + admin_api_key 模式。必须在加载任何插件之前注入。
 	hostService := plugin.NewHostService(db, pluginMgr, sched, concurrency, calculator, recorder)
@@ -161,6 +170,23 @@ func NewServer(cfg *config.Config, db *ent.Client, rdb *redis.Client) *Server {
 	}
 
 	return s
+}
+
+// SetDBStatsFunc 注入 DB 连接池统计函数（系统资源大盘用）。
+//
+// 由 main 在创建 Server 后调用，传入底层 *sql.DB.Stats——本层不持有 entsql.Driver，
+// 用函数解耦，避免把驱动细节渗进 server / service。
+func (s *Server) SetDBStatsFunc(fn func() sql.DBStats) {
+	if s.opsService != nil {
+		s.opsService.SetDBStatsFunc(fn)
+	}
+}
+
+// SetLogController 注入运行时日志级别控制器（LogSink）。由 main 在创建 Server 后调用。
+func (s *Server) SetLogController(c appops.LogController) {
+	if s.opsService != nil {
+		s.opsService.SetLogController(c)
+	}
 }
 
 // convertMarketEntries 把 config 层 MarketEntry 转换为 plugin 层 MarketplacePlugin

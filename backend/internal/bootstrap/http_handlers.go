@@ -99,28 +99,35 @@ func NewHTTPHandlers(dep HTTPDependencies) *HTTPHandlers {
 	userService.SetBalanceAlertCallback(func(email string, balance float64, threshold float64) {
 		balanceAlertSendEmail(settingsService, email, balance, threshold)
 	})
+
+	// 告警通知：注入基于 settings SMTP 的邮件发送器（M3）。
+	// 运维配置：注入基于 settings(group=ops) 的可调配置来源（M15）。
+	if dep.OpsService != nil {
+		dep.OpsService.SetNotifier(&opsEmailNotifier{settings: settingsService})
+		dep.OpsService.SetConfigProvider(&opsSettingsProvider{settings: settingsService})
+	}
 	usageStore := store.NewUsageStore(dep.DB)
 	usageService := appusage.NewService(usageStore, dep.Redis)
 
 	upgradeService := upgrade.NewService(upgrade.DetectMode(), dep.Redis)
 
 	return &HTTPHandlers{
-		Auth:           handler.NewAuthHandler(authService, settingsService, userService, verifyCodeStore, dep.DB, dep.JWTMgr),
-		User:           handler.NewUserHandler(userService, settingsService),
-		Account:        handler.NewAccountHandler(accountService, dep.Scheduler),
-		Group:          handler.NewGroupHandler(groupService),
-		APIKey:         handler.NewAPIKeyHandler(apiKeyService),
-		Subscription:   handler.NewSubscriptionHandler(subscriptionService),
-		Usage:          handler.NewUsageHandler(usageService),
-		Proxy:          handler.NewProxyHandler(proxyService),
-		Settings:       handler.NewSettingsHandler(settingsService, dep.Config.APIKeySecret()),
-		Dashboard:      handler.NewDashboardHandler(dashboardService),
-		Plugin:         handler.NewPluginHandler(pluginAdminService),
-		OpenClaw:       handler.NewOpenClawHandler(openclawService),
-		Version:        handler.NewVersionHandler(),
-		Upgrade:        handler.NewUpgradeHandler(upgradeService),
-		Ops:            handler.NewOpsHandler(dep.OpsService),
-		AccountService: accountService,
+		Auth:              handler.NewAuthHandler(authService, settingsService, userService, verifyCodeStore, dep.DB, dep.JWTMgr),
+		User:              handler.NewUserHandler(userService, settingsService),
+		Account:           handler.NewAccountHandler(accountService, dep.Scheduler),
+		Group:             handler.NewGroupHandler(groupService),
+		APIKey:            handler.NewAPIKeyHandler(apiKeyService),
+		Subscription:      handler.NewSubscriptionHandler(subscriptionService),
+		Usage:             handler.NewUsageHandler(usageService),
+		Proxy:             handler.NewProxyHandler(proxyService),
+		Settings:          handler.NewSettingsHandler(settingsService, dep.Config.APIKeySecret()),
+		Dashboard:         handler.NewDashboardHandler(dashboardService),
+		Plugin:            handler.NewPluginHandler(pluginAdminService),
+		OpenClaw:          handler.NewOpenClawHandler(openclawService),
+		Version:           handler.NewVersionHandler(),
+		Upgrade:           handler.NewUpgradeHandler(upgradeService),
+		Ops:               handler.NewOpsHandler(dep.OpsService),
+		AccountService:    accountService,
 	}
 }
 
@@ -145,6 +152,70 @@ const defaultBalanceAlertBody = `<div style="font-family: -apple-system, BlinkMa
 <p style="color: #c0c0c0; font-size: 11px; margin: 0; text-align: center;">此邮件由 {{site_name}} 系统自动发送</p>
 </div>
 </div>`
+
+// opsSettingsProvider 实现 ops.ConfigProvider，从 settings(group=ops) 读取运维可调配置。
+type opsSettingsProvider struct {
+	settings *appsettings.Service
+}
+
+func (p *opsSettingsProvider) OpsSettings(ctx context.Context) map[string]string {
+	items, err := p.settings.List(ctx, "ops")
+	if err != nil {
+		return nil
+	}
+	m := make(map[string]string, len(items))
+	for _, it := range items {
+		m[it.Key] = it.Value
+	}
+	return m
+}
+
+// opsEmailNotifier 实现 ops.Notifier，从 settings 读取 SMTP 配置发送告警邮件。
+type opsEmailNotifier struct {
+	settings *appsettings.Service
+}
+
+func (n *opsEmailNotifier) Send(ctx context.Context, to, subject, body string) error {
+	cfg, ok := loadSMTPConfig(ctx, n.settings)
+	if !ok {
+		return fmt.Errorf("SMTP 未配置")
+	}
+	return mailer.New(cfg).Send(to, subject, body)
+}
+
+// loadSMTPConfig 从 settings 读取 SMTP 配置。ok=false 表示未配置 Host。
+func loadSMTPConfig(ctx context.Context, settingsService *appsettings.Service) (mailer.Config, bool) {
+	smtpSettings, err := settingsService.List(ctx, "smtp")
+	if err != nil {
+		return mailer.Config{}, false
+	}
+	cfg := mailer.Config{}
+	for _, s := range smtpSettings {
+		switch s.Key {
+		case "smtp_host":
+			cfg.Host = s.Value
+		case "smtp_port":
+			cfg.Port, _ = strconv.Atoi(s.Value)
+		case "smtp_username":
+			cfg.Username = s.Value
+		case "smtp_password":
+			cfg.Password = s.Value
+		case "smtp_from_email":
+			cfg.FromAddr = s.Value
+		case "smtp_from_name":
+			cfg.FromName = s.Value
+		case "smtp_use_tls":
+			cfg.UseTLS = s.Value == "true"
+		}
+	}
+	if cfg.Host == "" {
+		return mailer.Config{}, false
+	}
+	if cfg.Port == 0 {
+		cfg.Port = 587
+	}
+	return cfg, true
+}
 
 // balanceAlertSendEmail 发送余额预警邮件。
 func balanceAlertSendEmail(settingsService *appsettings.Service, email string, balance, threshold float64) {

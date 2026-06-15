@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	stdsql "database/sql"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"syscall"
 	"time"
 
@@ -23,6 +25,7 @@ import (
 
 	"github.com/DouDOU-start/airgate-core/ent"
 	"github.com/DouDOU-start/airgate-core/ent/migrate"
+	appops "github.com/DouDOU-start/airgate-core/internal/app/ops"
 	"github.com/DouDOU-start/airgate-core/internal/bootstrap"
 	"github.com/DouDOU-start/airgate-core/internal/config"
 	"github.com/DouDOU-start/airgate-core/internal/i18n"
@@ -203,6 +206,21 @@ func startMainServer(cfg *config.Config) {
 	// 回填历史 API Key 的 key_hint 以及 reseller markup 新列等启动整理任务
 	bootstrap.RunStartupTasks(db, drv, cfg.APIKeySecret())
 
+	// 配置结构化日志 + DB sink（M11：系统日志落库 + 运行时调级）。
+	// 必须在表迁移之后：sink worker 异步写 ops_system_log。
+	logLevelVar := new(slog.LevelVar)
+	logLevelVar.Set(appops.ParseLevel(cfg.Log.Level))
+	hopts := &slog.HandlerOptions{Level: logLevelVar}
+	var baseHandler slog.Handler
+	if strings.EqualFold(cfg.Log.Format, "json") {
+		baseHandler = slog.NewJSONHandler(os.Stderr, hopts)
+	} else {
+		baseHandler = slog.NewTextHandler(os.Stderr, hopts)
+	}
+	logSink := appops.NewLogSink(store.NewOpsStore(db), baseHandler, logLevelVar)
+	logSink.Start(context.Background())
+	slog.SetDefault(slog.New(logSink))
+
 	// 初始化 Redis
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
@@ -233,6 +251,10 @@ func startMainServer(cfg *config.Config) {
 
 	// 创建并启动 HTTP 服务器
 	srv := server.NewServer(cfg, db, rdb)
+	// 注入 DB 连接池统计，供运维大盘系统资源卡采集（drv 持有底层 *sql.DB）。
+	srv.SetDBStatsFunc(func() stdsql.DBStats { return drv.DB().Stats() })
+	// 注入日志控制器，供运维后台运行时调整日志级别（/ops/log-level）。
+	srv.SetLogController(logSink)
 
 	// 启动插件系统（非阻塞，失败不影响核心服务）
 	srv.StartPlugins(context.Background())

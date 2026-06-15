@@ -2,8 +2,11 @@ package ops
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 // Service 运维（Ops）域用例编排。
@@ -15,8 +18,17 @@ import (
 //
 // 不碰 gin/http；入参用本包类型，出参用领域类型 + 哨兵错误。
 type Service struct {
-	repo   Repository
-	logger *slog.Logger
+	repo     Repository
+	logger   *slog.Logger
+	jobs     *JobRegistry       // 后台任务注册表，注入后系统资源卡可展示 Jobs
+	rdb      *redis.Client      // 系统资源卡采集 Redis 连接池用（可选）
+	dbStats  func() sql.DBStats // DB 连接池采集（可选）；由装配期注入，避免本层 import ent
+	counter  ConcurrencyCounter // 当前并发计数来源（scheduler），可选
+	logCtl   LogController      // 运行时日志级别控制（LogSink），可选
+	notifier Notifier           // 告警邮件通知器，可选
+	config   ConfigProvider     // 运维可调配置来源（settings group=ops），可选
+
+	lastReportDate string // 邮件日报去重：已发送的日期（YYYY-MM-DD）
 }
 
 // NewService 构造 Ops Service。
@@ -25,6 +37,19 @@ func NewService(repo Repository, logger *slog.Logger) *Service {
 		logger = slog.Default()
 	}
 	return &Service{repo: repo, logger: logger}
+}
+
+// SetRedis 注入 Redis client（系统资源采集用）。装配期调用一次。
+func (s *Service) SetRedis(rdb *redis.Client) {
+	s.rdb = rdb
+}
+
+// SetDBStatsFunc 注入 DB 连接池统计函数（系统资源采集用）。装配期调用一次。
+//
+// 用函数注入而非直传 *sql.DB / *ent.Client：本层（service）不得 import ent，
+// 而 database/sql 是标准库，sql.DBStats 作为出参不破坏分层。
+func (s *Service) SetDBStatsFunc(fn func() sql.DBStats) {
+	s.dbStats = fn
 }
 
 // Report 落一条插件上报的请求级指标。
@@ -65,13 +90,42 @@ func (s *Service) GetRequestLog(ctx context.Context, id int) (RequestLog, error)
 	return s.repo.GetRequestLog(ctx, id)
 }
 
+// Trace 返回一次请求的重试链路（同 client_request_id 的所有日志，按时间升序）。
+func (s *Service) Trace(ctx context.Context, clientRequestID string) ([]RequestLog, error) {
+	if clientRequestID == "" {
+		return nil, nil
+	}
+	return s.repo.ListTrace(ctx, clientRequestID)
+}
+
+// Analytics 按时间范围实时分析（全分位/TTFT/直方图/错误分布/Token/平台维度）。
+//
+// rangeSeconds<=0 时默认 1 小时；上限 7 天（防止扫描过多原始日志）。
+func (s *Service) Analytics(ctx context.Context, rangeSeconds int64, platform string) (Analytics, error) {
+	if rangeSeconds <= 0 {
+		rangeSeconds = 3600
+	}
+	const maxRange = int64(7 * 24 * 3600)
+	if rangeSeconds > maxRange {
+		rangeSeconds = maxRange
+	}
+	now := time.Now()
+	f := AnalyticsFilter{
+		Start:    now.Add(-time.Duration(rangeSeconds) * time.Second),
+		End:      now,
+		Platform: platform,
+	}
+	return s.repo.QueryAnalytics(ctx, f)
+}
+
 // Overview 实时大盘概览：最近一个窗口汇总 + 最近 trendWindows 个窗口趋势。
-func (s *Service) Overview(ctx context.Context, trendWindows int) (Overview, error) {
-	if trendWindows <= 0 || trendWindows > 240 {
-		trendWindows = 60 // 默认最近 60 个窗口（1min 窗口即最近 1 小时）
+// platform 为空时取全平台汇总，否则取该平台的趋势。
+func (s *Service) Overview(ctx context.Context, trendWindows int, platform string) (Overview, error) {
+	if trendWindows <= 0 || trendWindows > 1440 {
+		trendWindows = 60 // 默认最近 60 个窗口（1min 窗口即最近 1 小时）；上限 24h
 	}
 	since := time.Now().Add(-time.Duration(trendWindows) * time.Minute)
-	windows, err := s.repo.ListWindowStats(ctx, since)
+	windows, err := s.repo.ListWindowStats(ctx, since, platform)
 	if err != nil {
 		return Overview{}, err
 	}
@@ -131,7 +185,7 @@ func (s *Service) AggregateOnce(ctx context.Context, windowStart time.Time) erro
 //
 // logRetention 控制原始日志保留时长；statRetention 控制聚合窗口保留时长
 // （聚合窗口体积小，可比原始日志保留更久）。
-func (s *Service) Purge(ctx context.Context, logRetention, statRetention time.Duration) error {
+func (s *Service) Purge(ctx context.Context, logRetention, statRetention, sysLogRetention time.Duration) error {
 	now := time.Now()
 	if logRetention > 0 {
 		n, err := s.repo.PurgeRequestLogsBefore(ctx, now.Add(-logRetention))
@@ -151,14 +205,25 @@ func (s *Service) Purge(ctx context.Context, logRetention, statRetention time.Du
 			s.logger.Info("ops_window_stat_purged", "count", n, "retention", statRetention.String())
 		}
 	}
+	// 系统日志按独立保留期清理。
+	if sysLogRetention > 0 {
+		n, err := s.repo.PurgeSystemLogsBefore(ctx, now.Add(-sysLogRetention))
+		if err != nil {
+			return err
+		}
+		if n > 0 {
+			s.logger.Info("ops_system_log_purged", "count", n, "retention", sysLogRetention.String())
+		}
+	}
 	return nil
 }
 
 // MVP 默认保留期（后续可配置化）。
 const (
-	defaultLogRetention  = 7 * 24 * time.Hour  // 原始请求日志保留 7 天
-	defaultStatRetention = 30 * 24 * time.Hour // 聚合窗口保留 30 天（体积小，留久点）
-	purgeInterval        = time.Hour           // 清理周期
+	defaultLogRetention    = 7 * 24 * time.Hour  // 原始请求日志保留 7 天
+	defaultStatRetention   = 30 * 24 * time.Hour // 聚合窗口保留 30 天（体积小，留久点）
+	defaultSysLogRetention = 7 * 24 * time.Hour  // 系统日志保留 7 天
+	purgeInterval          = time.Hour           // 清理周期
 )
 
 // StartAggregationLoop 启动后台聚合 + 清理循环。由 server 在启动期调用，ctx 取消即退出。
@@ -168,9 +233,14 @@ const (
 func (s *Service) StartAggregationLoop(ctx context.Context) {
 	go s.runAggregationLoop(ctx)
 	go s.runPurgeLoop(ctx)
+	go s.runAlertLoop(ctx)
 }
 
 func (s *Service) runAggregationLoop(ctx context.Context) {
+	var job *JobHandle
+	if s.jobs != nil {
+		job = s.jobs.Register("ops_aggregation")
+	}
 	ticker := time.NewTicker(aggregateWindowSeconds * time.Second)
 	defer ticker.Stop()
 	for {
@@ -178,17 +248,29 @@ func (s *Service) runAggregationLoop(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
+			if job != nil {
+				job.Heartbeat()
+			}
 			// 聚合上一个完整整分钟窗口
 			prevWindow := time.Now().Add(-time.Minute).Truncate(time.Minute)
 			if err := s.AggregateOnce(ctx, prevWindow); err != nil {
 				s.logger.Warn("ops_aggregate_window_failed",
 					"window_start", prevWindow.Format(time.RFC3339), "error", err)
+				if job != nil {
+					job.MarkError(err)
+				}
+			} else if job != nil {
+				job.MarkRun()
 			}
 		}
 	}
 }
 
 func (s *Service) runPurgeLoop(ctx context.Context) {
+	var job *JobHandle
+	if s.jobs != nil {
+		job = s.jobs.Register("ops_purge")
+	}
 	ticker := time.NewTicker(purgeInterval)
 	defer ticker.Stop()
 	for {
@@ -196,8 +278,17 @@ func (s *Service) runPurgeLoop(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			if err := s.Purge(ctx, defaultLogRetention, defaultStatRetention); err != nil {
+			if job != nil {
+				job.Heartbeat()
+			}
+			logRet, statRet, sysRet := s.retentionDurations(ctx)
+			if err := s.Purge(ctx, logRet, statRet, sysRet); err != nil {
 				s.logger.Warn("ops_purge_failed", "error", err)
+				if job != nil {
+					job.MarkError(err)
+				}
+			} else if job != nil {
+				job.MarkRun()
 			}
 		}
 	}
