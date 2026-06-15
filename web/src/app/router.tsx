@@ -225,7 +225,17 @@ const adminGroupsRoute = createRoute({ getParentRoute: () => adminLayout, path: 
 const adminSubscriptionsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/subscriptions', component: renderPage(SubscriptionsPage) });
 const adminProxiesRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/proxies', component: renderPage(ProxiesPage) });
 const adminUsageRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/usage', component: renderPage(UsagePage) });
-const adminOpsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/ops', component: renderPage(OpsPage) });
+const adminOpsRoute = createRoute({
+  getParentRoute: () => adminLayout,
+  path: '/admin/ops',
+  component: renderPage(OpsPage),
+  // 运维大盘筛选持久化到 URL（时间范围 / 平台 / 请求明细模式），刷新与分享不丢状态。
+  validateSearch: (search: Record<string, unknown>) => ({
+    range: typeof search.range === 'string' ? search.range : undefined,
+    platform: typeof search.platform === 'string' ? search.platform : undefined,
+    mode: typeof search.mode === 'string' ? search.mode : undefined,
+  }),
+});
 const adminPluginsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/plugins', component: renderPage(PluginsPage) });
 const adminSettingsRoute = createRoute({ getParentRoute: () => adminLayout, path: '/admin/settings', component: renderPage(SettingsPage) });
 

@@ -933,9 +933,11 @@ export interface OpsOverviewResp {
 export interface OpsRequestLogResp {
   id: number;
   request_id: string;
+  client_request_id: string;
   plugin_id: string;
   platform: string;
   model: string;
+  upstream_model: string;
   endpoint: string;
   user_id: number;
   api_key_id: number;
@@ -962,6 +964,261 @@ export interface OpsErrorLogQuery {
   model?: string;
   error_kind?: string;
   only_errors?: number;
+  success_mode?: string;
+  min_duration_ms?: number;
+  sort_by?: string;
+  sort_desc?: number;
   start?: string;
   end?: string;
+}
+
+// ===== 分析（Analytics）=====
+export interface OpsPercentiles {
+  p50: number;
+  p90: number;
+  p95: number;
+  p99: number;
+  max: number;
+  avg: number;
+  samples: number;
+}
+
+export interface OpsHistogramBucket {
+  label: string;
+  min_ms: number;
+  max_ms: number;
+  count: number;
+}
+
+export interface OpsErrorClass {
+  kind: string;
+  label: string;
+  count: number;
+  ratio: number;
+}
+
+export interface OpsModelToken {
+  model: string;
+  requests: number;
+  input_tokens: number;
+  output_tokens: number;
+}
+
+export interface OpsPlatformStat {
+  platform: string;
+  requests: number;
+  error_requests: number;
+  error_rate: number;
+}
+
+export interface OpsAnalyticsSummary {
+  range_seconds: number;
+  total_requests: number;
+  success_requests: number;
+  error_requests: number;
+  error_rate: number;
+  rps: number;
+  sampled: boolean;
+}
+
+export interface OpsAnalyticsResp {
+  summary: OpsAnalyticsSummary;
+  latency: OpsPercentiles;
+  ttft: OpsPercentiles;
+  histogram: OpsHistogramBucket[];
+  error_distribution: OpsErrorClass[];
+  tokens_by_model: OpsModelToken[];
+  platform_breakdown: OpsPlatformStat[];
+}
+
+export interface OpsAnalyticsQuery {
+  range_seconds?: number;
+  platform?: string;
+}
+
+// ===== 并发统计（M7）=====
+export interface OpsConcurrencyItem {
+  key: string;
+  current: number;
+  max: number;
+  usage: number;
+}
+
+export interface OpsAccountConcurrency {
+  account_id: number;
+  name: string;
+  platform: string;
+  current: number;
+  max: number;
+  usage: number;
+  state: string;
+  recovery_seconds: number;
+}
+
+export interface OpsAccountAvailability {
+  active: number;
+  rate_limited: number;
+  degraded: number;
+  disabled: number;
+  total: number;
+  soonest_recovery_seconds: number;
+}
+
+export interface OpsConcurrencyResp {
+  availability: OpsAccountAvailability;
+  by_account: OpsAccountConcurrency[];
+  by_platform: OpsConcurrencyItem[];
+  by_group: OpsConcurrencyItem[];
+  total_current: number;
+  total_max: number;
+}
+
+// 切换率趋势（M13）
+export interface OpsSwitchRatePoint {
+  minute: string;
+  sets: number;
+  switches: number;
+  switch_rate: number;
+}
+
+// ===== 系统日志（M11）=====
+export interface OpsSystemLogResp {
+  id: number;
+  level: string;
+  component: string;
+  message: string;
+  request_id: string;
+  attrs: string;
+  created_at: string;
+}
+
+export interface OpsSystemLogQuery {
+  page?: number;
+  page_size?: number;
+  level?: string;
+  component?: string;
+  request_id?: string;
+  keyword?: string;
+  start?: string;
+  end?: string;
+}
+
+export interface OpsLogLevelResp {
+  level: string;
+  default: string;
+  dropped: number;
+}
+
+// ===== 健康分数（M4）=====
+export interface OpsDiagnostic {
+  level: string;
+  title: string;
+  detail: string;
+  suggestion: string;
+}
+
+export interface OpsHealthResp {
+  score: number;
+  grade: string;
+  business_sub: number;
+  infra_sub: number;
+  diagnostics: OpsDiagnostic[];
+  captured_at: string;
+}
+
+// ===== 告警（M3）=====
+export interface OpsAlertRule {
+  id: number;
+  name: string;
+  metric: string;
+  operator: string;
+  threshold: number;
+  window_seconds: number;
+  severity: string;
+  enabled: boolean;
+  cooldown_seconds: number;
+  notify_email: string;
+  platform: string;
+  last_fired_at: string;
+  created_at: string;
+}
+
+export interface OpsAlertRuleInput {
+  name: string;
+  metric: string;
+  operator: string;
+  threshold: number;
+  window_seconds: number;
+  severity: string;
+  enabled: boolean;
+  cooldown_seconds: number;
+  notify_email: string;
+  platform: string;
+}
+
+export interface OpsAlertEvent {
+  id: number;
+  rule_id: number;
+  rule_name: string;
+  metric: string;
+  operator: string;
+  value: number;
+  threshold: number;
+  severity: string;
+  status: string;
+  message: string;
+  created_at: string;
+  resolved_at: string;
+}
+
+export interface OpsAlertSilence {
+  id: number;
+  rule_id: number;
+  reason: string;
+  until: string;
+  created_at: string;
+}
+
+// 系统资源快照（/ops/system-metrics）
+export interface OpsMemoryResp {
+  heap_alloc_bytes: number;
+  sys_bytes: number;
+  num_gc: number;
+}
+
+export interface OpsRedisResp {
+  hits: number;
+  misses: number;
+  timeouts: number;
+  total_conns: number;
+  idle_conns: number;
+  stale_conns: number;
+}
+
+export interface OpsDBResp {
+  max_open_conns: number;
+  open_conns: number;
+  in_use: number;
+  idle: number;
+  wait_count: number;
+  wait_duration_ms: number;
+  max_idle_closed: number;
+  max_lifetime_closed: number;
+}
+
+export interface OpsJobResp {
+  name: string;
+  running: boolean;
+  last_heartbeat: string;
+  last_run_at: string;
+  last_error: string;
+}
+
+export interface OpsSystemMetricsResp {
+  goroutines: number;
+  memory: OpsMemoryResp;
+  db: OpsDBResp;
+  redis: OpsRedisResp;
+  jobs: OpsJobResp[];
+  captured_at: string;
 }
