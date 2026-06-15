@@ -442,6 +442,20 @@ func (s *Service) ToggleStatus(ctx context.Context, id int) (ToggleResult, error
 	return ToggleResult{ID: updated.ID, Status: updated.Status}, nil
 }
 
+// BanUser 将用户标记为禁用（status=disabled）。供内容审核自动封禁调用。
+// 幂等：已禁用用户再次调用无副作用。
+func (s *Service) BanUser(ctx context.Context, id int) error {
+	disabled := "disabled"
+	if _, err := s.repo.Update(ctx, id, Mutation{Status: &disabled}); err != nil {
+		sdk.LoggerFromContext(ctx).Error("user_auto_ban_failed",
+			sdk.LogFieldUserID, id, sdk.LogFieldError, err)
+		return err
+	}
+	sdk.LoggerFromContext(ctx).Info("user_disabled",
+		sdk.LogFieldUserID, id, sdk.LogFieldReason, "moderation_auto_ban")
+	return nil
+}
+
 // ListBalanceLogs 查询用户余额历史。
 func (s *Service) ListBalanceLogs(ctx context.Context, userID, page, pageSize int) (BalanceLogList, error) {
 	page, pageSize = normalizePage(page, pageSize)

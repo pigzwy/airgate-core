@@ -7,6 +7,7 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent"
 	appmoderation "github.com/DouDOU-start/airgate-core/internal/app/moderation"
 	appsettings "github.com/DouDOU-start/airgate-core/internal/app/settings"
+	appuser "github.com/DouDOU-start/airgate-core/internal/app/user"
 	"github.com/DouDOU-start/airgate-core/internal/auth"
 	"github.com/DouDOU-start/airgate-core/internal/infra/store"
 )
@@ -24,6 +25,8 @@ func newModerationService(db *ent.Client, secret string) *appmoderation.Service 
 		settings: store.NewSettingsStore(db),
 		secret:   secret,
 	})
+	// 自动封禁：命中达阈值时把用户标记为禁用（app/user.Service 满足 UserBanner）。
+	svc.SetUserBanner(appuser.NewService(store.NewUserStore(db)))
 	return svc
 }
 

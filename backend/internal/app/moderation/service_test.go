@@ -4,7 +4,67 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 )
+
+// fakeRepo 可配置的 Repository 假实现。
+type fakeRepo struct {
+	count    int
+	countErr error
+}
+
+func (f *fakeRepo) InsertLog(context.Context, LogInput) error { return nil }
+func (f *fakeRepo) CountViolationsSince(context.Context, int, time.Time) (int, error) {
+	return f.count, f.countErr
+}
+func (f *fakeRepo) ListLogs(context.Context, LogFilter) (LogResult, error) {
+	return LogResult{}, nil
+}
+
+// fakeBanner 记录是否被调用。
+type fakeBanner struct {
+	banned int // 被封禁的 userID，0=未调用
+	err    error
+}
+
+func (f *fakeBanner) BanUser(_ context.Context, userID int) error {
+	f.banned = userID
+	return f.err
+}
+
+func TestMaybeAutoBan(t *testing.T) {
+	cfg := Config{AutoBanEnabled: true, BanThreshold: 10, ViolationWindowHours: 720}
+	cases := []struct {
+		name     string
+		cfg      Config
+		count    int
+		countErr error
+		wantBan  bool
+	}{
+		{"达阈值→封禁", cfg, 10, nil, true},
+		{"超阈值→封禁", cfg, 15, nil, true},
+		{"未达阈值→不封", cfg, 9, nil, false},
+		{"未启用→不封", Config{AutoBanEnabled: false, BanThreshold: 10}, 99, nil, false},
+		{"计数出错→不封", cfg, 99, errors.New("db"), false},
+		{"阈值为0→不封", Config{AutoBanEnabled: true, BanThreshold: 0}, 99, nil, false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			repo := &fakeRepo{count: c.count, countErr: c.countErr}
+			banner := &fakeBanner{}
+			svc := NewService(nil, nil)
+			svc.SetRepository(repo)
+			svc.SetUserBanner(banner)
+			svc.maybeAutoBan(context.Background(), 42, c.cfg)
+			if c.wantBan && banner.banned != 42 {
+				t.Errorf("应封禁 user 42，实际 banned=%d", banner.banned)
+			}
+			if !c.wantBan && banner.banned != 0 {
+				t.Errorf("不应封禁，实际 banned=%d", banner.banned)
+			}
+		})
+	}
+}
 
 // fakeModerator 可配置的 APIModerator 假实现。
 type fakeModerator struct {

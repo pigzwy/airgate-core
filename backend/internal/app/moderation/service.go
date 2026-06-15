@@ -20,6 +20,7 @@ type Service struct {
 	api    APIModerator
 	repo   Repository     // 命中落库（nil 时不落，best-effort）
 	cfg    ConfigProvider // 运行期配置来源（nil 时视为未配置=放行）
+	banner UserBanner     // 自动封禁（nil 时不封）
 	logger *slog.Logger
 }
 
@@ -36,6 +37,12 @@ func (s *Service) SetRepository(repo Repository) { s.repo = repo }
 
 // SetConfigProvider 注入运行期配置来源。装配期调用。
 func (s *Service) SetConfigProvider(cfg ConfigProvider) { s.cfg = cfg }
+
+// SetUserBanner 注入自动封禁实现。装配期调用。
+func (s *Service) SetUserBanner(b UserBanner) { s.banner = b }
+
+// defaultBanWindow 违规计数窗口缺省值（30 天）。
+const defaultBanWindow = 720 * time.Hour
 
 // logRetention 异步落库的超时，独立于已结束的请求 context。
 const logInsertTimeout = 3 * time.Second
@@ -71,16 +78,45 @@ func (s *Service) Evaluate(ctx context.Context, in CheckInput) Decision {
 			Excerpt:   dec.Excerpt,
 			CreatedAt: time.Now(),
 		}
+		userID := in.UserID
 		go func() {
 			bctx, cancel := context.WithTimeout(context.Background(), logInsertTimeout)
 			defer cancel()
 			if err := s.repo.InsertLog(bctx, logIn); err != nil {
 				s.logger.Warn("moderation_log_insert_failed", "request_id", logIn.RequestID, "error", err)
+				return
 			}
+			// 日志已落库，count 包含本次命中——据此判断是否自动封禁
+			s.maybeAutoBan(bctx, userID, cfg)
 		}()
 	}
 
 	return dec
+}
+
+// maybeAutoBan 在窗口内命中次数达阈值时禁用用户。best-effort，仅记日志不返回错误。
+func (s *Service) maybeAutoBan(ctx context.Context, userID int, cfg Config) {
+	if !cfg.AutoBanEnabled || s.banner == nil || cfg.BanThreshold <= 0 || userID <= 0 {
+		return
+	}
+	window := time.Duration(cfg.ViolationWindowHours) * time.Hour
+	if window <= 0 {
+		window = defaultBanWindow
+	}
+	count, err := s.repo.CountViolationsSince(ctx, userID, time.Now().Add(-window))
+	if err != nil {
+		s.logger.Warn("moderation_violation_count_failed", "user_id", userID, "error", err)
+		return
+	}
+	if count < cfg.BanThreshold {
+		return
+	}
+	if err := s.banner.BanUser(ctx, userID); err != nil {
+		s.logger.Warn("moderation_auto_ban_failed", "user_id", userID, "error", err)
+		return
+	}
+	s.logger.Info("moderation_user_auto_banned",
+		"user_id", userID, "count", count, "threshold", cfg.BanThreshold)
 }
 
 // Check 对一次请求做内容审核，返回判定。

@@ -160,6 +160,12 @@ type ConfigProvider interface {
 	Load(ctx context.Context) (Config, error)
 }
 
+// UserBanner 自动封禁能力：把用户标记为禁用（status=disabled）。
+// 由 app/user.Service 满足。未注入时不执行自动封禁。
+type UserBanner interface {
+	BanUser(ctx context.Context, userID int) error
+}
+
 // DefaultThresholds 各分类默认阈值（对齐 sub2api 量级）。
 func DefaultThresholds() map[string]float64 {
 	return map[string]float64{
