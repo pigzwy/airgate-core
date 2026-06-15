@@ -15,6 +15,7 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/moderationlog"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertevent"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertrule"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertsilence"
@@ -46,6 +47,7 @@ const (
 	TypeAccount          = "Account"
 	TypeBalanceLog       = "BalanceLog"
 	TypeGroup            = "Group"
+	TypeModerationLog    = "ModerationLog"
 	TypeOpsAlertEvent    = "OpsAlertEvent"
 	TypeOpsAlertRule     = "OpsAlertRule"
 	TypeOpsAlertSilence  = "OpsAlertSilence"
@@ -5674,6 +5676,941 @@ func (m *GroupMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Group edge %s", name)
+}
+
+// ModerationLogMutation represents an operation that mutates the ModerationLog nodes in the graph.
+type ModerationLogMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *int
+	request_id          *string
+	user_id_snapshot    *int
+	adduser_id_snapshot *int
+	platform            *string
+	endpoint            *string
+	mode                *string
+	flagged             *bool
+	source              *string
+	category            *string
+	score               *float64
+	addscore            *float64
+	excerpt             *string
+	created_at          *time.Time
+	clearedFields       map[string]struct{}
+	done                bool
+	oldValue            func(context.Context) (*ModerationLog, error)
+	predicates          []predicate.ModerationLog
+}
+
+var _ ent.Mutation = (*ModerationLogMutation)(nil)
+
+// moderationlogOption allows management of the mutation configuration using functional options.
+type moderationlogOption func(*ModerationLogMutation)
+
+// newModerationLogMutation creates new mutation for the ModerationLog entity.
+func newModerationLogMutation(c config, op Op, opts ...moderationlogOption) *ModerationLogMutation {
+	m := &ModerationLogMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeModerationLog,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withModerationLogID sets the ID field of the mutation.
+func withModerationLogID(id int) moderationlogOption {
+	return func(m *ModerationLogMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ModerationLog
+		)
+		m.oldValue = func(ctx context.Context) (*ModerationLog, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ModerationLog.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withModerationLog sets the old ModerationLog of the mutation.
+func withModerationLog(node *ModerationLog) moderationlogOption {
+	return func(m *ModerationLogMutation) {
+		m.oldValue = func(context.Context) (*ModerationLog, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ModerationLogMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ModerationLogMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ModerationLogMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ModerationLogMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ModerationLog.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetRequestID sets the "request_id" field.
+func (m *ModerationLogMutation) SetRequestID(s string) {
+	m.request_id = &s
+}
+
+// RequestID returns the value of the "request_id" field in the mutation.
+func (m *ModerationLogMutation) RequestID() (r string, exists bool) {
+	v := m.request_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRequestID returns the old "request_id" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldRequestID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRequestID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRequestID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRequestID: %w", err)
+	}
+	return oldValue.RequestID, nil
+}
+
+// ResetRequestID resets all changes to the "request_id" field.
+func (m *ModerationLogMutation) ResetRequestID() {
+	m.request_id = nil
+}
+
+// SetUserIDSnapshot sets the "user_id_snapshot" field.
+func (m *ModerationLogMutation) SetUserIDSnapshot(i int) {
+	m.user_id_snapshot = &i
+	m.adduser_id_snapshot = nil
+}
+
+// UserIDSnapshot returns the value of the "user_id_snapshot" field in the mutation.
+func (m *ModerationLogMutation) UserIDSnapshot() (r int, exists bool) {
+	v := m.user_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserIDSnapshot returns the old "user_id_snapshot" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldUserIDSnapshot(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserIDSnapshot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserIDSnapshot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserIDSnapshot: %w", err)
+	}
+	return oldValue.UserIDSnapshot, nil
+}
+
+// AddUserIDSnapshot adds i to the "user_id_snapshot" field.
+func (m *ModerationLogMutation) AddUserIDSnapshot(i int) {
+	if m.adduser_id_snapshot != nil {
+		*m.adduser_id_snapshot += i
+	} else {
+		m.adduser_id_snapshot = &i
+	}
+}
+
+// AddedUserIDSnapshot returns the value that was added to the "user_id_snapshot" field in this mutation.
+func (m *ModerationLogMutation) AddedUserIDSnapshot() (r int, exists bool) {
+	v := m.adduser_id_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserIDSnapshot resets all changes to the "user_id_snapshot" field.
+func (m *ModerationLogMutation) ResetUserIDSnapshot() {
+	m.user_id_snapshot = nil
+	m.adduser_id_snapshot = nil
+}
+
+// SetPlatform sets the "platform" field.
+func (m *ModerationLogMutation) SetPlatform(s string) {
+	m.platform = &s
+}
+
+// Platform returns the value of the "platform" field in the mutation.
+func (m *ModerationLogMutation) Platform() (r string, exists bool) {
+	v := m.platform
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlatform returns the old "platform" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldPlatform(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlatform is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlatform requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlatform: %w", err)
+	}
+	return oldValue.Platform, nil
+}
+
+// ResetPlatform resets all changes to the "platform" field.
+func (m *ModerationLogMutation) ResetPlatform() {
+	m.platform = nil
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *ModerationLogMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *ModerationLogMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *ModerationLogMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetMode sets the "mode" field.
+func (m *ModerationLogMutation) SetMode(s string) {
+	m.mode = &s
+}
+
+// Mode returns the value of the "mode" field in the mutation.
+func (m *ModerationLogMutation) Mode() (r string, exists bool) {
+	v := m.mode
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMode returns the old "mode" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldMode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMode: %w", err)
+	}
+	return oldValue.Mode, nil
+}
+
+// ResetMode resets all changes to the "mode" field.
+func (m *ModerationLogMutation) ResetMode() {
+	m.mode = nil
+}
+
+// SetFlagged sets the "flagged" field.
+func (m *ModerationLogMutation) SetFlagged(b bool) {
+	m.flagged = &b
+}
+
+// Flagged returns the value of the "flagged" field in the mutation.
+func (m *ModerationLogMutation) Flagged() (r bool, exists bool) {
+	v := m.flagged
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFlagged returns the old "flagged" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldFlagged(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFlagged is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFlagged requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFlagged: %w", err)
+	}
+	return oldValue.Flagged, nil
+}
+
+// ResetFlagged resets all changes to the "flagged" field.
+func (m *ModerationLogMutation) ResetFlagged() {
+	m.flagged = nil
+}
+
+// SetSource sets the "source" field.
+func (m *ModerationLogMutation) SetSource(s string) {
+	m.source = &s
+}
+
+// Source returns the value of the "source" field in the mutation.
+func (m *ModerationLogMutation) Source() (r string, exists bool) {
+	v := m.source
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSource returns the old "source" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldSource(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSource is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSource requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSource: %w", err)
+	}
+	return oldValue.Source, nil
+}
+
+// ResetSource resets all changes to the "source" field.
+func (m *ModerationLogMutation) ResetSource() {
+	m.source = nil
+}
+
+// SetCategory sets the "category" field.
+func (m *ModerationLogMutation) SetCategory(s string) {
+	m.category = &s
+}
+
+// Category returns the value of the "category" field in the mutation.
+func (m *ModerationLogMutation) Category() (r string, exists bool) {
+	v := m.category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCategory returns the old "category" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldCategory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCategory: %w", err)
+	}
+	return oldValue.Category, nil
+}
+
+// ResetCategory resets all changes to the "category" field.
+func (m *ModerationLogMutation) ResetCategory() {
+	m.category = nil
+}
+
+// SetScore sets the "score" field.
+func (m *ModerationLogMutation) SetScore(f float64) {
+	m.score = &f
+	m.addscore = nil
+}
+
+// Score returns the value of the "score" field in the mutation.
+func (m *ModerationLogMutation) Score() (r float64, exists bool) {
+	v := m.score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScore returns the old "score" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+	}
+	return oldValue.Score, nil
+}
+
+// AddScore adds f to the "score" field.
+func (m *ModerationLogMutation) AddScore(f float64) {
+	if m.addscore != nil {
+		*m.addscore += f
+	} else {
+		m.addscore = &f
+	}
+}
+
+// AddedScore returns the value that was added to the "score" field in this mutation.
+func (m *ModerationLogMutation) AddedScore() (r float64, exists bool) {
+	v := m.addscore
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetScore resets all changes to the "score" field.
+func (m *ModerationLogMutation) ResetScore() {
+	m.score = nil
+	m.addscore = nil
+}
+
+// SetExcerpt sets the "excerpt" field.
+func (m *ModerationLogMutation) SetExcerpt(s string) {
+	m.excerpt = &s
+}
+
+// Excerpt returns the value of the "excerpt" field in the mutation.
+func (m *ModerationLogMutation) Excerpt() (r string, exists bool) {
+	v := m.excerpt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExcerpt returns the old "excerpt" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldExcerpt(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExcerpt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExcerpt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExcerpt: %w", err)
+	}
+	return oldValue.Excerpt, nil
+}
+
+// ResetExcerpt resets all changes to the "excerpt" field.
+func (m *ModerationLogMutation) ResetExcerpt() {
+	m.excerpt = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ModerationLogMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ModerationLogMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ModerationLog entity.
+// If the ModerationLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModerationLogMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ModerationLogMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// Where appends a list predicates to the ModerationLogMutation builder.
+func (m *ModerationLogMutation) Where(ps ...predicate.ModerationLog) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ModerationLogMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ModerationLogMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ModerationLog, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ModerationLogMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ModerationLogMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ModerationLog).
+func (m *ModerationLogMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ModerationLogMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.request_id != nil {
+		fields = append(fields, moderationlog.FieldRequestID)
+	}
+	if m.user_id_snapshot != nil {
+		fields = append(fields, moderationlog.FieldUserIDSnapshot)
+	}
+	if m.platform != nil {
+		fields = append(fields, moderationlog.FieldPlatform)
+	}
+	if m.endpoint != nil {
+		fields = append(fields, moderationlog.FieldEndpoint)
+	}
+	if m.mode != nil {
+		fields = append(fields, moderationlog.FieldMode)
+	}
+	if m.flagged != nil {
+		fields = append(fields, moderationlog.FieldFlagged)
+	}
+	if m.source != nil {
+		fields = append(fields, moderationlog.FieldSource)
+	}
+	if m.category != nil {
+		fields = append(fields, moderationlog.FieldCategory)
+	}
+	if m.score != nil {
+		fields = append(fields, moderationlog.FieldScore)
+	}
+	if m.excerpt != nil {
+		fields = append(fields, moderationlog.FieldExcerpt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, moderationlog.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ModerationLogMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case moderationlog.FieldRequestID:
+		return m.RequestID()
+	case moderationlog.FieldUserIDSnapshot:
+		return m.UserIDSnapshot()
+	case moderationlog.FieldPlatform:
+		return m.Platform()
+	case moderationlog.FieldEndpoint:
+		return m.Endpoint()
+	case moderationlog.FieldMode:
+		return m.Mode()
+	case moderationlog.FieldFlagged:
+		return m.Flagged()
+	case moderationlog.FieldSource:
+		return m.Source()
+	case moderationlog.FieldCategory:
+		return m.Category()
+	case moderationlog.FieldScore:
+		return m.Score()
+	case moderationlog.FieldExcerpt:
+		return m.Excerpt()
+	case moderationlog.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ModerationLogMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case moderationlog.FieldRequestID:
+		return m.OldRequestID(ctx)
+	case moderationlog.FieldUserIDSnapshot:
+		return m.OldUserIDSnapshot(ctx)
+	case moderationlog.FieldPlatform:
+		return m.OldPlatform(ctx)
+	case moderationlog.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	case moderationlog.FieldMode:
+		return m.OldMode(ctx)
+	case moderationlog.FieldFlagged:
+		return m.OldFlagged(ctx)
+	case moderationlog.FieldSource:
+		return m.OldSource(ctx)
+	case moderationlog.FieldCategory:
+		return m.OldCategory(ctx)
+	case moderationlog.FieldScore:
+		return m.OldScore(ctx)
+	case moderationlog.FieldExcerpt:
+		return m.OldExcerpt(ctx)
+	case moderationlog.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ModerationLog field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ModerationLogMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case moderationlog.FieldRequestID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRequestID(v)
+		return nil
+	case moderationlog.FieldUserIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserIDSnapshot(v)
+		return nil
+	case moderationlog.FieldPlatform:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlatform(v)
+		return nil
+	case moderationlog.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	case moderationlog.FieldMode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMode(v)
+		return nil
+	case moderationlog.FieldFlagged:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFlagged(v)
+		return nil
+	case moderationlog.FieldSource:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSource(v)
+		return nil
+	case moderationlog.FieldCategory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCategory(v)
+		return nil
+	case moderationlog.FieldScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScore(v)
+		return nil
+	case moderationlog.FieldExcerpt:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExcerpt(v)
+		return nil
+	case moderationlog.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ModerationLog field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ModerationLogMutation) AddedFields() []string {
+	var fields []string
+	if m.adduser_id_snapshot != nil {
+		fields = append(fields, moderationlog.FieldUserIDSnapshot)
+	}
+	if m.addscore != nil {
+		fields = append(fields, moderationlog.FieldScore)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ModerationLogMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case moderationlog.FieldUserIDSnapshot:
+		return m.AddedUserIDSnapshot()
+	case moderationlog.FieldScore:
+		return m.AddedScore()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ModerationLogMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case moderationlog.FieldUserIDSnapshot:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserIDSnapshot(v)
+		return nil
+	case moderationlog.FieldScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ModerationLog numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ModerationLogMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ModerationLogMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ModerationLogMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ModerationLog nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ModerationLogMutation) ResetField(name string) error {
+	switch name {
+	case moderationlog.FieldRequestID:
+		m.ResetRequestID()
+		return nil
+	case moderationlog.FieldUserIDSnapshot:
+		m.ResetUserIDSnapshot()
+		return nil
+	case moderationlog.FieldPlatform:
+		m.ResetPlatform()
+		return nil
+	case moderationlog.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	case moderationlog.FieldMode:
+		m.ResetMode()
+		return nil
+	case moderationlog.FieldFlagged:
+		m.ResetFlagged()
+		return nil
+	case moderationlog.FieldSource:
+		m.ResetSource()
+		return nil
+	case moderationlog.FieldCategory:
+		m.ResetCategory()
+		return nil
+	case moderationlog.FieldScore:
+		m.ResetScore()
+		return nil
+	case moderationlog.FieldExcerpt:
+		m.ResetExcerpt()
+		return nil
+	case moderationlog.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ModerationLog field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ModerationLogMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ModerationLogMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ModerationLogMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ModerationLogMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ModerationLogMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ModerationLogMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ModerationLogMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ModerationLog unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ModerationLogMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ModerationLog edge %s", name)
 }
 
 // OpsAlertEventMutation represents an operation that mutates the OpsAlertEvent nodes in the graph.

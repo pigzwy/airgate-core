@@ -9,6 +9,7 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/moderationlog"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertevent"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertrule"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertsilence"
@@ -212,6 +213,52 @@ func init() {
 	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
 	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	moderationlogFields := schema.ModerationLog{}.Fields()
+	_ = moderationlogFields
+	// moderationlogDescRequestID is the schema descriptor for request_id field.
+	moderationlogDescRequestID := moderationlogFields[0].Descriptor()
+	// moderationlog.DefaultRequestID holds the default value on creation for the request_id field.
+	moderationlog.DefaultRequestID = moderationlogDescRequestID.Default.(string)
+	// moderationlogDescUserIDSnapshot is the schema descriptor for user_id_snapshot field.
+	moderationlogDescUserIDSnapshot := moderationlogFields[1].Descriptor()
+	// moderationlog.DefaultUserIDSnapshot holds the default value on creation for the user_id_snapshot field.
+	moderationlog.DefaultUserIDSnapshot = moderationlogDescUserIDSnapshot.Default.(int)
+	// moderationlogDescPlatform is the schema descriptor for platform field.
+	moderationlogDescPlatform := moderationlogFields[2].Descriptor()
+	// moderationlog.DefaultPlatform holds the default value on creation for the platform field.
+	moderationlog.DefaultPlatform = moderationlogDescPlatform.Default.(string)
+	// moderationlogDescEndpoint is the schema descriptor for endpoint field.
+	moderationlogDescEndpoint := moderationlogFields[3].Descriptor()
+	// moderationlog.DefaultEndpoint holds the default value on creation for the endpoint field.
+	moderationlog.DefaultEndpoint = moderationlogDescEndpoint.Default.(string)
+	// moderationlogDescMode is the schema descriptor for mode field.
+	moderationlogDescMode := moderationlogFields[4].Descriptor()
+	// moderationlog.DefaultMode holds the default value on creation for the mode field.
+	moderationlog.DefaultMode = moderationlogDescMode.Default.(string)
+	// moderationlogDescFlagged is the schema descriptor for flagged field.
+	moderationlogDescFlagged := moderationlogFields[5].Descriptor()
+	// moderationlog.DefaultFlagged holds the default value on creation for the flagged field.
+	moderationlog.DefaultFlagged = moderationlogDescFlagged.Default.(bool)
+	// moderationlogDescSource is the schema descriptor for source field.
+	moderationlogDescSource := moderationlogFields[6].Descriptor()
+	// moderationlog.DefaultSource holds the default value on creation for the source field.
+	moderationlog.DefaultSource = moderationlogDescSource.Default.(string)
+	// moderationlogDescCategory is the schema descriptor for category field.
+	moderationlogDescCategory := moderationlogFields[7].Descriptor()
+	// moderationlog.DefaultCategory holds the default value on creation for the category field.
+	moderationlog.DefaultCategory = moderationlogDescCategory.Default.(string)
+	// moderationlogDescScore is the schema descriptor for score field.
+	moderationlogDescScore := moderationlogFields[8].Descriptor()
+	// moderationlog.DefaultScore holds the default value on creation for the score field.
+	moderationlog.DefaultScore = moderationlogDescScore.Default.(float64)
+	// moderationlogDescExcerpt is the schema descriptor for excerpt field.
+	moderationlogDescExcerpt := moderationlogFields[9].Descriptor()
+	// moderationlog.DefaultExcerpt holds the default value on creation for the excerpt field.
+	moderationlog.DefaultExcerpt = moderationlogDescExcerpt.Default.(string)
+	// moderationlogDescCreatedAt is the schema descriptor for created_at field.
+	moderationlogDescCreatedAt := moderationlogFields[10].Descriptor()
+	// moderationlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	moderationlog.DefaultCreatedAt = moderationlogDescCreatedAt.Default.(func() time.Time)
 	opsalerteventFields := schema.OpsAlertEvent{}.Fields()
 	_ = opsalerteventFields
 	// opsalerteventDescRuleID is the schema descriptor for rule_id field.

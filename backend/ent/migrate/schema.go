@@ -135,6 +135,44 @@ var (
 		Columns:    GroupsColumns,
 		PrimaryKey: []*schema.Column{GroupsColumns[0]},
 	}
+	// ModerationLogsColumns holds the columns for the "moderation_logs" table.
+	ModerationLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "request_id", Type: field.TypeString, Default: ""},
+		{Name: "user_id_snapshot", Type: field.TypeInt, Default: 0},
+		{Name: "platform", Type: field.TypeString, Default: ""},
+		{Name: "endpoint", Type: field.TypeString, Default: ""},
+		{Name: "mode", Type: field.TypeString, Default: ""},
+		{Name: "flagged", Type: field.TypeBool, Default: false},
+		{Name: "source", Type: field.TypeString, Default: ""},
+		{Name: "category", Type: field.TypeString, Default: ""},
+		{Name: "score", Type: field.TypeFloat64, Default: 0},
+		{Name: "excerpt", Type: field.TypeString, Size: 2147483647, Default: ""},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// ModerationLogsTable holds the schema information for the "moderation_logs" table.
+	ModerationLogsTable = &schema.Table{
+		Name:       "moderation_logs",
+		Columns:    ModerationLogsColumns,
+		PrimaryKey: []*schema.Column{ModerationLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "moderation_log_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ModerationLogsColumns[11]},
+			},
+			{
+				Name:    "moderation_log_user_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ModerationLogsColumns[2], ModerationLogsColumns[11]},
+			},
+			{
+				Name:    "moderation_log_flagged_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ModerationLogsColumns[6], ModerationLogsColumns[11]},
+			},
+		},
+	}
 	// OpsAlertEventsColumns holds the columns for the "ops_alert_events" table.
 	OpsAlertEventsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -721,6 +759,7 @@ var (
 		AccountsTable,
 		BalanceLogsTable,
 		GroupsTable,
+		ModerationLogsTable,
 		OpsAlertEventsTable,
 		OpsAlertRulesTable,
 		OpsAlertSilencesTable,

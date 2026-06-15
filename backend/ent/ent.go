@@ -16,6 +16,7 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/moderationlog"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertevent"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertrule"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertsilence"
@@ -94,6 +95,7 @@ func checkColumn(table, column string) error {
 			account.Table:          account.ValidColumn,
 			balancelog.Table:       balancelog.ValidColumn,
 			group.Table:            group.ValidColumn,
+			moderationlog.Table:    moderationlog.ValidColumn,
 			opsalertevent.Table:    opsalertevent.ValidColumn,
 			opsalertrule.Table:     opsalertrule.ValidColumn,
 			opsalertsilence.Table:  opsalertsilence.ValidColumn,

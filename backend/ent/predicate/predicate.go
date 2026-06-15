@@ -18,6 +18,9 @@ type BalanceLog func(*sql.Selector)
 // Group is the predicate function for group builders.
 type Group func(*sql.Selector)
 
+// ModerationLog is the predicate function for moderationlog builders.
+type ModerationLog func(*sql.Selector)
+
 // OpsAlertEvent is the predicate function for opsalertevent builders.
 type OpsAlertEvent func(*sql.Selector)
 

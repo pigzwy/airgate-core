@@ -19,6 +19,7 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/moderationlog"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertevent"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertrule"
 	"github.com/DouDOU-start/airgate-core/ent/opsalertsilence"
@@ -48,6 +49,8 @@ type Client struct {
 	BalanceLog *BalanceLogClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// ModerationLog is the client for interacting with the ModerationLog builders.
+	ModerationLog *ModerationLogClient
 	// OpsAlertEvent is the client for interacting with the OpsAlertEvent builders.
 	OpsAlertEvent *OpsAlertEventClient
 	// OpsAlertRule is the client for interacting with the OpsAlertRule builders.
@@ -91,6 +94,7 @@ func (c *Client) init() {
 	c.Account = NewAccountClient(c.config)
 	c.BalanceLog = NewBalanceLogClient(c.config)
 	c.Group = NewGroupClient(c.config)
+	c.ModerationLog = NewModerationLogClient(c.config)
 	c.OpsAlertEvent = NewOpsAlertEventClient(c.config)
 	c.OpsAlertRule = NewOpsAlertRuleClient(c.config)
 	c.OpsAlertSilence = NewOpsAlertSilenceClient(c.config)
@@ -201,6 +205,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Account:          NewAccountClient(cfg),
 		BalanceLog:       NewBalanceLogClient(cfg),
 		Group:            NewGroupClient(cfg),
+		ModerationLog:    NewModerationLogClient(cfg),
 		OpsAlertEvent:    NewOpsAlertEventClient(cfg),
 		OpsAlertRule:     NewOpsAlertRuleClient(cfg),
 		OpsAlertSilence:  NewOpsAlertSilenceClient(cfg),
@@ -238,6 +243,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Account:          NewAccountClient(cfg),
 		BalanceLog:       NewBalanceLogClient(cfg),
 		Group:            NewGroupClient(cfg),
+		ModerationLog:    NewModerationLogClient(cfg),
 		OpsAlertEvent:    NewOpsAlertEventClient(cfg),
 		OpsAlertRule:     NewOpsAlertRuleClient(cfg),
 		OpsAlertSilence:  NewOpsAlertSilenceClient(cfg),
@@ -281,10 +287,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsAlertEvent, c.OpsAlertRule,
-		c.OpsAlertSilence, c.OpsRequestLog, c.OpsSystemLog, c.OpsWindowStat, c.Plugin,
-		c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
-		c.UserSubscription,
+		c.APIKey, c.Account, c.BalanceLog, c.Group, c.ModerationLog, c.OpsAlertEvent,
+		c.OpsAlertRule, c.OpsAlertSilence, c.OpsRequestLog, c.OpsSystemLog,
+		c.OpsWindowStat, c.Plugin, c.PluginSource, c.Proxy, c.Setting, c.Task,
+		c.UsageLog, c.User, c.UserSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -294,10 +300,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsAlertEvent, c.OpsAlertRule,
-		c.OpsAlertSilence, c.OpsRequestLog, c.OpsSystemLog, c.OpsWindowStat, c.Plugin,
-		c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
-		c.UserSubscription,
+		c.APIKey, c.Account, c.BalanceLog, c.Group, c.ModerationLog, c.OpsAlertEvent,
+		c.OpsAlertRule, c.OpsAlertSilence, c.OpsRequestLog, c.OpsSystemLog,
+		c.OpsWindowStat, c.Plugin, c.PluginSource, c.Proxy, c.Setting, c.Task,
+		c.UsageLog, c.User, c.UserSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -314,6 +320,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BalanceLog.mutate(ctx, m)
 	case *GroupMutation:
 		return c.Group.mutate(ctx, m)
+	case *ModerationLogMutation:
+		return c.ModerationLog.mutate(ctx, m)
 	case *OpsAlertEventMutation:
 		return c.OpsAlertEvent.mutate(ctx, m)
 	case *OpsAlertRuleMutation:
@@ -1068,6 +1076,139 @@ func (c *GroupClient) mutate(ctx context.Context, m *GroupMutation) (Value, erro
 		return (&GroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Group mutation op: %q", m.Op())
+	}
+}
+
+// ModerationLogClient is a client for the ModerationLog schema.
+type ModerationLogClient struct {
+	config
+}
+
+// NewModerationLogClient returns a client for the ModerationLog from the given config.
+func NewModerationLogClient(c config) *ModerationLogClient {
+	return &ModerationLogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `moderationlog.Hooks(f(g(h())))`.
+func (c *ModerationLogClient) Use(hooks ...Hook) {
+	c.hooks.ModerationLog = append(c.hooks.ModerationLog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `moderationlog.Intercept(f(g(h())))`.
+func (c *ModerationLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ModerationLog = append(c.inters.ModerationLog, interceptors...)
+}
+
+// Create returns a builder for creating a ModerationLog entity.
+func (c *ModerationLogClient) Create() *ModerationLogCreate {
+	mutation := newModerationLogMutation(c.config, OpCreate)
+	return &ModerationLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ModerationLog entities.
+func (c *ModerationLogClient) CreateBulk(builders ...*ModerationLogCreate) *ModerationLogCreateBulk {
+	return &ModerationLogCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ModerationLogClient) MapCreateBulk(slice any, setFunc func(*ModerationLogCreate, int)) *ModerationLogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ModerationLogCreateBulk{err: fmt.Errorf("calling to ModerationLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ModerationLogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ModerationLogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ModerationLog.
+func (c *ModerationLogClient) Update() *ModerationLogUpdate {
+	mutation := newModerationLogMutation(c.config, OpUpdate)
+	return &ModerationLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ModerationLogClient) UpdateOne(ml *ModerationLog) *ModerationLogUpdateOne {
+	mutation := newModerationLogMutation(c.config, OpUpdateOne, withModerationLog(ml))
+	return &ModerationLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ModerationLogClient) UpdateOneID(id int) *ModerationLogUpdateOne {
+	mutation := newModerationLogMutation(c.config, OpUpdateOne, withModerationLogID(id))
+	return &ModerationLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ModerationLog.
+func (c *ModerationLogClient) Delete() *ModerationLogDelete {
+	mutation := newModerationLogMutation(c.config, OpDelete)
+	return &ModerationLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ModerationLogClient) DeleteOne(ml *ModerationLog) *ModerationLogDeleteOne {
+	return c.DeleteOneID(ml.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ModerationLogClient) DeleteOneID(id int) *ModerationLogDeleteOne {
+	builder := c.Delete().Where(moderationlog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ModerationLogDeleteOne{builder}
+}
+
+// Query returns a query builder for ModerationLog.
+func (c *ModerationLogClient) Query() *ModerationLogQuery {
+	return &ModerationLogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeModerationLog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ModerationLog entity by its id.
+func (c *ModerationLogClient) Get(ctx context.Context, id int) (*ModerationLog, error) {
+	return c.Query().Where(moderationlog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ModerationLogClient) GetX(ctx context.Context, id int) *ModerationLog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ModerationLogClient) Hooks() []Hook {
+	return c.hooks.ModerationLog
+}
+
+// Interceptors returns the client interceptors.
+func (c *ModerationLogClient) Interceptors() []Interceptor {
+	return c.inters.ModerationLog
+}
+
+func (c *ModerationLogClient) mutate(ctx context.Context, m *ModerationLogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ModerationLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ModerationLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ModerationLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ModerationLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ModerationLog mutation op: %q", m.Op())
 	}
 }
 
@@ -3128,12 +3269,12 @@ func (c *UserSubscriptionClient) mutate(ctx context.Context, m *UserSubscription
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		APIKey, Account, BalanceLog, Group, OpsAlertEvent, OpsAlertRule,
+		APIKey, Account, BalanceLog, Group, ModerationLog, OpsAlertEvent, OpsAlertRule,
 		OpsAlertSilence, OpsRequestLog, OpsSystemLog, OpsWindowStat, Plugin,
 		PluginSource, Proxy, Setting, Task, UsageLog, User, UserSubscription []ent.Hook
 	}
 	inters struct {
-		APIKey, Account, BalanceLog, Group, OpsAlertEvent, OpsAlertRule,
+		APIKey, Account, BalanceLog, Group, ModerationLog, OpsAlertEvent, OpsAlertRule,
 		OpsAlertSilence, OpsRequestLog, OpsSystemLog, OpsWindowStat, Plugin,
 		PluginSource, Proxy, Setting, Task, UsageLog, User,
 		UserSubscription []ent.Interceptor

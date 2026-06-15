@@ -20,6 +20,8 @@ type Tx struct {
 	BalanceLog *BalanceLogClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// ModerationLog is the client for interacting with the ModerationLog builders.
+	ModerationLog *ModerationLogClient
 	// OpsAlertEvent is the client for interacting with the OpsAlertEvent builders.
 	OpsAlertEvent *OpsAlertEventClient
 	// OpsAlertRule is the client for interacting with the OpsAlertRule builders.
@@ -183,6 +185,7 @@ func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
 	tx.BalanceLog = NewBalanceLogClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
+	tx.ModerationLog = NewModerationLogClient(tx.config)
 	tx.OpsAlertEvent = NewOpsAlertEventClient(tx.config)
 	tx.OpsAlertRule = NewOpsAlertRuleClient(tx.config)
 	tx.OpsAlertSilence = NewOpsAlertSilenceClient(tx.config)
