@@ -16,6 +16,12 @@
 > - **新增「管理员合规确认门」**（三节平台特性）：admin 登录后须确认合规声明才放行（中间件 + `docs/legal/admin-compliance.*`），airgate 无。
 > - **新增「用户×平台 USD 配额」**（三节用量限额）：`UserPlatformQuota` 表，每用户对各平台日/周/月 USD 限额（feat(quota) 2026-05-26），airgate 无。
 > - 复核仍准确：支付 Stripe/Airwallex/退款/商户快照/审计日志（四节）；health 算术 challenge + 请求模板 + Replace 模式（五节）；系统日志多维筛选（八节）。
+>
+> **校准记录（2026-06-15，三大块落地并提交）**：本会话完成并 commit 了三条线，本文档相应"缺失"项已不再准确，要点：
+> - **运维 Ops 基本补齐**：`ops-feature-roadmap.md` M1~M16 全部 `[x]`——告警闭环、系统日志+运行时级别、健康分数+诊断、SSE 实时推送、并发四维卡、TTFT+全分位、延迟直方图、错误分布饼图、切换率、OpenAI Token 统计、设置中心、URL深链/全屏 都已做。**仅剩**：claude/kiro 插件上报铺开、CPU/DB 资源卡（M1 的 2/6）、分段延迟 trace（待 SDK 扩字段）。第三/五/八节相关行据此更新。
+> - **管理员合规确认门** 前后端完整落地（`app/compliance` + 中间件 + 确认弹窗 + 设置开关，默认关闭）。三节平台特性该项已做。
+> - **内容审核 moderation** 落地：检测核心（敏感词+OpenAI API+脱敏）+ forwarder 预检执行 + 管理 API/前端 ModerationPage + 自动封禁（status=disabled）。**仍缺**：模型黑名单（all/include/exclude）、错误透传规则、命中邮件通知。三/五节据此更新。
+> - 当前 `master` 领先 origin 约 5 个提交（未 push）。
 
 ## 核对口径
 
@@ -75,20 +81,22 @@
 | OpenAI / Claude / Kiro 网关 | gateway 插件 |
 | 支付（易支付虎皮椒+彩虹/支付宝/微信） | airgate-epay 插件 |
 | 渠道可用性监控 + 公开状态页 | airgate-health 插件 |
-| **运维 Ops MVP**：请求级日志采集 + 1min 聚合大盘（RPS/错误率/P50-99）+ 系统资源 4 卡 + 错误日志/详情钻取 | Core `app/ops` + openai 插件上报 |
+| **运维 Ops**（基本补齐）：请求级日志+聚合大盘+系统资源卡+错误钻取+**告警闭环+系统日志+健康分数+SSE实时+并发四维+全分位+直方图+饼图+切换率+Token统计+设置中心** | Core `app/ops`（M1~M16）+ openai 插件上报 |
+| **管理员合规确认门**（登录强制确认合规声明，含中间件+法律文档+设置开关，默认关闭） | Core `app/compliance` |
+| **内容审核 moderation**（敏感词+OpenAI Moderation API+脱敏+observe/pre_block+自动封禁），转发前预检 | Core `app/moderation` + forwarder 挂载 |
 
 ### airgate 缺失或较弱（按用户优先级）
 
 | 类别 | 缺什么 | 落位 |
 |------|--------|------|
-| **运维 Ops** ★最需要 | ~~实时大盘、错误日志/请求详情~~（MVP 已落地）；仍缺：**告警、系统日志查询、健康分数、WebSocket 实时、时间范围+维度下钻、CPU/DB 资源卡** | Core `app/ops` 增强（路线见 `ops-feature-roadmap.md`） |
-| **风控/审核** ★需要 | 内容审核、违规封禁、错误透传规则、模型黑名单 | Core 新增 `app/moderation` |
-| **支付细节** ★对齐 | 退款、订单状态机、审计日志、运营仪表板、Resume Token 等（详见第四节） | 增强 epay 插件 |
+| ~~运维 Ops~~ ✅基本完成 | 仅剩：claude/kiro 插件上报铺开、CPU/DB 资源卡、分段延迟 trace（待 SDK） | Core `app/ops` |
+| **风控/审核** 🔶大部完成 | ~~内容审核、违规封禁~~（已做）；仍缺：**模型黑名单**（all/include/exclude）、**错误透传规则**、命中邮件通知 | Core `app/moderation` 增强 |
+| **用量限额** ★下一个 | **用户×平台 USD 配额**（anthropic/openai/gemini/antigravity 各自日/周/月限额，nil=不限、0=禁用；admin 配额弹窗 + 用户面板配额单元）。设计见 `risk-quota-compliance-design.md` 第二节 | Core 新增 |
+| **支付细节** ★对齐 | 退款、订单状态机、审计日志、运营仪表板、Resume Token、Stripe/Airwallex、充值倍数（详见第四节） | 增强 epay 插件 |
 | **渠道监控细节** ★对齐 | challenge 校验、请求模板、小时级聚合（详见第五节） | 增强 health 插件 |
 | 计费营销 | 卡密、优惠码、推广返利、订阅计划商品化 | Core 新增 |
-| **用量限额** | **用户×平台 USD 配额**（anthropic/openai/gemini/antigravity 各自日/周/月限额，nil=不限、0=禁用；admin 配额弹窗 + 用户面板配额单元） | Core 新增 |
 | 认证增强 | 多 OAuth 登录、TOTP 2FA、邮箱绑定 | Core 增强 auth |
-| 平台特性 | 公告、自定义页、用户属性、简易/后端模式、数据备份、**管理员合规确认门**（admin compliance gate，登录后强制确认合规声明才放行，含中间件+法律文档） | Core 新增 |
+| 平台特性 | 公告、自定义页、用户属性、简易/后端模式、数据备份（~~合规门~~已做） | Core 新增 |
 | 网关（不急） | Gemini、Antigravity、Bedrock | 新建插件（暂缓） |
 
 ---
@@ -144,14 +152,14 @@ sub2api 有、epay 无：日营收趋势(daily_series)、支付方式分布、To
 | OpenAI Token 统计 | 按 model/user/key | `ops_openai_token_stats.go` |
 | 数据清理/聚合/定时报告 | cron | `ops_cleanup/aggregation/scheduled_report` |
 
-### 风控/内容审核（airgate 全无）★需要
-| 功能 | sub2api | 关键文件 |
+### 风控/内容审核（airgate 大部已落地，2026-06-15）
+| 功能 | sub2api | airgate |
 |------|---------|---------|
-| 内容审核（敏感词 + OpenAI Moderation API） | ✅ | `content_moderation.go` |
-| 输入审核（observe/pre_block 模式）+ 脱敏 | ✅ | `content_moderation_input/redact.go` |
-| 违规封禁（N 次/M 小时）+ 邮件通知 | ✅ | `content_moderation.go`/`_email.go` |
-| 错误透传规则（按错误码自定义策略） | ✅ | `error_passthrough_service.go` |
-| 模型黑名单（all/include/exclude） | ✅ | `content_moderation.go` |
+| 内容审核（敏感词 + OpenAI Moderation API） | ✅ | ✅ `app/moderation`（keyword + openai 客户端） |
+| 输入审核（observe/pre_block 模式）+ 脱敏 | ✅ | ✅ `input.go`（提取+脱敏）、`service.go`（模式） |
+| 违规封禁（N 次/M 小时） | ✅ | ✅ auto-ban（status=disabled）；**邮件通知 ❌** |
+| 错误透传规则（按错误码自定义策略） | ✅ | ❌ 未做 |
+| 模型黑名单（all/include/exclude） | ✅ | ❌ 未做（Config 预留位但未实现 model_filter） |
 
 ---
 
@@ -159,12 +167,14 @@ sub2api 有、epay 无：日营收趋势(daily_series)、支付方式分布、To
 
 聚焦用户诉求：**运维 + 风控（新建）** 和 **支付/渠道监控细节对齐（增强插件）**。
 
-1. ✅ ~~**先定运维数据采集路径**~~（已定路径 1：插件上报）。
-2. ✅ ~~**运维 MVP**~~（已落地：错误日志 + 实时基础指标 + 系统资源卡，采集路径已验证可行）。
-3. **运维补齐**（当前主线）：按 `ops-feature-roadmap.md` 推进 M2~M16，优先 告警闭环 / 时间范围+维度下钻 / 健康分数 / claude·kiro 插件铺开上报。
-4. **风控**：Core 新增 `app/moderation` + 错误透传规则。
-5. **支付细节对齐**：按第四节，优先补退款 + 订单状态机 + 运营仪表板（增强 epay 插件）。
-6. **渠道监控对齐**：按第五节，补 challenge 校验 + 请求模板（增强 health 插件）。
+1. ✅ ~~运维数据采集路径~~（已定路径 1：插件上报）。
+2. ✅ ~~运维 Ops~~（M1~M16 基本补齐）。
+3. ✅ ~~管理员合规确认门~~（前后端完整）。
+4. ✅ ~~内容审核 moderation~~（检测+执行+管理+前端+auto-ban；仍缺模型黑名单/错误透传/封禁邮件）。
+5. **用量限额**（★当前主线建议）：用户×平台 USD 配额，纯 Core，方案见 `risk-quota-compliance-design.md` 第二节。
+6. **支付细节对齐**：按第四节，优先补退款 + 订单状态机 + 运营仪表板（增强 epay 插件）。
+7. **渠道监控对齐**：按第五节，补 challenge 校验 + 请求模板（增强 health 插件）。
+8. **其余 Core 新增**：计费营销（卡密/优惠码/返利/订阅商品化）、认证增强（多 OAuth/2FA/邮箱绑定）、平台特性（公告/自定义页/数据备份）。
 
 > 每个 Core 新 domain 参照 `account` 全链路；每个 Ent schema 变更要 `make ent` 提交生成代码。
 
@@ -236,6 +246,8 @@ airgate 的 `Host.Invoke` 是「通用平台原语」（ADR-0001）：新增能�
 ---
 
 ## 八、Ops 前端差距清单（精确核对，2026-06-14）
+
+> ⚠️ **本节已大体过时（2026-06-15）**：下表是 Ops 补齐前的差距快照。`ops-feature-roadmap.md` M1~M16 已全部完成，本节标 ❌/🔶 的项绝大多数已实现（健康分数、WebSocket→SSE、时间范围下钻、并发四维、系统资源卡、TTFT/全分位、直方图、错误饼图、错误日志增强、系统日志、告警、设置中心、Token 统计、深链全屏等）。仍未做的少数项见顶部 2026-06-15 校准记录（claude/kiro 上报、CPU/DB 卡、分段延迟 trace）。下表保留作历史对照。
 
 > 基于 sub2api `frontend/src/views/admin/ops/`（19 个 .vue 组件 + `api/admin/ops.ts` 40+ 接口）与 airgate 当前 OpsPage 逐项对比。
 >
