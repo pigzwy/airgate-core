@@ -99,8 +99,12 @@ func (s *Server) registerRoutes() {
 
 	// === 管理员路由（需要管理员 JWT + AdminOnly，支持 admin- 管理员 API Key） ===
 	adminGroup := v1.Group("/admin")
-	adminGroup.Use(middleware.JWTAuth(s.jwtMgr, s.db), middleware.AdminOnly())
+	adminGroup.Use(middleware.JWTAuth(s.jwtMgr, s.db), middleware.AdminOnly(), middleware.AdminComplianceGate(handlers.ComplianceService))
 	{
+		// 管理员合规确认门（自身端点经中间件 bypass，未确认时仍可访问）
+		adminGroup.GET("/compliance", handlers.Compliance.GetStatus)
+		adminGroup.POST("/compliance/accept", handlers.Compliance.Accept)
+		adminGroup.PUT("/compliance/enable", handlers.Compliance.SetEnabled)
 
 		// 用户管理
 		adminGroup.GET("/users", handlers.User.ListUsers)

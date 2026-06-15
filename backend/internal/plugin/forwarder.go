@@ -34,6 +34,7 @@ type Forwarder struct {
 	concurrency *scheduler.ConcurrencyManager
 	calculator  *billing.Calculator
 	recorder    *billing.Recorder
+	moderation  moderationGate // 内容审核网关（可选，未注入时跳过）
 }
 
 // NewForwarder 创建转发器。
@@ -84,6 +85,10 @@ func (f *Forwarder) Forward(c *gin.Context) {
 		return
 	}
 	if !f.checkBalance(c, state) {
+		return
+	}
+	// 内容审核预检：pre_block 命中即拒，不占账号并发槽。
+	if !f.checkModeration(c, state) {
 		return
 	}
 

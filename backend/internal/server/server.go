@@ -118,6 +118,9 @@ func NewServer(cfg *config.Config, db *ent.Client, rdb *redis.Client) *Server {
 	hostService.SetOpsReporter(opsReporterAdapter{svc: opsService})
 	pluginMgr.SetHostService(hostService)
 	forwarder := plugin.NewForwarder(db, pluginMgr, sched, concurrency, calculator, recorder)
+	// 内容审核（风控）：转发前预检。默认关闭（settings 未配置时放行），
+	// 配置经 settings(group=moderation) 下发，命中 pre_block 即拒。
+	forwarder.SetModeration(newModerationService(db, cfg.APIKeySecret()))
 
 	marketOpts := []plugin.MarketplaceOption{
 		plugin.WithGithubToken(cfg.Plugins.Marketplace.GithubToken),

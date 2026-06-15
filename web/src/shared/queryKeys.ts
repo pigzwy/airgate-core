@@ -38,4 +38,5 @@ export const queryKeys = {
   opsSettings: (...args: unknown[]) => ['ops-settings', ...args] as const,
   opsErrorLogs: (...args: unknown[]) => ['ops-error-logs', ...args] as const,
   opsTrace: (...args: unknown[]) => ['ops-trace', ...args] as const,
+  compliance: () => ['compliance'] as const,
 } as const;

@@ -15,6 +15,7 @@ import (
 	appaccount "github.com/DouDOU-start/airgate-core/internal/app/account"
 	appapikey "github.com/DouDOU-start/airgate-core/internal/app/apikey"
 	appauth "github.com/DouDOU-start/airgate-core/internal/app/auth"
+	appcompliance "github.com/DouDOU-start/airgate-core/internal/app/compliance"
 	appdashboard "github.com/DouDOU-start/airgate-core/internal/app/dashboard"
 	appgroup "github.com/DouDOU-start/airgate-core/internal/app/group"
 	appopenclaw "github.com/DouDOU-start/airgate-core/internal/app/openclaw"
@@ -65,8 +66,11 @@ type HTTPHandlers struct {
 	Version      *handler.VersionHandler
 	Upgrade      *handler.UpgradeHandler
 	Ops          *handler.OpsHandler
+	Compliance   *handler.ComplianceHandler
 
 	AccountService *appaccount.Service
+	// ComplianceService 暴露给 router，用于装配合规门中间件。
+	ComplianceService *appcompliance.Service
 }
 
 // NewHTTPHandlers 统一构造 HTTP 处理器。
@@ -91,6 +95,7 @@ func NewHTTPHandlers(dep HTTPDependencies) *HTTPHandlers {
 	pluginAdminService := apppluginadmin.NewService(dep.PluginMgr, dep.Marketplace)
 	settingsStore := store.NewSettingsStore(dep.DB)
 	settingsService := appsettings.NewService(settingsStore)
+	complianceService := appcompliance.NewService(settingsService)
 	openclawService := appopenclaw.NewService(settingsService)
 	userStore := store.NewUserStore(dep.DB)
 	userService := appuser.NewService(userStore)
@@ -127,7 +132,9 @@ func NewHTTPHandlers(dep HTTPDependencies) *HTTPHandlers {
 		Version:           handler.NewVersionHandler(),
 		Upgrade:           handler.NewUpgradeHandler(upgradeService),
 		Ops:               handler.NewOpsHandler(dep.OpsService),
+		Compliance:        handler.NewComplianceHandler(complianceService),
 		AccountService:    accountService,
+		ComplianceService: complianceService,
 	}
 }
 

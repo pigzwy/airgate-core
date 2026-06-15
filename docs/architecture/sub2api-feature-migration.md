@@ -4,12 +4,26 @@
 
 核对文档（基于真实代码）。目的：把 sub2api（单体）与 airgate（Core + 插件）逐项功能对照清楚，作为"哪些已有、哪些缺、缺的该放哪、怎么做"的事实依据。
 
+> **校准记录（2026-06-14，全文重核）**：自本文初版后，Core 侧 **Ops MVP 已端到端落地**，本次按真实代码全文校准。关键变化：
+> - **运维数据采集路径已定并实现**（第二节）：选定「插件经 `Host.Invoke("ops.report_request")` 上报」，Core 已加 host case + `app/ops` 落库 + 1min 聚合 + 清理；**openai 插件已上报**（`gateway/ops_report.go`，`gateway.go:138` 已接），claude/kiro 未铺开。
+> - **第七节 7.3 改动清单基本完成**（仅 SDK helper 跳过、claude/kiro 上报未铺）。
+> - **M1 系统资源卡已超前完成**（原属第七节 7.4「MVP 后扩展」）：6 卡中已实现 4（Goroutines/内存/Redis/后台 Jobs 心跳），仅 **CPU、DB 连接池**未做。第八节相应行已更新。
+> - 当前 OpsPage 覆盖度由初版 ~15-20% 升至约 **25-30%**。
+> - 兄弟文档 `ops-feature-roadmap.md` 亦过时（M1 实际已做但仍标 `[ ]`），后续推进以该文为任务清单。
+>
+> **sub2api 侧重核（2026-06-14，对齐上游 0.1.136）**：用户更新了 sub2api 代码后重新核对。结构数字基本不变（ops 前端组件 19、API 45、广义 ops `.go` 89）；两处随上游更新已修正：
+> - **告警指标 13 → 16 种**（八节，新增 cpu/memory/proxy 过期等，详见该节）。
+> - **新增「管理员合规确认门」**（三节平台特性）：admin 登录后须确认合规声明才放行（中间件 + `docs/legal/admin-compliance.*`），airgate 无。
+> - **新增「用户×平台 USD 配额」**（三节用量限额）：`UserPlatformQuota` 表，每用户对各平台日/周/月 USD 限额（feat(quota) 2026-05-26），airgate 无。
+> - 复核仍准确：支付 Stripe/Airwallex/退款/商户快照/审计日志（四节）；health 算术 challenge + 请求模板 + Replace 模式（五节）；系统日志多维筛选（八节）。
+
 ## 核对口径
 
 - **airgate Core**：本地代码核对，准确。
 - **airgate 插件**：已全部 clone 到 `D:\java\github\` 核对，准确——`airgate-openai`、`airgate-epay`、`airgate-health`、`airgate-claude`、`airgate-kiro`。
 - **sub2api**：本地源码核对，准确。
 - epay / health 两节为**逐功能点精确核对**（见第四、五节）。claude/kiro 用户暂不关注，未深核。
+- **2026-06-14 重核范围**：本轮重点校准 **Core Ops 全链路 + OpsPage 前端**（二/三/六/七/八节，逐文件核对）；epay/health（四/五节）插件代码无变更，沿用上次精确核对结论，未重查。
 
 图例：✅ 已有　🔶 部分有/需增强　❌ 没有
 
@@ -22,7 +36,7 @@
 | **整体架构** | 单体：所有功能编进一个二进制 | Core 内核 + 独立插件进程（gRPC / hashicorp go-plugin） |
 | **网关实现** | 内置 OpenAI/Claude/Gemini/Antigravity/Bedrock | 由 gateway 插件提供，Core 不转发 AI 请求 |
 | **支付实现** | 内置 5 渠道 | 由 payment 插件提供（airgate-epay） |
-| **运维监控** | 内置 Ops（70+ 文件，转发热路径埋点） | 几乎无（仅 health 插件做主动探测） |
+| **运维监控** | 内置 Ops（70+ 文件，转发热路径埋点） | Core `app/ops` MVP：插件经 Host 上报请求级指标 → 落库 → 1min 聚合 → React 大盘 + 系统资源卡；health 插件另做主动探测。覆盖度约 25-30%（详见七、八节） |
 | **后端分层** | service 直连 ent | 严格四层：dto→handler→service→Repository(接口)→store→ent；service 禁止 import ent |
 | **前端** | Vue 3（172 组件，60+ 页） | React 19 + TanStack Query（约 15 页） |
 | **扩展方式** | 改源码 | 插件热插拔，Core 不重启 |
@@ -34,18 +48,20 @@
 
 ## 二、★最关键的架构发现：运维数据从哪来
 
+> **已定并落地（2026-06-14）**：采集路径 = **路径 1「插件经 Host.Invoke 上报」**。Core 已加 `ops.report_request` host case + `app/ops` 落库；openai 插件已上报。下方三路径分析保留为决策依据。
+
 这决定运维功能能不能做、怎么做，是整个迁移最核心的技术难题。
 
 - **sub2api**：转发在主进程内，每个请求在 `gateway.Forward` 直接埋点 `RecordError/RecordSuccess` → 落库 `usage_logs/ops_error_logs` → 后台 `OpsMetricsCollector`（1分钟 cron + leader lock）聚合成 RPS/延迟分位/错误率 → WebSocket 推前端。**真实用户流量全程可见**。
 - **airgate**：转发在**插件子进程**里。Core 默认看不到请求级细节（延迟、token、错误体、上游状态码）。
 - **airgate-health**：是**主动心跳探测**（自己发测试请求采集可用性），**采集不到真实用户流量**。
 
-**三种可选采集路径**（需拍板）：
-1. **插件经 Host.Invoke 上报**：每次 Forward 后，插件把请求级指标回传 Core 落库。改动所有 gateway 插件，但数据最全最准。
+**三种可选采集路径**（✅ 已选路径 1）：
+1. **插件经 Host.Invoke 上报**（✅ 采用）：每次 Forward 后，插件把请求级指标回传 Core 落库。改动所有 gateway 插件，但数据最全最准。
 2. **Core 在 ext-proxy/forwarder 层埋点**：Core 转发到插件的出入口处采样。改动集中在 Core，但拿不到插件内部细节（如真实上游延迟/错误体）。
 3. **混合**：基础指标 Core 埋点（路径 2），详细错误/token 插件上报（路径 1）。
 
-> 这是运维迁移的**前置设计决策**，建议优先定。已有线索：airgate 计费链路（billing/recorder）已经在记 UsageLog，说明插件已能经 Host 上报 token/cost——可在此基础上扩展为 Ops 采集。
+> ~~这是运维迁移的**前置设计决策**，建议优先定。~~（已定为路径 1 并实现）已有线索印证可行：airgate 计费链路（billing/recorder）早已经 Host 上报 token/cost——Ops 采集正是在此机制上扩展。
 
 ---
 
@@ -59,18 +75,20 @@
 | OpenAI / Claude / Kiro 网关 | gateway 插件 |
 | 支付（易支付虎皮椒+彩虹/支付宝/微信） | airgate-epay 插件 |
 | 渠道可用性监控 + 公开状态页 | airgate-health 插件 |
+| **运维 Ops MVP**：请求级日志采集 + 1min 聚合大盘（RPS/错误率/P50-99）+ 系统资源 4 卡 + 错误日志/详情钻取 | Core `app/ops` + openai 插件上报 |
 
 ### airgate 缺失或较弱（按用户优先级）
 
 | 类别 | 缺什么 | 落位 |
 |------|--------|------|
-| **运维 Ops** ★最需要 | 实时大盘、告警、错误日志/请求详情、系统日志查询、健康分数 | Core 新增 `app/ops` |
+| **运维 Ops** ★最需要 | ~~实时大盘、错误日志/请求详情~~（MVP 已落地）；仍缺：**告警、系统日志查询、健康分数、WebSocket 实时、时间范围+维度下钻、CPU/DB 资源卡** | Core `app/ops` 增强（路线见 `ops-feature-roadmap.md`） |
 | **风控/审核** ★需要 | 内容审核、违规封禁、错误透传规则、模型黑名单 | Core 新增 `app/moderation` |
 | **支付细节** ★对齐 | 退款、订单状态机、审计日志、运营仪表板、Resume Token 等（详见第四节） | 增强 epay 插件 |
 | **渠道监控细节** ★对齐 | challenge 校验、请求模板、小时级聚合（详见第五节） | 增强 health 插件 |
 | 计费营销 | 卡密、优惠码、推广返利、订阅计划商品化 | Core 新增 |
+| **用量限额** | **用户×平台 USD 配额**（anthropic/openai/gemini/antigravity 各自日/周/月限额，nil=不限、0=禁用；admin 配额弹窗 + 用户面板配额单元） | Core 新增 |
 | 认证增强 | 多 OAuth 登录、TOTP 2FA、邮箱绑定 | Core 增强 auth |
-| 平台特性 | 公告、自定义页、用户属性、简易/后端模式、数据备份 | Core 新增 |
+| 平台特性 | 公告、自定义页、用户属性、简易/后端模式、数据备份、**管理员合规确认门**（admin compliance gate，登录后强制确认合规声明才放行，含中间件+法律文档） | Core 新增 |
 | 网关（不急） | Gemini、Antigravity、Bedrock | 新建插件（暂缓） |
 
 ---
@@ -141,9 +159,9 @@ sub2api 有、epay 无：日营收趋势(daily_series)、支付方式分布、To
 
 聚焦用户诉求：**运维 + 风控（新建）** 和 **支付/渠道监控细节对齐（增强插件）**。
 
-1. **先定运维数据采集路径**（第二节的 3 选 1）——这是 Ops 一切的前提，不定无法动工。
-2. **运维 MVP**：Core 新增 `app/ops`，先做「错误日志 + 实时基础指标」最小闭环（数据采集 → 落库 → 一个 React 大盘页），验证采集路径可行。
-3. **告警系统**：在 Ops 数据之上加规则评估 + 邮件（复用 settings 的 SMTP）。
+1. ✅ ~~**先定运维数据采集路径**~~（已定路径 1：插件上报）。
+2. ✅ ~~**运维 MVP**~~（已落地：错误日志 + 实时基础指标 + 系统资源卡，采集路径已验证可行）。
+3. **运维补齐**（当前主线）：按 `ops-feature-roadmap.md` 推进 M2~M16，优先 告警闭环 / 时间范围+维度下钻 / 健康分数 / claude·kiro 插件铺开上报。
 4. **风控**：Core 新增 `app/moderation` + 错误透传规则。
 5. **支付细节对齐**：按第四节，优先补退款 + 订单状态机 + 运营仪表板（增强 epay 插件）。
 6. **渠道监控对齐**：按第五节，补 challenge 校验 + 请求模板（增强 health 插件）。
@@ -152,9 +170,11 @@ sub2api 有、epay 无：日营收趋势(daily_series)、支付方式分布、To
 
 ---
 
-## 七、运维 Ops MVP 设计（已定方案）
+## 七、运维 Ops MVP 设计（✅ 已实现）
 
 **决策**：采集路径 = 插件上报；第一个动手 = Ops MVP。
+
+> **实现状态（2026-06-14）**：MVP **已端到端打通并超出原范围**。7.3 改动清单除「SDK helper」（跳过，插件直接 `hostInvoke`）与「claude/kiro 上报」（未铺开）外全部完成；额外做了 M1 系统资源卡（4/6）。下方清单已按真实代码勾选。
 
 ### 7.1 地基确认（已核实代码）
 
@@ -180,29 +200,31 @@ airgate 的 `Host.Invoke` 是「通用平台原语」（ADR-0001）：新增能�
 ### 7.3 改动清单（按 airgate 四层）
 
 **SDK 侧**（airgate-sdk，可能需要）
-- [ ] 确认 SDK 是否已有 Host 上报 helper；没有则加一个 `host.ReportRequest(...)` 便捷方法（可选，也可插件直接 Invoke）
+- [~] ~~SDK Host 上报 helper~~ **跳过**：openai 插件直接 `g.hostInvoke("ops.report_request", payload)`，未抽 helper（够用）
 
 **插件侧**（先改 airgate-openai 一个验证，再铺开 claude/kiro）
-- [ ] 在 `gateway.go` Forward 收尾处，组装指标并 `Host.Invoke("ops.report_request", ...)`
-- [ ] manifest 声明所需 capability（如 `host.ops`）
+- [x] openai `gateway/ops_report.go` 组装指标并上报；`gateway.go:138` 已在 Forward 收尾处调用 `reportOps(...)`
+- [ ] manifest capability：**未声明 `host.ops`**——Core 端 `ops.report_request` case 无 capability 门禁（best-effort，nil reporter 静默丢弃），故插件无需声明也能上报；后续要收紧再补
+- [ ] **claude / kiro 插件尚未铺开上报**（仅 openai 验证通）
 
 **Core 侧**（主战场，按四层）
-- [ ] `ent/schema/opsrequestlog.go` + `opswindowstat.go` → `make ent`
-- [ ] `app/ops/{service,types,errors}.go`：定义 `ReportInput`、`Repository` 接口、查询用 `Filter/Result`
-- [ ] `infra/store/ops_store.go`：Repository 的 ent 实现
-- [ ] `plugin/host_service.go`：加 `hostMethodOpsReport = "ops.report_request"` 常量 + case + capability 校验
-- [ ] `app/ops` 后台聚合器：1min cron 算 window_stats（参考 health 插件的 aggregator 思路）
-- [ ] `server/dto/ops.go` + `server/handler/ops_handler{,_routes,_mapper}.go`：管理员查询 API（实时指标、错误列表、错误详情）
-- [ ] `bootstrap/http_handlers.go` + `server/router.go`：接线（store→service→handler，挂 adminGroup）
+- [x] `ent/schema/opsrequestlog.go` + `opswindowstat.go`（已 `make ent` 并提交）
+- [x] `app/ops/{types,errors,service}.go`：`ReportInput`、`Repository` 接口、`RequestLogFilter/Result`、`WindowStat/Overview`
+- [x] `infra/store/ops_store.go`：Repository 的 ent 实现（Go 侧分位聚合，避开 sql/modifier feature）
+- [x] `plugin/host_service.go`：`hostMethodOpsReport` 常量 + case + `OpsReporter` 接口（**无 capability 校验**）
+- [x] `app/ops` 后台聚合器：`StartAggregationLoop`（1min 聚合上一整分钟窗口 + 1h 清理，带 `JobRegistry` 心跳）
+- [x] `server/dto/ops.go` + `server/handler/ops_handler{,_routes,_mapper}.go`：overview / system-metrics / error-logs / error-logs/:id
+- [x] `bootstrap/http_handlers.go` + `server/router.go`：接线完成，4 端点挂 adminGroup
 
 **前端侧**（React，MVP 简化版）
-- [ ] `web/src/pages/admin/OpsPage.tsx`：实时大盘（指标卡 + 趋势图，轮询）+ 错误日志表 + 错误详情弹窗
-- [ ] `web/src/shared/api/ops.ts` + queryKeys
-- [ ] AppShell 加菜单入口
+- [x] `web/src/pages/admin/OpsPage.tsx`：指标卡 + 趋势图（15s 轮询）+ 错误日志表 + 详情弹窗 + **系统资源 6 卡**（5s 轮询）+ 后台任务心跳明细
+- [x] `web/src/shared/api/ops.ts` + queryKeys + types
+- [x] AppShell 菜单入口（OpsPage 已接入路由）
 
 ### 7.4 MVP 后的扩展（不在首期）
 
-WebSocket 实时推送、告警系统、系统日志查询、健康分数、OpenAI Token 统计、数据清理/定时报告——验证 MVP 采集路径可行后再逐个加。
+- ✅ **已超前完成**：数据保留期清理（`Purge` 循环，日志 7 天 / 聚合 30 天）；M1 系统资源卡（Goroutines/内存/Redis/Jobs 心跳）。
+- ⏳ **仍待做**：WebSocket 实时推送、告警系统、系统日志查询、健康分数、OpenAI Token 统计、定时报告、CPU/DB 资源卡——见 `ops-feature-roadmap.md` 任务清单（M2~M16）。
 
 ### 7.5 风险点
 
@@ -215,7 +237,9 @@ WebSocket 实时推送、告警系统、系统日志查询、健康分数、Open
 
 ## 八、Ops 前端差距清单（精确核对，2026-06-14）
 
-> 基于 sub2api `frontend/src/views/admin/ops/`（19 个 .vue 组件 + `api/admin/ops.ts` 40+ 接口）与 airgate 当前 OpsPage（4 指标卡 + RPS/错误率折线 + 错误日志表 + 15s 轮询）逐项对比。当前覆盖度约 **15-20%**。
+> 基于 sub2api `frontend/src/views/admin/ops/`（19 个 .vue 组件 + `api/admin/ops.ts` 40+ 接口）与 airgate 当前 OpsPage 逐项对比。
+>
+> **airgate 现状（2026-06-14 校准）**：4 业务指标卡（RPS/错误率/P95/窗口请求数，15s 轮询）+ RPS/错误率折线趋势 + 错误日志表 + 详情弹窗 + **系统资源 6 卡区（Goroutines/堆/系统内存/GC/Redis/后台 Jobs，5s 轮询）+ 后台任务心跳明细**。当前覆盖度约 **25-30%**（系统资源块已补齐，本节相关行已更新）。
 
 ### 顶部工具栏
 | 功能 | sub2api | airgate |
@@ -244,7 +268,16 @@ WebSocket 实时推送、告警系统、系统日志查询、健康分数、Open
 | 上游错误卡（上游错误率+排除429/529+429/529数） | ❌ |
 
 ### 系统资源卡（sub2api 6 张）
-CPU/内存/数据库连接/Redis连接/Goroutines/后台Jobs心跳 —— airgate **全部 ❌**
+| 卡 | airgate |
+|----|---------|
+| Goroutines | ✅ `runtime.NumGoroutine()`，>2000 染红 |
+| 内存（堆已用 + 系统申请 + GC 次数） | ✅ `runtime.MemStats` |
+| Redis 连接池（总数/空闲/超时） | ✅ go-redis `PoolStats`，超时染红 |
+| 后台 Jobs 心跳（名称/上次运行/错误） | ✅ `JobRegistry`，含明细行 |
+| **CPU 使用率** | ❌ 需 gopsutil（`system.go` 注释明确暂不含） |
+| **数据库连接池** | ❌ 需 ent driver 断言 |
+
+> 6 卡已实现 **4 张**，仅 CPU、DB 连接池待补（M1 后续增强）。原「全部 ❌」已作废。
 
 ### 并发/可用性卡
 平台/分组/账号/用户四维并发统计 + 账号可用性（限流/过载倒计时）+ 进度条 —— airgate **全部 ❌**
@@ -270,7 +303,9 @@ CPU/内存/数据库连接/Redis连接/Goroutines/后台Jobs心跳 —— airgat
 | 请求明细（成功/慢请求列表，不只错误） | ❌ |
 
 ### 告警模块
-规则管理（13种指标+运算符+阈值+窗口+持续+严重度+冷却+邮件+filters）/ 事件流（状态徽章+severity+游标分页）/ 静默（按规则+平台+group+region）/ 手动解决 —— airgate **全部 ❌**
+规则管理（**16 种指标**+运算符+阈值+窗口+持续+严重度+冷却+邮件+filters）/ 事件流（状态徽章+severity+游标分页）/ 静默（按规则+平台+group+region）/ 手动解决 —— airgate **全部 ❌**
+
+> 16 种指标（`ops_alert_evaluator_service.go` 实测）：cpu_usage_percent、memory_usage_percent、concurrency_queue_depth、group_available_accounts、group_available_ratio、account_rate_limited_count、account_error_count、account_temp_unscheduled_count、group_rate_limit_ratio、account_error_ratio、overload_account_count、proxy_expired_count、proxy_expiring_soon_count、success_rate、error_rate、upstream_error_rate。（初版"13 种"已随上游更新增至 16。）
 
 ### 设置中心（8 大块）
 运行时（评估间隔+分布式锁+全局静默）/ 指标阈值染色 / 告警邮件 / 报告邮件(每日每周摘要) / 数据保留 / 预聚合开关 / OpenAI 配额自动暂停 / 错误过滤开关(5类) / 自动刷新可调 —— airgate **全部 ❌**
@@ -280,7 +315,7 @@ CPU/内存/数据库连接/Redis连接/Goroutines/后台Jobs心跳 —— airgat
 
 ### 补齐优先级
 - **P0（架构性/最易感知）**：健康分数+诊断、WebSocket 实时、时间范围+维度下钻、请求详情钻取(成功也看)、告警闭环
-- **P1（运维必备）**：并发四维卡、系统资源6卡、TTFT+全分位、延迟直方图、错误分布饼图、错误日志增强+trace、系统日志+运行时级别
+- **P1（运维必备）**：并发四维卡、~~系统资源6卡~~（剩 CPU/DB 2 卡）、TTFT+全分位、延迟直方图、错误分布饼图、错误日志增强+trace、系统日志+运行时级别
 - **P2（增强）**：切换率、吞吐缩放、URL深链、全屏、OpenAI Token 统计、设置中心
 
 ### 关键文件参考

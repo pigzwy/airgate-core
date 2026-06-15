@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { SettingItem, TestSMTPReq } from '../../shared/types';
 import { SystemUpdatePanel } from './SystemUpdatePanel';
+import { ComplianceToggleCard } from './ComplianceToggleCard';
 import { NativeSwitch } from '../../shared/components/NativeSwitch';
 import { CommonModal } from '../../shared/components/CommonModal';
 
@@ -390,6 +391,10 @@ export default function SettingsPage() {
             <Card.Content>
               <div>
                 <SecurityPanel />
+
+                <div className="mt-6">
+                  <ComplianceToggleCard />
+                </div>
 
                 <SettingsSection title={t('settings.registration_auth')}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

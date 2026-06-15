@@ -15,6 +15,7 @@ import { effectiveDocUrl } from '../../shared/utils/docUrl';
 import { useIsMobile } from '../../shared/hooks/useMediaQuery';
 import { usePersistentBoolean } from '../../shared/hooks/usePersistentBoolean';
 import { TopLoadingLine } from '../../shared/components/PageLoading';
+import { AdminComplianceGate } from '../../shared/components/AdminComplianceGate';
 import {
   LayoutDashboard,
   Users,
@@ -551,6 +552,9 @@ export function AppShell({ children }: AppShellProps) {
           </div>
         </main>
       </div>
+
+      {/* 管理员合规确认门：任一管理端请求返回 423 时弹出（门关闭时永不触发） */}
+      <AdminComplianceGate />
     </div>
   );
 }

@@ -80,6 +80,14 @@ export function getSessionAPIKey(): string | null {
   return readBrowserStorage('sessionStorage', API_KEY_SECRET_STORAGE);
 }
 
+// 合规门：任一管理端请求返回 423（需确认合规）时触发的全局回调，
+// 由 AdminComplianceGate 在挂载时注册，用于弹出确认弹窗。
+let complianceRequiredHandler: (() => void) | null = null;
+
+export function setComplianceRequiredHandler(fn: (() => void) | null) {
+  complianceRequiredHandler = fn;
+}
+
 // 查询参数类型
 type QueryParams = Record<string, any>;
 type RequestOptions = {
@@ -155,6 +163,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
     if (res.status === 401 && accessToken) {
       setToken(null);
       window.location.href = '/login';
+    } else if (res.status === 423) {
+      // 管理员合规确认门：触发全局确认弹窗。仍抛错让发起的查询失败，
+      // 确认通过后由弹窗 invalidate 重新拉取。
+      complianceRequiredHandler?.();
     }
     throw new ApiError(json.code, json.message, res.status);
   }
