@@ -45,7 +45,6 @@ export function OpsSettingsPanel() {
       reportEmail: settings.reportEmail,
       reportHour: settings.reportHour,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     settings.errorRateWarn,
     settings.p95Warn,

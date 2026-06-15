@@ -63,7 +63,7 @@ export function useOpsStream(enabled: boolean) {
           }
         }
         throw new Error('stream closed');
-      } catch (err) {
+      } catch {
         if (stopped || controller.signal.aborted) return;
         setStatus('error');
         retryTimer = setTimeout(connect, 3000);
