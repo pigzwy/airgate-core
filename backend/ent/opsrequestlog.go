@@ -19,12 +19,16 @@ type OpsRequestLog struct {
 	ID int `json:"id,omitempty"`
 	// 请求追踪 ID，用于错误详情钻取与跨日志关联
 	RequestID string `json:"request_id,omitempty"`
+	// 客户端请求 ID（跨账号重试共享），同值多行构成一次 trace
+	ClientRequestID string `json:"client_request_id,omitempty"`
 	// 上报来源插件 ID（如 gateway-openai）
 	PluginID string `json:"plugin_id,omitempty"`
 	// Platform holds the value of the "platform" field.
 	Platform string `json:"platform,omitempty"`
-	// Model holds the value of the "model" field.
+	// 客户端请求的模型（requested）
 	Model string `json:"model,omitempty"`
+	// 实际上游使用的模型（mapped），与 model 不同即发生了模型映射
+	UpstreamModel string `json:"upstream_model,omitempty"`
 	// 请求端点，如 /v1/chat/completions
 	Endpoint string `json:"endpoint,omitempty"`
 	// UserIDSnapshot holds the value of the "user_id_snapshot" field.
@@ -71,7 +75,7 @@ func (*OpsRequestLog) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case opsrequestlog.FieldID, opsrequestlog.FieldUserIDSnapshot, opsrequestlog.FieldAPIKeyIDSnapshot, opsrequestlog.FieldAccountIDSnapshot, opsrequestlog.FieldGroupIDSnapshot, opsrequestlog.FieldStatusCode, opsrequestlog.FieldUpstreamStatusCode, opsrequestlog.FieldDurationMs, opsrequestlog.FieldFirstTokenMs, opsrequestlog.FieldInputTokens, opsrequestlog.FieldOutputTokens:
 			values[i] = new(sql.NullInt64)
-		case opsrequestlog.FieldRequestID, opsrequestlog.FieldPluginID, opsrequestlog.FieldPlatform, opsrequestlog.FieldModel, opsrequestlog.FieldEndpoint, opsrequestlog.FieldErrorKind, opsrequestlog.FieldErrorMsg, opsrequestlog.FieldErrorDetail:
+		case opsrequestlog.FieldRequestID, opsrequestlog.FieldClientRequestID, opsrequestlog.FieldPluginID, opsrequestlog.FieldPlatform, opsrequestlog.FieldModel, opsrequestlog.FieldUpstreamModel, opsrequestlog.FieldEndpoint, opsrequestlog.FieldErrorKind, opsrequestlog.FieldErrorMsg, opsrequestlog.FieldErrorDetail:
 			values[i] = new(sql.NullString)
 		case opsrequestlog.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -102,6 +106,12 @@ func (orl *OpsRequestLog) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				orl.RequestID = value.String
 			}
+		case opsrequestlog.FieldClientRequestID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field client_request_id", values[i])
+			} else if value.Valid {
+				orl.ClientRequestID = value.String
+			}
 		case opsrequestlog.FieldPluginID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field plugin_id", values[i])
@@ -119,6 +129,12 @@ func (orl *OpsRequestLog) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field model", values[i])
 			} else if value.Valid {
 				orl.Model = value.String
+			}
+		case opsrequestlog.FieldUpstreamModel:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field upstream_model", values[i])
+			} else if value.Valid {
+				orl.UpstreamModel = value.String
 			}
 		case opsrequestlog.FieldEndpoint:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -261,6 +277,9 @@ func (orl *OpsRequestLog) String() string {
 	builder.WriteString("request_id=")
 	builder.WriteString(orl.RequestID)
 	builder.WriteString(", ")
+	builder.WriteString("client_request_id=")
+	builder.WriteString(orl.ClientRequestID)
+	builder.WriteString(", ")
 	builder.WriteString("plugin_id=")
 	builder.WriteString(orl.PluginID)
 	builder.WriteString(", ")
@@ -269,6 +288,9 @@ func (orl *OpsRequestLog) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("model=")
 	builder.WriteString(orl.Model)
+	builder.WriteString(", ")
+	builder.WriteString("upstream_model=")
+	builder.WriteString(orl.UpstreamModel)
 	builder.WriteString(", ")
 	builder.WriteString("endpoint=")
 	builder.WriteString(orl.Endpoint)

@@ -20,8 +20,16 @@ type Tx struct {
 	BalanceLog *BalanceLogClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// OpsAlertEvent is the client for interacting with the OpsAlertEvent builders.
+	OpsAlertEvent *OpsAlertEventClient
+	// OpsAlertRule is the client for interacting with the OpsAlertRule builders.
+	OpsAlertRule *OpsAlertRuleClient
+	// OpsAlertSilence is the client for interacting with the OpsAlertSilence builders.
+	OpsAlertSilence *OpsAlertSilenceClient
 	// OpsRequestLog is the client for interacting with the OpsRequestLog builders.
 	OpsRequestLog *OpsRequestLogClient
+	// OpsSystemLog is the client for interacting with the OpsSystemLog builders.
+	OpsSystemLog *OpsSystemLogClient
 	// OpsWindowStat is the client for interacting with the OpsWindowStat builders.
 	OpsWindowStat *OpsWindowStatClient
 	// Plugin is the client for interacting with the Plugin builders.
@@ -175,7 +183,11 @@ func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
 	tx.BalanceLog = NewBalanceLogClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
+	tx.OpsAlertEvent = NewOpsAlertEventClient(tx.config)
+	tx.OpsAlertRule = NewOpsAlertRuleClient(tx.config)
+	tx.OpsAlertSilence = NewOpsAlertSilenceClient(tx.config)
 	tx.OpsRequestLog = NewOpsRequestLogClient(tx.config)
+	tx.OpsSystemLog = NewOpsSystemLogClient(tx.config)
 	tx.OpsWindowStat = NewOpsWindowStatClient(tx.config)
 	tx.Plugin = NewPluginClient(tx.config)
 	tx.PluginSource = NewPluginSourceClient(tx.config)

@@ -41,6 +41,20 @@ func (orlu *OpsRequestLogUpdate) SetNillableRequestID(s *string) *OpsRequestLogU
 	return orlu
 }
 
+// SetClientRequestID sets the "client_request_id" field.
+func (orlu *OpsRequestLogUpdate) SetClientRequestID(s string) *OpsRequestLogUpdate {
+	orlu.mutation.SetClientRequestID(s)
+	return orlu
+}
+
+// SetNillableClientRequestID sets the "client_request_id" field if the given value is not nil.
+func (orlu *OpsRequestLogUpdate) SetNillableClientRequestID(s *string) *OpsRequestLogUpdate {
+	if s != nil {
+		orlu.SetClientRequestID(*s)
+	}
+	return orlu
+}
+
 // SetPluginID sets the "plugin_id" field.
 func (orlu *OpsRequestLogUpdate) SetPluginID(s string) *OpsRequestLogUpdate {
 	orlu.mutation.SetPluginID(s)
@@ -79,6 +93,20 @@ func (orlu *OpsRequestLogUpdate) SetModel(s string) *OpsRequestLogUpdate {
 func (orlu *OpsRequestLogUpdate) SetNillableModel(s *string) *OpsRequestLogUpdate {
 	if s != nil {
 		orlu.SetModel(*s)
+	}
+	return orlu
+}
+
+// SetUpstreamModel sets the "upstream_model" field.
+func (orlu *OpsRequestLogUpdate) SetUpstreamModel(s string) *OpsRequestLogUpdate {
+	orlu.mutation.SetUpstreamModel(s)
+	return orlu
+}
+
+// SetNillableUpstreamModel sets the "upstream_model" field if the given value is not nil.
+func (orlu *OpsRequestLogUpdate) SetNillableUpstreamModel(s *string) *OpsRequestLogUpdate {
+	if s != nil {
+		orlu.SetUpstreamModel(*s)
 	}
 	return orlu
 }
@@ -421,6 +449,9 @@ func (orlu *OpsRequestLogUpdate) sqlSave(ctx context.Context) (n int, err error)
 	if value, ok := orlu.mutation.RequestID(); ok {
 		_spec.SetField(opsrequestlog.FieldRequestID, field.TypeString, value)
 	}
+	if value, ok := orlu.mutation.ClientRequestID(); ok {
+		_spec.SetField(opsrequestlog.FieldClientRequestID, field.TypeString, value)
+	}
 	if value, ok := orlu.mutation.PluginID(); ok {
 		_spec.SetField(opsrequestlog.FieldPluginID, field.TypeString, value)
 	}
@@ -429,6 +460,9 @@ func (orlu *OpsRequestLogUpdate) sqlSave(ctx context.Context) (n int, err error)
 	}
 	if value, ok := orlu.mutation.Model(); ok {
 		_spec.SetField(opsrequestlog.FieldModel, field.TypeString, value)
+	}
+	if value, ok := orlu.mutation.UpstreamModel(); ok {
+		_spec.SetField(opsrequestlog.FieldUpstreamModel, field.TypeString, value)
 	}
 	if value, ok := orlu.mutation.Endpoint(); ok {
 		_spec.SetField(opsrequestlog.FieldEndpoint, field.TypeString, value)
@@ -542,6 +576,20 @@ func (orluo *OpsRequestLogUpdateOne) SetNillableRequestID(s *string) *OpsRequest
 	return orluo
 }
 
+// SetClientRequestID sets the "client_request_id" field.
+func (orluo *OpsRequestLogUpdateOne) SetClientRequestID(s string) *OpsRequestLogUpdateOne {
+	orluo.mutation.SetClientRequestID(s)
+	return orluo
+}
+
+// SetNillableClientRequestID sets the "client_request_id" field if the given value is not nil.
+func (orluo *OpsRequestLogUpdateOne) SetNillableClientRequestID(s *string) *OpsRequestLogUpdateOne {
+	if s != nil {
+		orluo.SetClientRequestID(*s)
+	}
+	return orluo
+}
+
 // SetPluginID sets the "plugin_id" field.
 func (orluo *OpsRequestLogUpdateOne) SetPluginID(s string) *OpsRequestLogUpdateOne {
 	orluo.mutation.SetPluginID(s)
@@ -580,6 +628,20 @@ func (orluo *OpsRequestLogUpdateOne) SetModel(s string) *OpsRequestLogUpdateOne 
 func (orluo *OpsRequestLogUpdateOne) SetNillableModel(s *string) *OpsRequestLogUpdateOne {
 	if s != nil {
 		orluo.SetModel(*s)
+	}
+	return orluo
+}
+
+// SetUpstreamModel sets the "upstream_model" field.
+func (orluo *OpsRequestLogUpdateOne) SetUpstreamModel(s string) *OpsRequestLogUpdateOne {
+	orluo.mutation.SetUpstreamModel(s)
+	return orluo
+}
+
+// SetNillableUpstreamModel sets the "upstream_model" field if the given value is not nil.
+func (orluo *OpsRequestLogUpdateOne) SetNillableUpstreamModel(s *string) *OpsRequestLogUpdateOne {
+	if s != nil {
+		orluo.SetUpstreamModel(*s)
 	}
 	return orluo
 }
@@ -952,6 +1014,9 @@ func (orluo *OpsRequestLogUpdateOne) sqlSave(ctx context.Context) (_node *OpsReq
 	if value, ok := orluo.mutation.RequestID(); ok {
 		_spec.SetField(opsrequestlog.FieldRequestID, field.TypeString, value)
 	}
+	if value, ok := orluo.mutation.ClientRequestID(); ok {
+		_spec.SetField(opsrequestlog.FieldClientRequestID, field.TypeString, value)
+	}
 	if value, ok := orluo.mutation.PluginID(); ok {
 		_spec.SetField(opsrequestlog.FieldPluginID, field.TypeString, value)
 	}
@@ -960,6 +1025,9 @@ func (orluo *OpsRequestLogUpdateOne) sqlSave(ctx context.Context) (_node *OpsReq
 	}
 	if value, ok := orluo.mutation.Model(); ok {
 		_spec.SetField(opsrequestlog.FieldModel, field.TypeString, value)
+	}
+	if value, ok := orluo.mutation.UpstreamModel(); ok {
+		_spec.SetField(opsrequestlog.FieldUpstreamModel, field.TypeString, value)
 	}
 	if value, ok := orluo.mutation.Endpoint(); ok {
 		_spec.SetField(opsrequestlog.FieldEndpoint, field.TypeString, value)

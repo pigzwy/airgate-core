@@ -135,13 +135,104 @@ var (
 		Columns:    GroupsColumns,
 		PrimaryKey: []*schema.Column{GroupsColumns[0]},
 	}
+	// OpsAlertEventsColumns holds the columns for the "ops_alert_events" table.
+	OpsAlertEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "rule_id", Type: field.TypeInt, Default: 0},
+		{Name: "rule_name", Type: field.TypeString, Default: ""},
+		{Name: "metric", Type: field.TypeString, Default: ""},
+		{Name: "operator", Type: field.TypeString, Default: ""},
+		{Name: "value", Type: field.TypeFloat64, Default: 0},
+		{Name: "threshold", Type: field.TypeFloat64, Default: 0},
+		{Name: "severity", Type: field.TypeString, Default: "warning"},
+		{Name: "status", Type: field.TypeString, Default: "firing"},
+		{Name: "message", Type: field.TypeString, Size: 2147483647, Default: ""},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "resolved_at", Type: field.TypeTime, Nullable: true},
+	}
+	// OpsAlertEventsTable holds the schema information for the "ops_alert_events" table.
+	OpsAlertEventsTable = &schema.Table{
+		Name:       "ops_alert_events",
+		Columns:    OpsAlertEventsColumns,
+		PrimaryKey: []*schema.Column{OpsAlertEventsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "ops_alert_event_status_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsAlertEventsColumns[8], OpsAlertEventsColumns[10]},
+			},
+			{
+				Name:    "ops_alert_event_rule_status",
+				Unique:  false,
+				Columns: []*schema.Column{OpsAlertEventsColumns[1], OpsAlertEventsColumns[8]},
+			},
+			{
+				Name:    "ops_alert_event_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsAlertEventsColumns[10]},
+			},
+		},
+	}
+	// OpsAlertRulesColumns holds the columns for the "ops_alert_rules" table.
+	OpsAlertRulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "metric", Type: field.TypeString},
+		{Name: "operator", Type: field.TypeString, Default: "gt"},
+		{Name: "threshold", Type: field.TypeFloat64, Default: 0},
+		{Name: "window_seconds", Type: field.TypeInt, Default: 300},
+		{Name: "severity", Type: field.TypeString, Default: "warning"},
+		{Name: "enabled", Type: field.TypeBool, Default: true},
+		{Name: "cooldown_seconds", Type: field.TypeInt, Default: 600},
+		{Name: "notify_email", Type: field.TypeString, Default: ""},
+		{Name: "platform", Type: field.TypeString, Default: ""},
+		{Name: "last_fired_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// OpsAlertRulesTable holds the schema information for the "ops_alert_rules" table.
+	OpsAlertRulesTable = &schema.Table{
+		Name:       "ops_alert_rules",
+		Columns:    OpsAlertRulesColumns,
+		PrimaryKey: []*schema.Column{OpsAlertRulesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "opsalertrule_enabled",
+				Unique:  false,
+				Columns: []*schema.Column{OpsAlertRulesColumns[7]},
+			},
+		},
+	}
+	// OpsAlertSilencesColumns holds the columns for the "ops_alert_silences" table.
+	OpsAlertSilencesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "rule_id", Type: field.TypeInt, Default: 0},
+		{Name: "reason", Type: field.TypeString, Default: ""},
+		{Name: "until", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// OpsAlertSilencesTable holds the schema information for the "ops_alert_silences" table.
+	OpsAlertSilencesTable = &schema.Table{
+		Name:       "ops_alert_silences",
+		Columns:    OpsAlertSilencesColumns,
+		PrimaryKey: []*schema.Column{OpsAlertSilencesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "opsalertsilence_until",
+				Unique:  false,
+				Columns: []*schema.Column{OpsAlertSilencesColumns[3]},
+			},
+		},
+	}
 	// OpsRequestLogsColumns holds the columns for the "ops_request_logs" table.
 	OpsRequestLogsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "request_id", Type: field.TypeString, Default: ""},
+		{Name: "client_request_id", Type: field.TypeString, Default: ""},
 		{Name: "plugin_id", Type: field.TypeString, Default: ""},
 		{Name: "platform", Type: field.TypeString, Default: ""},
 		{Name: "model", Type: field.TypeString, Default: ""},
+		{Name: "upstream_model", Type: field.TypeString, Default: ""},
 		{Name: "endpoint", Type: field.TypeString, Default: ""},
 		{Name: "user_id_snapshot", Type: field.TypeInt, Default: 0},
 		{Name: "api_key_id_snapshot", Type: field.TypeInt, Default: 0},
@@ -169,27 +260,70 @@ var (
 			{
 				Name:    "ops_request_log_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{OpsRequestLogsColumns[21]},
+				Columns: []*schema.Column{OpsRequestLogsColumns[23]},
 			},
 			{
 				Name:    "ops_request_log_success_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{OpsRequestLogsColumns[10], OpsRequestLogsColumns[21]},
+				Columns: []*schema.Column{OpsRequestLogsColumns[12], OpsRequestLogsColumns[23]},
 			},
 			{
 				Name:    "ops_request_log_platform_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{OpsRequestLogsColumns[3], OpsRequestLogsColumns[21]},
+				Columns: []*schema.Column{OpsRequestLogsColumns[4], OpsRequestLogsColumns[23]},
 			},
 			{
 				Name:    "ops_request_log_error_kind_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{OpsRequestLogsColumns[18], OpsRequestLogsColumns[21]},
+				Columns: []*schema.Column{OpsRequestLogsColumns[20], OpsRequestLogsColumns[23]},
 			},
 			{
 				Name:    "ops_request_log_request_id",
 				Unique:  false,
 				Columns: []*schema.Column{OpsRequestLogsColumns[1]},
+			},
+			{
+				Name:    "ops_request_log_client_request_id",
+				Unique:  false,
+				Columns: []*schema.Column{OpsRequestLogsColumns[2]},
+			},
+		},
+	}
+	// OpsSystemLogsColumns holds the columns for the "ops_system_logs" table.
+	OpsSystemLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "level", Type: field.TypeString, Default: ""},
+		{Name: "component", Type: field.TypeString, Default: ""},
+		{Name: "message", Type: field.TypeString, Size: 2147483647, Default: ""},
+		{Name: "request_id", Type: field.TypeString, Default: ""},
+		{Name: "attrs", Type: field.TypeString, Size: 2147483647, Default: ""},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// OpsSystemLogsTable holds the schema information for the "ops_system_logs" table.
+	OpsSystemLogsTable = &schema.Table{
+		Name:       "ops_system_logs",
+		Columns:    OpsSystemLogsColumns,
+		PrimaryKey: []*schema.Column{OpsSystemLogsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "ops_system_log_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsSystemLogsColumns[6]},
+			},
+			{
+				Name:    "ops_system_log_level_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsSystemLogsColumns[1], OpsSystemLogsColumns[6]},
+			},
+			{
+				Name:    "ops_system_log_component_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{OpsSystemLogsColumns[2], OpsSystemLogsColumns[6]},
+			},
+			{
+				Name:    "ops_system_log_request_id",
+				Unique:  false,
+				Columns: []*schema.Column{OpsSystemLogsColumns[4]},
 			},
 		},
 	}
@@ -587,7 +721,11 @@ var (
 		AccountsTable,
 		BalanceLogsTable,
 		GroupsTable,
+		OpsAlertEventsTable,
+		OpsAlertRulesTable,
+		OpsAlertSilencesTable,
 		OpsRequestLogsTable,
+		OpsSystemLogsTable,
 		OpsWindowStatsTable,
 		PluginsTable,
 		PluginSourcesTable,

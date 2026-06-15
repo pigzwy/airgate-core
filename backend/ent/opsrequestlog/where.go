@@ -59,6 +59,11 @@ func RequestID(v string) predicate.OpsRequestLog {
 	return predicate.OpsRequestLog(sql.FieldEQ(FieldRequestID, v))
 }
 
+// ClientRequestID applies equality check predicate on the "client_request_id" field. It's identical to ClientRequestIDEQ.
+func ClientRequestID(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldEQ(FieldClientRequestID, v))
+}
+
 // PluginID applies equality check predicate on the "plugin_id" field. It's identical to PluginIDEQ.
 func PluginID(v string) predicate.OpsRequestLog {
 	return predicate.OpsRequestLog(sql.FieldEQ(FieldPluginID, v))
@@ -72,6 +77,11 @@ func Platform(v string) predicate.OpsRequestLog {
 // Model applies equality check predicate on the "model" field. It's identical to ModelEQ.
 func Model(v string) predicate.OpsRequestLog {
 	return predicate.OpsRequestLog(sql.FieldEQ(FieldModel, v))
+}
+
+// UpstreamModel applies equality check predicate on the "upstream_model" field. It's identical to UpstreamModelEQ.
+func UpstreamModel(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldEQ(FieldUpstreamModel, v))
 }
 
 // Endpoint applies equality check predicate on the "endpoint" field. It's identical to EndpointEQ.
@@ -222,6 +232,71 @@ func RequestIDEqualFold(v string) predicate.OpsRequestLog {
 // RequestIDContainsFold applies the ContainsFold predicate on the "request_id" field.
 func RequestIDContainsFold(v string) predicate.OpsRequestLog {
 	return predicate.OpsRequestLog(sql.FieldContainsFold(FieldRequestID, v))
+}
+
+// ClientRequestIDEQ applies the EQ predicate on the "client_request_id" field.
+func ClientRequestIDEQ(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldEQ(FieldClientRequestID, v))
+}
+
+// ClientRequestIDNEQ applies the NEQ predicate on the "client_request_id" field.
+func ClientRequestIDNEQ(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldNEQ(FieldClientRequestID, v))
+}
+
+// ClientRequestIDIn applies the In predicate on the "client_request_id" field.
+func ClientRequestIDIn(vs ...string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldIn(FieldClientRequestID, vs...))
+}
+
+// ClientRequestIDNotIn applies the NotIn predicate on the "client_request_id" field.
+func ClientRequestIDNotIn(vs ...string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldNotIn(FieldClientRequestID, vs...))
+}
+
+// ClientRequestIDGT applies the GT predicate on the "client_request_id" field.
+func ClientRequestIDGT(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldGT(FieldClientRequestID, v))
+}
+
+// ClientRequestIDGTE applies the GTE predicate on the "client_request_id" field.
+func ClientRequestIDGTE(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldGTE(FieldClientRequestID, v))
+}
+
+// ClientRequestIDLT applies the LT predicate on the "client_request_id" field.
+func ClientRequestIDLT(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldLT(FieldClientRequestID, v))
+}
+
+// ClientRequestIDLTE applies the LTE predicate on the "client_request_id" field.
+func ClientRequestIDLTE(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldLTE(FieldClientRequestID, v))
+}
+
+// ClientRequestIDContains applies the Contains predicate on the "client_request_id" field.
+func ClientRequestIDContains(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldContains(FieldClientRequestID, v))
+}
+
+// ClientRequestIDHasPrefix applies the HasPrefix predicate on the "client_request_id" field.
+func ClientRequestIDHasPrefix(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldHasPrefix(FieldClientRequestID, v))
+}
+
+// ClientRequestIDHasSuffix applies the HasSuffix predicate on the "client_request_id" field.
+func ClientRequestIDHasSuffix(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldHasSuffix(FieldClientRequestID, v))
+}
+
+// ClientRequestIDEqualFold applies the EqualFold predicate on the "client_request_id" field.
+func ClientRequestIDEqualFold(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldEqualFold(FieldClientRequestID, v))
+}
+
+// ClientRequestIDContainsFold applies the ContainsFold predicate on the "client_request_id" field.
+func ClientRequestIDContainsFold(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldContainsFold(FieldClientRequestID, v))
 }
 
 // PluginIDEQ applies the EQ predicate on the "plugin_id" field.
@@ -417,6 +492,71 @@ func ModelEqualFold(v string) predicate.OpsRequestLog {
 // ModelContainsFold applies the ContainsFold predicate on the "model" field.
 func ModelContainsFold(v string) predicate.OpsRequestLog {
 	return predicate.OpsRequestLog(sql.FieldContainsFold(FieldModel, v))
+}
+
+// UpstreamModelEQ applies the EQ predicate on the "upstream_model" field.
+func UpstreamModelEQ(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldEQ(FieldUpstreamModel, v))
+}
+
+// UpstreamModelNEQ applies the NEQ predicate on the "upstream_model" field.
+func UpstreamModelNEQ(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldNEQ(FieldUpstreamModel, v))
+}
+
+// UpstreamModelIn applies the In predicate on the "upstream_model" field.
+func UpstreamModelIn(vs ...string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldIn(FieldUpstreamModel, vs...))
+}
+
+// UpstreamModelNotIn applies the NotIn predicate on the "upstream_model" field.
+func UpstreamModelNotIn(vs ...string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldNotIn(FieldUpstreamModel, vs...))
+}
+
+// UpstreamModelGT applies the GT predicate on the "upstream_model" field.
+func UpstreamModelGT(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldGT(FieldUpstreamModel, v))
+}
+
+// UpstreamModelGTE applies the GTE predicate on the "upstream_model" field.
+func UpstreamModelGTE(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldGTE(FieldUpstreamModel, v))
+}
+
+// UpstreamModelLT applies the LT predicate on the "upstream_model" field.
+func UpstreamModelLT(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldLT(FieldUpstreamModel, v))
+}
+
+// UpstreamModelLTE applies the LTE predicate on the "upstream_model" field.
+func UpstreamModelLTE(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldLTE(FieldUpstreamModel, v))
+}
+
+// UpstreamModelContains applies the Contains predicate on the "upstream_model" field.
+func UpstreamModelContains(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldContains(FieldUpstreamModel, v))
+}
+
+// UpstreamModelHasPrefix applies the HasPrefix predicate on the "upstream_model" field.
+func UpstreamModelHasPrefix(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldHasPrefix(FieldUpstreamModel, v))
+}
+
+// UpstreamModelHasSuffix applies the HasSuffix predicate on the "upstream_model" field.
+func UpstreamModelHasSuffix(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldHasSuffix(FieldUpstreamModel, v))
+}
+
+// UpstreamModelEqualFold applies the EqualFold predicate on the "upstream_model" field.
+func UpstreamModelEqualFold(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldEqualFold(FieldUpstreamModel, v))
+}
+
+// UpstreamModelContainsFold applies the ContainsFold predicate on the "upstream_model" field.
+func UpstreamModelContainsFold(v string) predicate.OpsRequestLog {
+	return predicate.OpsRequestLog(sql.FieldContainsFold(FieldUpstreamModel, v))
 }
 
 // EndpointEQ applies the EQ predicate on the "endpoint" field.

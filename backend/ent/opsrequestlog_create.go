@@ -34,6 +34,20 @@ func (orlc *OpsRequestLogCreate) SetNillableRequestID(s *string) *OpsRequestLogC
 	return orlc
 }
 
+// SetClientRequestID sets the "client_request_id" field.
+func (orlc *OpsRequestLogCreate) SetClientRequestID(s string) *OpsRequestLogCreate {
+	orlc.mutation.SetClientRequestID(s)
+	return orlc
+}
+
+// SetNillableClientRequestID sets the "client_request_id" field if the given value is not nil.
+func (orlc *OpsRequestLogCreate) SetNillableClientRequestID(s *string) *OpsRequestLogCreate {
+	if s != nil {
+		orlc.SetClientRequestID(*s)
+	}
+	return orlc
+}
+
 // SetPluginID sets the "plugin_id" field.
 func (orlc *OpsRequestLogCreate) SetPluginID(s string) *OpsRequestLogCreate {
 	orlc.mutation.SetPluginID(s)
@@ -72,6 +86,20 @@ func (orlc *OpsRequestLogCreate) SetModel(s string) *OpsRequestLogCreate {
 func (orlc *OpsRequestLogCreate) SetNillableModel(s *string) *OpsRequestLogCreate {
 	if s != nil {
 		orlc.SetModel(*s)
+	}
+	return orlc
+}
+
+// SetUpstreamModel sets the "upstream_model" field.
+func (orlc *OpsRequestLogCreate) SetUpstreamModel(s string) *OpsRequestLogCreate {
+	orlc.mutation.SetUpstreamModel(s)
+	return orlc
+}
+
+// SetNillableUpstreamModel sets the "upstream_model" field if the given value is not nil.
+func (orlc *OpsRequestLogCreate) SetNillableUpstreamModel(s *string) *OpsRequestLogCreate {
+	if s != nil {
+		orlc.SetUpstreamModel(*s)
 	}
 	return orlc
 }
@@ -353,6 +381,10 @@ func (orlc *OpsRequestLogCreate) defaults() {
 		v := opsrequestlog.DefaultRequestID
 		orlc.mutation.SetRequestID(v)
 	}
+	if _, ok := orlc.mutation.ClientRequestID(); !ok {
+		v := opsrequestlog.DefaultClientRequestID
+		orlc.mutation.SetClientRequestID(v)
+	}
 	if _, ok := orlc.mutation.PluginID(); !ok {
 		v := opsrequestlog.DefaultPluginID
 		orlc.mutation.SetPluginID(v)
@@ -364,6 +396,10 @@ func (orlc *OpsRequestLogCreate) defaults() {
 	if _, ok := orlc.mutation.Model(); !ok {
 		v := opsrequestlog.DefaultModel
 		orlc.mutation.SetModel(v)
+	}
+	if _, ok := orlc.mutation.UpstreamModel(); !ok {
+		v := opsrequestlog.DefaultUpstreamModel
+		orlc.mutation.SetUpstreamModel(v)
 	}
 	if _, ok := orlc.mutation.Endpoint(); !ok {
 		v := opsrequestlog.DefaultEndpoint
@@ -440,6 +476,9 @@ func (orlc *OpsRequestLogCreate) check() error {
 	if _, ok := orlc.mutation.RequestID(); !ok {
 		return &ValidationError{Name: "request_id", err: errors.New(`ent: missing required field "OpsRequestLog.request_id"`)}
 	}
+	if _, ok := orlc.mutation.ClientRequestID(); !ok {
+		return &ValidationError{Name: "client_request_id", err: errors.New(`ent: missing required field "OpsRequestLog.client_request_id"`)}
+	}
 	if _, ok := orlc.mutation.PluginID(); !ok {
 		return &ValidationError{Name: "plugin_id", err: errors.New(`ent: missing required field "OpsRequestLog.plugin_id"`)}
 	}
@@ -448,6 +487,9 @@ func (orlc *OpsRequestLogCreate) check() error {
 	}
 	if _, ok := orlc.mutation.Model(); !ok {
 		return &ValidationError{Name: "model", err: errors.New(`ent: missing required field "OpsRequestLog.model"`)}
+	}
+	if _, ok := orlc.mutation.UpstreamModel(); !ok {
+		return &ValidationError{Name: "upstream_model", err: errors.New(`ent: missing required field "OpsRequestLog.upstream_model"`)}
 	}
 	if _, ok := orlc.mutation.Endpoint(); !ok {
 		return &ValidationError{Name: "endpoint", err: errors.New(`ent: missing required field "OpsRequestLog.endpoint"`)}
@@ -530,6 +572,10 @@ func (orlc *OpsRequestLogCreate) createSpec() (*OpsRequestLog, *sqlgraph.CreateS
 		_spec.SetField(opsrequestlog.FieldRequestID, field.TypeString, value)
 		_node.RequestID = value
 	}
+	if value, ok := orlc.mutation.ClientRequestID(); ok {
+		_spec.SetField(opsrequestlog.FieldClientRequestID, field.TypeString, value)
+		_node.ClientRequestID = value
+	}
 	if value, ok := orlc.mutation.PluginID(); ok {
 		_spec.SetField(opsrequestlog.FieldPluginID, field.TypeString, value)
 		_node.PluginID = value
@@ -541,6 +587,10 @@ func (orlc *OpsRequestLogCreate) createSpec() (*OpsRequestLog, *sqlgraph.CreateS
 	if value, ok := orlc.mutation.Model(); ok {
 		_spec.SetField(opsrequestlog.FieldModel, field.TypeString, value)
 		_node.Model = value
+	}
+	if value, ok := orlc.mutation.UpstreamModel(); ok {
+		_spec.SetField(opsrequestlog.FieldUpstreamModel, field.TypeString, value)
+		_node.UpstreamModel = value
 	}
 	if value, ok := orlc.mutation.Endpoint(); ok {
 		_spec.SetField(opsrequestlog.FieldEndpoint, field.TypeString, value)

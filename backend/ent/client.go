@@ -19,7 +19,11 @@ import (
 	"github.com/DouDOU-start/airgate-core/ent/apikey"
 	"github.com/DouDOU-start/airgate-core/ent/balancelog"
 	"github.com/DouDOU-start/airgate-core/ent/group"
+	"github.com/DouDOU-start/airgate-core/ent/opsalertevent"
+	"github.com/DouDOU-start/airgate-core/ent/opsalertrule"
+	"github.com/DouDOU-start/airgate-core/ent/opsalertsilence"
 	"github.com/DouDOU-start/airgate-core/ent/opsrequestlog"
+	"github.com/DouDOU-start/airgate-core/ent/opssystemlog"
 	"github.com/DouDOU-start/airgate-core/ent/opswindowstat"
 	"github.com/DouDOU-start/airgate-core/ent/plugin"
 	"github.com/DouDOU-start/airgate-core/ent/pluginsource"
@@ -44,8 +48,16 @@ type Client struct {
 	BalanceLog *BalanceLogClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// OpsAlertEvent is the client for interacting with the OpsAlertEvent builders.
+	OpsAlertEvent *OpsAlertEventClient
+	// OpsAlertRule is the client for interacting with the OpsAlertRule builders.
+	OpsAlertRule *OpsAlertRuleClient
+	// OpsAlertSilence is the client for interacting with the OpsAlertSilence builders.
+	OpsAlertSilence *OpsAlertSilenceClient
 	// OpsRequestLog is the client for interacting with the OpsRequestLog builders.
 	OpsRequestLog *OpsRequestLogClient
+	// OpsSystemLog is the client for interacting with the OpsSystemLog builders.
+	OpsSystemLog *OpsSystemLogClient
 	// OpsWindowStat is the client for interacting with the OpsWindowStat builders.
 	OpsWindowStat *OpsWindowStatClient
 	// Plugin is the client for interacting with the Plugin builders.
@@ -79,7 +91,11 @@ func (c *Client) init() {
 	c.Account = NewAccountClient(c.config)
 	c.BalanceLog = NewBalanceLogClient(c.config)
 	c.Group = NewGroupClient(c.config)
+	c.OpsAlertEvent = NewOpsAlertEventClient(c.config)
+	c.OpsAlertRule = NewOpsAlertRuleClient(c.config)
+	c.OpsAlertSilence = NewOpsAlertSilenceClient(c.config)
 	c.OpsRequestLog = NewOpsRequestLogClient(c.config)
+	c.OpsSystemLog = NewOpsSystemLogClient(c.config)
 	c.OpsWindowStat = NewOpsWindowStatClient(c.config)
 	c.Plugin = NewPluginClient(c.config)
 	c.PluginSource = NewPluginSourceClient(c.config)
@@ -185,7 +201,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Account:          NewAccountClient(cfg),
 		BalanceLog:       NewBalanceLogClient(cfg),
 		Group:            NewGroupClient(cfg),
+		OpsAlertEvent:    NewOpsAlertEventClient(cfg),
+		OpsAlertRule:     NewOpsAlertRuleClient(cfg),
+		OpsAlertSilence:  NewOpsAlertSilenceClient(cfg),
 		OpsRequestLog:    NewOpsRequestLogClient(cfg),
+		OpsSystemLog:     NewOpsSystemLogClient(cfg),
 		OpsWindowStat:    NewOpsWindowStatClient(cfg),
 		Plugin:           NewPluginClient(cfg),
 		PluginSource:     NewPluginSourceClient(cfg),
@@ -218,7 +238,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Account:          NewAccountClient(cfg),
 		BalanceLog:       NewBalanceLogClient(cfg),
 		Group:            NewGroupClient(cfg),
+		OpsAlertEvent:    NewOpsAlertEventClient(cfg),
+		OpsAlertRule:     NewOpsAlertRuleClient(cfg),
+		OpsAlertSilence:  NewOpsAlertSilenceClient(cfg),
 		OpsRequestLog:    NewOpsRequestLogClient(cfg),
+		OpsSystemLog:     NewOpsSystemLogClient(cfg),
 		OpsWindowStat:    NewOpsWindowStatClient(cfg),
 		Plugin:           NewPluginClient(cfg),
 		PluginSource:     NewPluginSourceClient(cfg),
@@ -257,8 +281,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsRequestLog, c.OpsWindowStat,
-		c.Plugin, c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
+		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsAlertEvent, c.OpsAlertRule,
+		c.OpsAlertSilence, c.OpsRequestLog, c.OpsSystemLog, c.OpsWindowStat, c.Plugin,
+		c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
 		c.UserSubscription,
 	} {
 		n.Use(hooks...)
@@ -269,8 +294,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsRequestLog, c.OpsWindowStat,
-		c.Plugin, c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
+		c.APIKey, c.Account, c.BalanceLog, c.Group, c.OpsAlertEvent, c.OpsAlertRule,
+		c.OpsAlertSilence, c.OpsRequestLog, c.OpsSystemLog, c.OpsWindowStat, c.Plugin,
+		c.PluginSource, c.Proxy, c.Setting, c.Task, c.UsageLog, c.User,
 		c.UserSubscription,
 	} {
 		n.Intercept(interceptors...)
@@ -288,8 +314,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.BalanceLog.mutate(ctx, m)
 	case *GroupMutation:
 		return c.Group.mutate(ctx, m)
+	case *OpsAlertEventMutation:
+		return c.OpsAlertEvent.mutate(ctx, m)
+	case *OpsAlertRuleMutation:
+		return c.OpsAlertRule.mutate(ctx, m)
+	case *OpsAlertSilenceMutation:
+		return c.OpsAlertSilence.mutate(ctx, m)
 	case *OpsRequestLogMutation:
 		return c.OpsRequestLog.mutate(ctx, m)
+	case *OpsSystemLogMutation:
+		return c.OpsSystemLog.mutate(ctx, m)
 	case *OpsWindowStatMutation:
 		return c.OpsWindowStat.mutate(ctx, m)
 	case *PluginMutation:
@@ -1037,6 +1071,405 @@ func (c *GroupClient) mutate(ctx context.Context, m *GroupMutation) (Value, erro
 	}
 }
 
+// OpsAlertEventClient is a client for the OpsAlertEvent schema.
+type OpsAlertEventClient struct {
+	config
+}
+
+// NewOpsAlertEventClient returns a client for the OpsAlertEvent from the given config.
+func NewOpsAlertEventClient(c config) *OpsAlertEventClient {
+	return &OpsAlertEventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `opsalertevent.Hooks(f(g(h())))`.
+func (c *OpsAlertEventClient) Use(hooks ...Hook) {
+	c.hooks.OpsAlertEvent = append(c.hooks.OpsAlertEvent, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `opsalertevent.Intercept(f(g(h())))`.
+func (c *OpsAlertEventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OpsAlertEvent = append(c.inters.OpsAlertEvent, interceptors...)
+}
+
+// Create returns a builder for creating a OpsAlertEvent entity.
+func (c *OpsAlertEventClient) Create() *OpsAlertEventCreate {
+	mutation := newOpsAlertEventMutation(c.config, OpCreate)
+	return &OpsAlertEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OpsAlertEvent entities.
+func (c *OpsAlertEventClient) CreateBulk(builders ...*OpsAlertEventCreate) *OpsAlertEventCreateBulk {
+	return &OpsAlertEventCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OpsAlertEventClient) MapCreateBulk(slice any, setFunc func(*OpsAlertEventCreate, int)) *OpsAlertEventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OpsAlertEventCreateBulk{err: fmt.Errorf("calling to OpsAlertEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OpsAlertEventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OpsAlertEventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OpsAlertEvent.
+func (c *OpsAlertEventClient) Update() *OpsAlertEventUpdate {
+	mutation := newOpsAlertEventMutation(c.config, OpUpdate)
+	return &OpsAlertEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OpsAlertEventClient) UpdateOne(oae *OpsAlertEvent) *OpsAlertEventUpdateOne {
+	mutation := newOpsAlertEventMutation(c.config, OpUpdateOne, withOpsAlertEvent(oae))
+	return &OpsAlertEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OpsAlertEventClient) UpdateOneID(id int) *OpsAlertEventUpdateOne {
+	mutation := newOpsAlertEventMutation(c.config, OpUpdateOne, withOpsAlertEventID(id))
+	return &OpsAlertEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OpsAlertEvent.
+func (c *OpsAlertEventClient) Delete() *OpsAlertEventDelete {
+	mutation := newOpsAlertEventMutation(c.config, OpDelete)
+	return &OpsAlertEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OpsAlertEventClient) DeleteOne(oae *OpsAlertEvent) *OpsAlertEventDeleteOne {
+	return c.DeleteOneID(oae.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OpsAlertEventClient) DeleteOneID(id int) *OpsAlertEventDeleteOne {
+	builder := c.Delete().Where(opsalertevent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OpsAlertEventDeleteOne{builder}
+}
+
+// Query returns a query builder for OpsAlertEvent.
+func (c *OpsAlertEventClient) Query() *OpsAlertEventQuery {
+	return &OpsAlertEventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOpsAlertEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OpsAlertEvent entity by its id.
+func (c *OpsAlertEventClient) Get(ctx context.Context, id int) (*OpsAlertEvent, error) {
+	return c.Query().Where(opsalertevent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OpsAlertEventClient) GetX(ctx context.Context, id int) *OpsAlertEvent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OpsAlertEventClient) Hooks() []Hook {
+	return c.hooks.OpsAlertEvent
+}
+
+// Interceptors returns the client interceptors.
+func (c *OpsAlertEventClient) Interceptors() []Interceptor {
+	return c.inters.OpsAlertEvent
+}
+
+func (c *OpsAlertEventClient) mutate(ctx context.Context, m *OpsAlertEventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OpsAlertEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OpsAlertEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OpsAlertEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OpsAlertEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OpsAlertEvent mutation op: %q", m.Op())
+	}
+}
+
+// OpsAlertRuleClient is a client for the OpsAlertRule schema.
+type OpsAlertRuleClient struct {
+	config
+}
+
+// NewOpsAlertRuleClient returns a client for the OpsAlertRule from the given config.
+func NewOpsAlertRuleClient(c config) *OpsAlertRuleClient {
+	return &OpsAlertRuleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `opsalertrule.Hooks(f(g(h())))`.
+func (c *OpsAlertRuleClient) Use(hooks ...Hook) {
+	c.hooks.OpsAlertRule = append(c.hooks.OpsAlertRule, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `opsalertrule.Intercept(f(g(h())))`.
+func (c *OpsAlertRuleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OpsAlertRule = append(c.inters.OpsAlertRule, interceptors...)
+}
+
+// Create returns a builder for creating a OpsAlertRule entity.
+func (c *OpsAlertRuleClient) Create() *OpsAlertRuleCreate {
+	mutation := newOpsAlertRuleMutation(c.config, OpCreate)
+	return &OpsAlertRuleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OpsAlertRule entities.
+func (c *OpsAlertRuleClient) CreateBulk(builders ...*OpsAlertRuleCreate) *OpsAlertRuleCreateBulk {
+	return &OpsAlertRuleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OpsAlertRuleClient) MapCreateBulk(slice any, setFunc func(*OpsAlertRuleCreate, int)) *OpsAlertRuleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OpsAlertRuleCreateBulk{err: fmt.Errorf("calling to OpsAlertRuleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OpsAlertRuleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OpsAlertRuleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OpsAlertRule.
+func (c *OpsAlertRuleClient) Update() *OpsAlertRuleUpdate {
+	mutation := newOpsAlertRuleMutation(c.config, OpUpdate)
+	return &OpsAlertRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OpsAlertRuleClient) UpdateOne(oar *OpsAlertRule) *OpsAlertRuleUpdateOne {
+	mutation := newOpsAlertRuleMutation(c.config, OpUpdateOne, withOpsAlertRule(oar))
+	return &OpsAlertRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OpsAlertRuleClient) UpdateOneID(id int) *OpsAlertRuleUpdateOne {
+	mutation := newOpsAlertRuleMutation(c.config, OpUpdateOne, withOpsAlertRuleID(id))
+	return &OpsAlertRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OpsAlertRule.
+func (c *OpsAlertRuleClient) Delete() *OpsAlertRuleDelete {
+	mutation := newOpsAlertRuleMutation(c.config, OpDelete)
+	return &OpsAlertRuleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OpsAlertRuleClient) DeleteOne(oar *OpsAlertRule) *OpsAlertRuleDeleteOne {
+	return c.DeleteOneID(oar.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OpsAlertRuleClient) DeleteOneID(id int) *OpsAlertRuleDeleteOne {
+	builder := c.Delete().Where(opsalertrule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OpsAlertRuleDeleteOne{builder}
+}
+
+// Query returns a query builder for OpsAlertRule.
+func (c *OpsAlertRuleClient) Query() *OpsAlertRuleQuery {
+	return &OpsAlertRuleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOpsAlertRule},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OpsAlertRule entity by its id.
+func (c *OpsAlertRuleClient) Get(ctx context.Context, id int) (*OpsAlertRule, error) {
+	return c.Query().Where(opsalertrule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OpsAlertRuleClient) GetX(ctx context.Context, id int) *OpsAlertRule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OpsAlertRuleClient) Hooks() []Hook {
+	return c.hooks.OpsAlertRule
+}
+
+// Interceptors returns the client interceptors.
+func (c *OpsAlertRuleClient) Interceptors() []Interceptor {
+	return c.inters.OpsAlertRule
+}
+
+func (c *OpsAlertRuleClient) mutate(ctx context.Context, m *OpsAlertRuleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OpsAlertRuleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OpsAlertRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OpsAlertRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OpsAlertRuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OpsAlertRule mutation op: %q", m.Op())
+	}
+}
+
+// OpsAlertSilenceClient is a client for the OpsAlertSilence schema.
+type OpsAlertSilenceClient struct {
+	config
+}
+
+// NewOpsAlertSilenceClient returns a client for the OpsAlertSilence from the given config.
+func NewOpsAlertSilenceClient(c config) *OpsAlertSilenceClient {
+	return &OpsAlertSilenceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `opsalertsilence.Hooks(f(g(h())))`.
+func (c *OpsAlertSilenceClient) Use(hooks ...Hook) {
+	c.hooks.OpsAlertSilence = append(c.hooks.OpsAlertSilence, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `opsalertsilence.Intercept(f(g(h())))`.
+func (c *OpsAlertSilenceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OpsAlertSilence = append(c.inters.OpsAlertSilence, interceptors...)
+}
+
+// Create returns a builder for creating a OpsAlertSilence entity.
+func (c *OpsAlertSilenceClient) Create() *OpsAlertSilenceCreate {
+	mutation := newOpsAlertSilenceMutation(c.config, OpCreate)
+	return &OpsAlertSilenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OpsAlertSilence entities.
+func (c *OpsAlertSilenceClient) CreateBulk(builders ...*OpsAlertSilenceCreate) *OpsAlertSilenceCreateBulk {
+	return &OpsAlertSilenceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OpsAlertSilenceClient) MapCreateBulk(slice any, setFunc func(*OpsAlertSilenceCreate, int)) *OpsAlertSilenceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OpsAlertSilenceCreateBulk{err: fmt.Errorf("calling to OpsAlertSilenceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OpsAlertSilenceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OpsAlertSilenceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OpsAlertSilence.
+func (c *OpsAlertSilenceClient) Update() *OpsAlertSilenceUpdate {
+	mutation := newOpsAlertSilenceMutation(c.config, OpUpdate)
+	return &OpsAlertSilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OpsAlertSilenceClient) UpdateOne(oas *OpsAlertSilence) *OpsAlertSilenceUpdateOne {
+	mutation := newOpsAlertSilenceMutation(c.config, OpUpdateOne, withOpsAlertSilence(oas))
+	return &OpsAlertSilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OpsAlertSilenceClient) UpdateOneID(id int) *OpsAlertSilenceUpdateOne {
+	mutation := newOpsAlertSilenceMutation(c.config, OpUpdateOne, withOpsAlertSilenceID(id))
+	return &OpsAlertSilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OpsAlertSilence.
+func (c *OpsAlertSilenceClient) Delete() *OpsAlertSilenceDelete {
+	mutation := newOpsAlertSilenceMutation(c.config, OpDelete)
+	return &OpsAlertSilenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OpsAlertSilenceClient) DeleteOne(oas *OpsAlertSilence) *OpsAlertSilenceDeleteOne {
+	return c.DeleteOneID(oas.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OpsAlertSilenceClient) DeleteOneID(id int) *OpsAlertSilenceDeleteOne {
+	builder := c.Delete().Where(opsalertsilence.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OpsAlertSilenceDeleteOne{builder}
+}
+
+// Query returns a query builder for OpsAlertSilence.
+func (c *OpsAlertSilenceClient) Query() *OpsAlertSilenceQuery {
+	return &OpsAlertSilenceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOpsAlertSilence},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OpsAlertSilence entity by its id.
+func (c *OpsAlertSilenceClient) Get(ctx context.Context, id int) (*OpsAlertSilence, error) {
+	return c.Query().Where(opsalertsilence.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OpsAlertSilenceClient) GetX(ctx context.Context, id int) *OpsAlertSilence {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OpsAlertSilenceClient) Hooks() []Hook {
+	return c.hooks.OpsAlertSilence
+}
+
+// Interceptors returns the client interceptors.
+func (c *OpsAlertSilenceClient) Interceptors() []Interceptor {
+	return c.inters.OpsAlertSilence
+}
+
+func (c *OpsAlertSilenceClient) mutate(ctx context.Context, m *OpsAlertSilenceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OpsAlertSilenceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OpsAlertSilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OpsAlertSilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OpsAlertSilenceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OpsAlertSilence mutation op: %q", m.Op())
+	}
+}
+
 // OpsRequestLogClient is a client for the OpsRequestLog schema.
 type OpsRequestLogClient struct {
 	config
@@ -1167,6 +1600,139 @@ func (c *OpsRequestLogClient) mutate(ctx context.Context, m *OpsRequestLogMutati
 		return (&OpsRequestLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown OpsRequestLog mutation op: %q", m.Op())
+	}
+}
+
+// OpsSystemLogClient is a client for the OpsSystemLog schema.
+type OpsSystemLogClient struct {
+	config
+}
+
+// NewOpsSystemLogClient returns a client for the OpsSystemLog from the given config.
+func NewOpsSystemLogClient(c config) *OpsSystemLogClient {
+	return &OpsSystemLogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `opssystemlog.Hooks(f(g(h())))`.
+func (c *OpsSystemLogClient) Use(hooks ...Hook) {
+	c.hooks.OpsSystemLog = append(c.hooks.OpsSystemLog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `opssystemlog.Intercept(f(g(h())))`.
+func (c *OpsSystemLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OpsSystemLog = append(c.inters.OpsSystemLog, interceptors...)
+}
+
+// Create returns a builder for creating a OpsSystemLog entity.
+func (c *OpsSystemLogClient) Create() *OpsSystemLogCreate {
+	mutation := newOpsSystemLogMutation(c.config, OpCreate)
+	return &OpsSystemLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OpsSystemLog entities.
+func (c *OpsSystemLogClient) CreateBulk(builders ...*OpsSystemLogCreate) *OpsSystemLogCreateBulk {
+	return &OpsSystemLogCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OpsSystemLogClient) MapCreateBulk(slice any, setFunc func(*OpsSystemLogCreate, int)) *OpsSystemLogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OpsSystemLogCreateBulk{err: fmt.Errorf("calling to OpsSystemLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OpsSystemLogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OpsSystemLogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OpsSystemLog.
+func (c *OpsSystemLogClient) Update() *OpsSystemLogUpdate {
+	mutation := newOpsSystemLogMutation(c.config, OpUpdate)
+	return &OpsSystemLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OpsSystemLogClient) UpdateOne(osl *OpsSystemLog) *OpsSystemLogUpdateOne {
+	mutation := newOpsSystemLogMutation(c.config, OpUpdateOne, withOpsSystemLog(osl))
+	return &OpsSystemLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OpsSystemLogClient) UpdateOneID(id int) *OpsSystemLogUpdateOne {
+	mutation := newOpsSystemLogMutation(c.config, OpUpdateOne, withOpsSystemLogID(id))
+	return &OpsSystemLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OpsSystemLog.
+func (c *OpsSystemLogClient) Delete() *OpsSystemLogDelete {
+	mutation := newOpsSystemLogMutation(c.config, OpDelete)
+	return &OpsSystemLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OpsSystemLogClient) DeleteOne(osl *OpsSystemLog) *OpsSystemLogDeleteOne {
+	return c.DeleteOneID(osl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OpsSystemLogClient) DeleteOneID(id int) *OpsSystemLogDeleteOne {
+	builder := c.Delete().Where(opssystemlog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OpsSystemLogDeleteOne{builder}
+}
+
+// Query returns a query builder for OpsSystemLog.
+func (c *OpsSystemLogClient) Query() *OpsSystemLogQuery {
+	return &OpsSystemLogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOpsSystemLog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OpsSystemLog entity by its id.
+func (c *OpsSystemLogClient) Get(ctx context.Context, id int) (*OpsSystemLog, error) {
+	return c.Query().Where(opssystemlog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OpsSystemLogClient) GetX(ctx context.Context, id int) *OpsSystemLog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OpsSystemLogClient) Hooks() []Hook {
+	return c.hooks.OpsSystemLog
+}
+
+// Interceptors returns the client interceptors.
+func (c *OpsSystemLogClient) Interceptors() []Interceptor {
+	return c.inters.OpsSystemLog
+}
+
+func (c *OpsSystemLogClient) mutate(ctx context.Context, m *OpsSystemLogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OpsSystemLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OpsSystemLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OpsSystemLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OpsSystemLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OpsSystemLog mutation op: %q", m.Op())
 	}
 }
 
@@ -2562,11 +3128,13 @@ func (c *UserSubscriptionClient) mutate(ctx context.Context, m *UserSubscription
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		APIKey, Account, BalanceLog, Group, OpsRequestLog, OpsWindowStat, Plugin,
+		APIKey, Account, BalanceLog, Group, OpsAlertEvent, OpsAlertRule,
+		OpsAlertSilence, OpsRequestLog, OpsSystemLog, OpsWindowStat, Plugin,
 		PluginSource, Proxy, Setting, Task, UsageLog, User, UserSubscription []ent.Hook
 	}
 	inters struct {
-		APIKey, Account, BalanceLog, Group, OpsRequestLog, OpsWindowStat, Plugin,
+		APIKey, Account, BalanceLog, Group, OpsAlertEvent, OpsAlertRule,
+		OpsAlertSilence, OpsRequestLog, OpsSystemLog, OpsWindowStat, Plugin,
 		PluginSource, Proxy, Setting, Task, UsageLog, User,
 		UserSubscription []ent.Interceptor
 	}

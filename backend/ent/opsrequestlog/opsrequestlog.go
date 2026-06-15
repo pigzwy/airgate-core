@@ -15,12 +15,16 @@ const (
 	FieldID = "id"
 	// FieldRequestID holds the string denoting the request_id field in the database.
 	FieldRequestID = "request_id"
+	// FieldClientRequestID holds the string denoting the client_request_id field in the database.
+	FieldClientRequestID = "client_request_id"
 	// FieldPluginID holds the string denoting the plugin_id field in the database.
 	FieldPluginID = "plugin_id"
 	// FieldPlatform holds the string denoting the platform field in the database.
 	FieldPlatform = "platform"
 	// FieldModel holds the string denoting the model field in the database.
 	FieldModel = "model"
+	// FieldUpstreamModel holds the string denoting the upstream_model field in the database.
+	FieldUpstreamModel = "upstream_model"
 	// FieldEndpoint holds the string denoting the endpoint field in the database.
 	FieldEndpoint = "endpoint"
 	// FieldUserIDSnapshot holds the string denoting the user_id_snapshot field in the database.
@@ -63,9 +67,11 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldRequestID,
+	FieldClientRequestID,
 	FieldPluginID,
 	FieldPlatform,
 	FieldModel,
+	FieldUpstreamModel,
 	FieldEndpoint,
 	FieldUserIDSnapshot,
 	FieldAPIKeyIDSnapshot,
@@ -98,12 +104,16 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultRequestID holds the default value on creation for the "request_id" field.
 	DefaultRequestID string
+	// DefaultClientRequestID holds the default value on creation for the "client_request_id" field.
+	DefaultClientRequestID string
 	// DefaultPluginID holds the default value on creation for the "plugin_id" field.
 	DefaultPluginID string
 	// DefaultPlatform holds the default value on creation for the "platform" field.
 	DefaultPlatform string
 	// DefaultModel holds the default value on creation for the "model" field.
 	DefaultModel string
+	// DefaultUpstreamModel holds the default value on creation for the "upstream_model" field.
+	DefaultUpstreamModel string
 	// DefaultEndpoint holds the default value on creation for the "endpoint" field.
 	DefaultEndpoint string
 	// DefaultUserIDSnapshot holds the default value on creation for the "user_id_snapshot" field.
@@ -153,6 +163,11 @@ func ByRequestID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRequestID, opts...).ToFunc()
 }
 
+// ByClientRequestID orders the results by the client_request_id field.
+func ByClientRequestID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldClientRequestID, opts...).ToFunc()
+}
+
 // ByPluginID orders the results by the plugin_id field.
 func ByPluginID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPluginID, opts...).ToFunc()
@@ -166,6 +181,11 @@ func ByPlatform(opts ...sql.OrderTermOption) OrderOption {
 // ByModel orders the results by the model field.
 func ByModel(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldModel, opts...).ToFunc()
+}
+
+// ByUpstreamModel orders the results by the upstream_model field.
+func ByUpstreamModel(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpstreamModel, opts...).ToFunc()
 }
 
 // ByEndpoint orders the results by the endpoint field.

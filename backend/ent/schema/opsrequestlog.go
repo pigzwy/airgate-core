@@ -25,10 +25,15 @@ func (OpsRequestLog) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("request_id").Default("").
 			Comment("请求追踪 ID，用于错误详情钻取与跨日志关联"),
+		field.String("client_request_id").Default("").
+			Comment("客户端请求 ID（跨账号重试共享），同值多行构成一次 trace"),
 		field.String("plugin_id").Default("").
 			Comment("上报来源插件 ID（如 gateway-openai）"),
 		field.String("platform").Default(""),
-		field.String("model").Default(""),
+		field.String("model").Default("").
+			Comment("客户端请求的模型（requested）"),
+		field.String("upstream_model").Default("").
+			Comment("实际上游使用的模型（mapped），与 model 不同即发生了模型映射"),
 		field.String("endpoint").Default("").
 			Comment("请求端点，如 /v1/chat/completions"),
 
@@ -77,5 +82,7 @@ func (OpsRequestLog) Indexes() []ent.Index {
 			StorageKey("ops_request_log_error_kind_created_at"),
 		index.Fields("request_id").
 			StorageKey("ops_request_log_request_id"),
+		index.Fields("client_request_id").
+			StorageKey("ops_request_log_client_request_id"),
 	}
 }

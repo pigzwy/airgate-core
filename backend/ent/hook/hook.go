@@ -57,6 +57,42 @@ func (f GroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupMutation", m)
 }
 
+// The OpsAlertEventFunc type is an adapter to allow the use of ordinary
+// function as OpsAlertEvent mutator.
+type OpsAlertEventFunc func(context.Context, *ent.OpsAlertEventMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OpsAlertEventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OpsAlertEventMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OpsAlertEventMutation", m)
+}
+
+// The OpsAlertRuleFunc type is an adapter to allow the use of ordinary
+// function as OpsAlertRule mutator.
+type OpsAlertRuleFunc func(context.Context, *ent.OpsAlertRuleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OpsAlertRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OpsAlertRuleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OpsAlertRuleMutation", m)
+}
+
+// The OpsAlertSilenceFunc type is an adapter to allow the use of ordinary
+// function as OpsAlertSilence mutator.
+type OpsAlertSilenceFunc func(context.Context, *ent.OpsAlertSilenceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OpsAlertSilenceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OpsAlertSilenceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OpsAlertSilenceMutation", m)
+}
+
 // The OpsRequestLogFunc type is an adapter to allow the use of ordinary
 // function as OpsRequestLog mutator.
 type OpsRequestLogFunc func(context.Context, *ent.OpsRequestLogMutation) (ent.Value, error)
@@ -67,6 +103,18 @@ func (f OpsRequestLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OpsRequestLogMutation", m)
+}
+
+// The OpsSystemLogFunc type is an adapter to allow the use of ordinary
+// function as OpsSystemLog mutator.
+type OpsSystemLogFunc func(context.Context, *ent.OpsSystemLogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OpsSystemLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OpsSystemLogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OpsSystemLogMutation", m)
 }
 
 // The OpsWindowStatFunc type is an adapter to allow the use of ordinary
